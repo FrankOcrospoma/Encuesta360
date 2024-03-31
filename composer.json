@@ -6,15 +6,21 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "barryvdh/laravel-dompdf": "^2.1",
+        "doctrine/dbal": "^3.8",
+        "dompdf/dompdf": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.8",
         "laravel/framework": "^10.10",
         "laravel/jetstream": "^4.3",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "laraveles/spanish": "^1.5",
+        "rezaamini-ir/laravel-easypanel": "^2.3",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
+        "enlightn/enlightn": "^2.7",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",

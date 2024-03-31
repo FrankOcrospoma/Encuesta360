@@ -2,7 +2,11 @@
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Models\Encuesta;
+use Barryvdh\DomPDF\Facade\PDF;
 use Inertia\Inertia;
+use App\Http\Controllers\EncuestaController;
+use App\Http\Controllers\RespuestasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,4 +36,30 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+    
+    Route::get('/encuestas', function () {
+        return view('admin::encuestas');
+    })->name('encuestas');
 });
+
+Route::get('/encuestapdf/{encuesta}', function ($encuestaId) {
+    // Buscar la encuesta por el ID proporcionado
+    $encuesta = Encuesta::where('id', $encuestaId)->firstOrFail();
+
+    // Cargar la vista de PDF con la encuesta específica
+    $pdf = PDF::loadView('pdf.encuestaspdf', compact('encuesta'));
+
+    // Retornar el PDF al navegador
+    return $pdf->stream();
+})->name('encuestas.pdf');
+
+Route::get('/encuestapdf/{encuesta}', [EncuestaController::class, 'generarPDF'])->name('encuestas.pdf');
+
+
+Route::post('/encuestas/store', [EncuestaController::class, 'store'])->name('encuestas.store');
+
+Route::post('/guardar-respuestas', [RespuestasController::class, 'store'])->name('guardar.respuestas');
+
+
+Route::post('/enviar-encuesta', [EncuestaController::class, 'enviarEncuesta'])->name('enviar.encuesta');
+Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder'])->name('encuestas.responder');

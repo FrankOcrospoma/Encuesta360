@@ -1,0 +1,152 @@
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-decoration: underline;
+}
+
+.table {
+    width: 98%;
+    /* Reducir el ancho de la tabla */
+    border-collapse: collapse;
+    table-layout: fixed;
+    /* Establecer un ancho fijo para las celdas */
+    margin-left: 2%;
+    /* Agregar margen a la izquierda */
+}
+
+.table th,
+.table td {
+    padding: 8px;
+    text-align: left;
+    /* Alinear el texto hacia la izquierda */
+    word-wrap: break-word;
+    /* border: solid 1px; */
+}
+
+/* Estilos para la recta y segmentos */
+.line-container {
+    text-align: center;
+    margin-top: 20px;
+    position: relative;
+}
+
+.line {
+    width: 85%;
+    /* Restar el ancho total menos el grosor del segmento */
+    height: 2px;
+    background-color: black;
+    margin: 0 auto;
+    position: absolute;
+    left: 0;
+    /* Colocar la línea en la posición inicial */
+    right: 100px;
+    /* Colocar la línea en la posición final */
+}
+
+.segment {
+    position: absolute;
+    top: -6.5px;
+    width: 1px;
+    height: 13px;
+    background-color: black;
+}
+
+/* Posicionar cada segmento */
+.seg-1 {
+    left: 0.5%;
+    /* Comienza desde la segunda columna */
+}
+
+.seg-2 {
+    left: 21%;
+}
+
+.seg-3 {
+    left: 42%;
+}
+
+.seg-4 {
+    left: 62%;
+}
+
+.seg-5 {
+    left: 82%;
+}
+
+.response {
+    /* Estilos actualizados para las respuestas */
+    position: absolute;
+    top: -40px;
+    /* Ajustar según sea necesario para evitar superposición con la recta */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Centrar el texto en el segmento */
+    color: black;
+    padding: 5px 10px;
+    /* Añadir un poco de espacio alrededor del texto */
+    border-radius: 10px;
+    /* Bordes redondeados para un aspecto más suave */
+    white-space: nowrap;
+    /* Asegurar que el texto no se envuelva */
+    font-size: 12px;
+    /* Ajustar el tamaño del texto según sea necesario */
+}
+
+/* Estilo para la columna N */
+.table th:first-child,
+.table td:first-child {
+    text-align: center;
+    /* Alinear el texto hacia el centro */
+}
+
+.parallel-line-container {
+    text-align: center;
+    position: relative;
+    height: 20px;
+    /* Altura del contenedor para asegurar un adecuado espaciado */
+}
+
+.parallel-line {
+    width: calc(100% - 4px);
+    height: 13px;
+    /* Aumentar el grosor de la barra */
+    background-color: #3498db;
+    /* Ejemplo de color: azul */
+    margin: 0 auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 6px;
+}
+
+.blue-line {
+    background-color: #007BFF;
+    /* Un azul más vibrante */
+}
+
+.red-line {
+    background-color: #FF5733;
+    /* Un rojo más intenso */
+}
+
+.green-line {
+    background-color: #28A745;
+    /* Un verde más saturado */
+}
+
+.purple-line {
+    background-color: #D633FF;
+    /* Un púrpura más luminoso */
+}
+
+/* Continúa con más colores según necesites */
