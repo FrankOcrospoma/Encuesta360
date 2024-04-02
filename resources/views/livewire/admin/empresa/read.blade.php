@@ -2,7 +2,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header p-0">
-                <h3 class="card-title">{{ __('ListTitle', ['name' => __(\Illuminate\Support\Str::plural('Empresa')) ]) }}</h3>
+                <h3 class="card-title">Lista de {{ __(\Illuminate\Support\Str::plural('Empresa')) }}</h3>
 
                 <div class="px-2 mt-4">
 
@@ -14,7 +14,7 @@
                     <div class="row justify-content-between mt-4 mb-4">
                         @if(getCrudConfig('Empresa')->create && hasPermission(getRouteName().'.empresa.create', 1, 1))
                         <div class="col-md-4 right-0">
-                            <a href="@route(getRouteName().'.empresa.create')" class="btn btn-success">{{ __('CreateTitle', ['name' => __('Empresa') ]) }}</a>
+                            <a href="@route(getRouteName().'.empresa.create')" class="btn btn-success">Crear {{  __('Empresa')  }}</a>
                         </div>
                         @endif
                         @if(getCrudConfig('Empresa')->searchable())
@@ -42,6 +42,7 @@
                             <th scope="col" style='cursor: pointer' wire:click="sort('nombre')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'nombre') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'nombre') fa-sort-amount-up ml-2 @endif'></i> {{ __('Nombre') }} </th>
                             <th scope="col" style='cursor: pointer' wire:click="sort('direccion')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'direccion') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'direccion') fa-sort-amount-up ml-2 @endif'></i> {{ __('Direccion') }} </th>
                             <th scope="col" style='cursor: pointer' wire:click="sort('representante')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'representante') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'representante') fa-sort-amount-up ml-2 @endif'></i> {{ __('Representante') }} </th>
+                            <th scope="col" style='cursor: pointer' wire:click="sort('estado')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'estado') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'estado') fa-sort-amount-up ml-2 @endif'></i> {{ __('Estado') }} </th>
                             
                             @if(getCrudConfig('Empresa')->delete or getCrudConfig('Empresa')->update)
                                 <th scope="col">{{ __('Action') }}</th>

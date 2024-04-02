@@ -16,6 +16,7 @@ class Update extends Component
     public $nombre;
     public $direccion;
     public $representante;
+    public $estado;
     
     protected $rules = [
         'ruc' => 'required|string|max:11',
@@ -29,7 +30,8 @@ class Update extends Component
         $this->ruc = $this->empresa->ruc;
         $this->nombre = $this->empresa->nombre;
         $this->direccion = $this->empresa->direccion;
-        $this->representante = $this->empresa->representante;        
+        $this->representante = $this->empresa->representante;
+        $this->estado = $this->empresa->estado;        
     }
 
     public function updated($input)
@@ -49,6 +51,7 @@ class Update extends Component
             'nombre' => $this->nombre,
             'direccion' => $this->direccion,
             'representante' => $this->representante,
+            'estado' => $this->estado,
             'user_id' => auth()->id(),
         ]);
     }

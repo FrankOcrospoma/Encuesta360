@@ -24,7 +24,8 @@ class EmpresaComponent implements CRUDComponent
             'ruc',
             'nombre',
             'direccion',
-            'representante'
+            'representante',
+            'estado'
         ];
          
     }
@@ -34,7 +35,7 @@ class EmpresaComponent implements CRUDComponent
         return [
             'ruc',
             'nombre',
-           
+            'estado'
         ];
     }
 
@@ -45,7 +46,9 @@ class EmpresaComponent implements CRUDComponent
             'ruc' => 'text',
             'nombre' => 'text',
             'direccion' => 'text',
-            'representante' => 'text'
+            'representante' => 'text',
+            'estado' => 'checkbox'
+
         ];
     }
     public function setField($field, $value)

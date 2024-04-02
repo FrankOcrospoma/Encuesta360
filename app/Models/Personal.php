@@ -15,8 +15,10 @@ class Personal extends Model
         'dni',
         'nombre',
         'correo',
+        'telefono',
         'cargo',
-        'empresa'
+        'empresa',
+        'estado'
     ];
     public function __toString()
     {

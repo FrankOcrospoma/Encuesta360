@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\PDF;
 use Inertia\Inertia;
 use App\Http\Controllers\EncuestaController;
 use App\Http\Controllers\RespuestasController;
+use App\Http\Controllers\ModelosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,3 +64,6 @@ Route::post('/guardar-respuestas', [RespuestasController::class, 'store'])->name
 
 Route::post('/enviar-encuesta', [EncuestaController::class, 'enviarEncuesta'])->name('enviar.encuesta');
 Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder'])->name('encuestas.responder');
+
+Route::post('/personal/updateEstado/{id}', [ModelosController::class, 'updateEstadoPersona'])->name('personal.updateEstado');
+Route::post('/empresa/updateEstado/{id}', [ModelosController::class, 'updateEstadoEmpresa'])->name('personal.updateEstado');

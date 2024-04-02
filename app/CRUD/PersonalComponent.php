@@ -26,13 +26,13 @@ class PersonalComponent implements CRUDComponent
     // which kind of data should be showed in list page
     public function fields()
     {
-        return ['dni', 'nombre', 'correo', 'Cargo', 'Empresa'];
+        return ['dni', 'nombre', 'correo', 'telefono','Cargo', 'Empresa','estado'];
     }
     
     // Searchable fields, if you dont want search feature, remove it
     public function searchable()
     {
-        return ['dni', 'nombre','correo','cargo.nombre', 'empresa.nombre'];
+        return ['dni', 'nombre','correo', 'telefono', 'cargo.nombre', 'empresa.nombre','estado'];
     }
 
     // Write every fields in your db which you want to have a input
@@ -46,12 +46,14 @@ class PersonalComponent implements CRUDComponent
             'dni' => 'text',
             'nombre' => 'text',
             'correo' => 'email', // Campo de tipo correo electrónico
+            'telefono' => 'number',
             'cargo' => [
                 'select' => $options['cargos'],
             ],
             'empresa' => [
                 'select' => $options['empresas'],
             ],
+            'estado' => 'checkbox'
         ];
     }
     
@@ -62,7 +64,8 @@ class PersonalComponent implements CRUDComponent
         return [
             'dni' => 'required|string|max:20',
             'nombre' => 'required|string|max:255',
-            'correo' => 'required|email|max:255', // Validación de correo electrónico único
+            'correo' => 'required|email|max:255',
+            'telefono' => 'required|max:15',
             'cargo' => 'required|integer|exists:cargos,id',
             'empresa' => 'required|integer|exists:empresas,id',
         ];

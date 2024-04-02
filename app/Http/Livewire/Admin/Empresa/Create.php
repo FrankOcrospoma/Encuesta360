@@ -14,6 +14,7 @@ class Create extends Component
     public $nombre;
     public $direccion;
     public $representante;
+    public $estado;
     
     protected $rules = [
         'ruc' => 'required|string|max:11',
@@ -39,6 +40,7 @@ class Create extends Component
             'nombre' => $this->nombre,
             'direccion' => $this->direccion,
             'representante' => $this->representante,
+            'estado' => $this->estado,
             'user_id' => auth()->id(),
         ]);
 
