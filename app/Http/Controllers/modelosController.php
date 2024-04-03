@@ -38,7 +38,7 @@ class ModelosController extends Controller
     {
         $personal = Personal::where('empresa', $empresaId)->get(); // Asegúrate que la columna se llame 'empresa_id' o ajusta según tu esquema de BD.
     
-        return view('partials.personal_details', compact('personal'));
+        return view('personal.crud', compact('personal'));
     }
     
     

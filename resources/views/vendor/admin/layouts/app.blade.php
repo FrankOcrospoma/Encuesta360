@@ -80,7 +80,7 @@
                 </ul>
 
                 <ul class="navbar-nav float-right">
-                    <li class="nav-item d-none d-md-block">
+                    {{-- <li class="nav-item d-none d-md-block">
                         <a class="nav-link" href="javascript:void(0)">
                             <div class="customize-input">
                                 <select id="langChanger" class="form-control bg-white custom-shadow border-0 h-25" style="border-radius: 6px">
@@ -95,7 +95,7 @@
                                 </script>
                             </div>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <!-- User profile and search -->
                     <li class="nav-item dropdown">

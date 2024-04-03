@@ -16,7 +16,7 @@ class Create extends Component
     public $telefono;
     public $cargo;
     public $empresa;
-    public $estado;
+    public $estado = false;
     
     protected $rules = [
         'dni' => 'required|string|max:20',

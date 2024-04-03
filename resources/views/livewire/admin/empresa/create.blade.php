@@ -15,7 +15,7 @@
         <div class="card-body">
             <!-- Ruc Input -->
             <div class='form-group'>
-                <label for='input-ruc' class='col-sm-2 control-label'>{{ __('Ruc') }}</label>
+                <label for='input-ruc' class='col-sm-2 control-label'>{{ __('Ruc') }}<span style="color: red" class="required">*</span></label>
                 <div class="input-group mb-3">
                     <input type='text' id='input-ruc' wire:model.lazy='ruc' class="form-control @error('ruc') is-invalid @enderror" autocomplete='on'>
                     <div class="input-group-append">
@@ -26,7 +26,7 @@
             </div>
             <!-- Nombre Input -->
             <div class='form-group'>
-                <label for='input-nombre' class='col-sm-2 control-label '> {{ __('Nombre') }}</label>
+                <label for='input-nombre' class='col-sm-2 control-label '> {{ __('Nombre') }}<span style="color: red" class="required">*</span></label>
                 <input type='text' id='input-nombre' wire:model.lazy='nombre' class="form-control  @error('nombre') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('nombre') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
@@ -38,7 +38,7 @@
             </div>
             <!-- Dni Input -->
             <div class='form-group'>
-                <label class='col-sm-2 control-label'> {{ __('Dni') }}</label>
+                <label class='col-sm-2 control-label'> {{ __('Dni') }}<span style="color: red" class="required">*</span></label>
                 <div class="input-group mb-3">
                     <input type='text' id='input-dni' class="form-control" placeholder='' autocomplete='on'>
                     <div class="input-group-append">
@@ -49,7 +49,7 @@
             </div>
             <!-- Representante Input -->
             <div class='form-group'>
-                <label for='input-representante' class='col-sm-2 control-label '> {{ __('Representante') }}</label>
+                <label for='input-representante' class='col-sm-2 control-label '> {{ __('Representante') }}<span style="color: red" class="required">*</span></label>
                 <input type='text' id='input-representante' wire:model.lazy='representante' class="form-control  @error('representante') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('representante') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
