@@ -2,7 +2,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header p-0">
-                <h3 class="card-title">{{ __('ListTitle', ['name' => __(\Illuminate\Support\Str::plural('Personal')) ]) }}</h3>
+                <h3 class="card-title"> Lista de {{ __(\Illuminate\Support\Str::plural('Personal'))  }}</h3>
 
                 <div class="px-2 mt-4">
 
@@ -14,7 +14,7 @@
                     <div class="row justify-content-between mt-4 mb-4">
                         @if(getCrudConfig('Personal')->create && hasPermission(getRouteName().'.personal.create', 1, 1))
                         <div class="col-md-4 right-0">
-                            <a href="@route(getRouteName().'.personal.create')" class="btn btn-success">{{ __('CreateTitle', ['name' => __('Personal') ]) }}</a>
+                            <a href="@route(getRouteName().'.personal.create')" class="btn btn-success">Crear {{ __('Personal')}}</a>
                         </div>
                         @endif
                         @if(getCrudConfig('Personal')->searchable())

@@ -35,7 +35,9 @@ class EmpresaComponent implements CRUDComponent
         return [
             'ruc',
             'nombre',
-            'estado'
+            'representante',
+            'estado',
+
         ];
     }
 

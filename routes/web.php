@@ -66,4 +66,5 @@ Route::post('/enviar-encuesta', [EncuestaController::class, 'enviarEncuesta'])->
 Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder'])->name('encuestas.responder');
 
 Route::post('/personal/updateEstado/{id}', [ModelosController::class, 'updateEstadoPersona'])->name('personal.updateEstado');
-Route::post('/empresa/updateEstado/{id}', [ModelosController::class, 'updateEstadoEmpresa'])->name('personal.updateEstado');
+Route::post('/empresa/updateEstado/{id}', [ModelosController::class, 'updateEstadoEmpresa'])->name('empresa.updateEstado');
+Route::get('/empresa/personal/{empresaId}', [ModelosController::class, 'personal'])->name('empresa.personal');
