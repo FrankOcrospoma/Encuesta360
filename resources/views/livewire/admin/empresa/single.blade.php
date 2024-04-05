@@ -73,62 +73,61 @@
         .slider.round:before {
         border-radius: 50%;
         }
-/* Estilos del modal para centrado vertical y horizontal */
-.cs-modal {
-    display: none; 
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto; /* Permite desplazamiento vertical si el contenido excede la altura */
-    background-color: rgba(0,0,0,0.4); /* Fondo semitransparente */
-    display: flex;
-    align-items: center; /* Centrado vertical */
-    justify-content: center; /* Centrado horizontal */
-    z-index: 9999; /* Asegura que el modal esté sobre otros elementos */
-}
+        /* Estilos del modal para centrado vertical y horizontal */
+        .cs-modal {
+            display: none; 
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto; /* Permite desplazamiento vertical si el contenido excede la altura */
+            background-color: rgba(0,0,0,0.4); /* Fondo semitransparente */
+            display: flex;
+            align-items: center; /* Centrado vertical */
+            justify-content: center; /* Centrado horizontal */
+            z-index: 9999; /* Asegura que el modal esté sobre otros elementos */
+        }
 
-.cs-modal .bg-white {
-    margin: auto;
-    width: 50%; /* Se ajusta al contenido */
-    height: 80%;
-    max-width: 190%; /* Un máximo que asegura margen con los bordes */
-    padding: 20px; /* Espacio dentro del modal */
-    background: #fff; /* Fondo blanco del modal */
-    border-radius: 5px; /* Bordes redondeados del modal */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
-    overflow-y: auto; /* Asegura desplazamiento vertical dentro del modal si es necesario */
-}
-.modal-body {
-    width: 100%; /* Ocupa todo el ancho disponible */
-}
+        .cs-modal .bg-white {
+            margin: auto;
+            width: 80%; /* Se ajusta al contenido */
+            height: 80%;
+            max-width: 190%; /* Un máximo que asegura margen con los bordes */
+            padding: 20px; /* Espacio dentro del modal */
+            background: #fff; /* Fondo blanco del modal */
+            border-radius: 5px; /* Bordes redondeados del modal */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+            overflow-y: auto; /* Asegura desplazamiento vertical dentro del modal si es necesario */
+        }
+        .modal-body {
+            width: 100%; /* Ocupa todo el ancho disponible */
+        }
 
-.cs-modal div {
-     max-width: 100%;
-    z-index: 30;
-}
-/* Estilos actualizados para el modal para incluir la barra inferior */
-.cs-modal .bg-white {
-    display: flex;
-    flex-direction: column; /* Organiza los hijos del modal en columna */
-    justify-content: space-between; /* Separa el contenido del pie */
-}
+        .cs-modal div {
+            max-width: 100%;
+        }
+        /* Estilos actualizados para el modal para incluir la barra inferior */
+        .cs-modal .bg-white {
+            display: flex;
+            flex-direction: column; /* Organiza los hijos del modal en columna */
+            justify-content: space-between; /* Separa el contenido del pie */
+        }
 
-.modal-body {
-    flex-grow: 1; /* Permite que el contenido crezca para llenar el espacio */
-    overflow-y: auto; /* Mantiene el desplazamiento si el contenido excede la altura */
-}
+        .modal-body {
+            flex-grow: 1; /* Permite que el contenido crezca para llenar el espacio */
+            overflow-y: auto; /* Mantiene el desplazamiento si el contenido excede la altura */
+        }
 
-/* Estilos para la barra inferior del modal */
-.modal-footer {
-    width: 100%; /* Ocupa todo el ancho disponible del modal */
-    padding: 10px 20px; /* Espaciado dentro de la barra */
-    background: #fff; /* Fondo blanco */
-    border-top: 1px solid #eee; /* Borde superior para separar del contenido */
-    display: flex; /* Permite alinear los elementos dentro fácilmente */
-    justify-content: flex-end; /* Alinea el botón a la derecha */
-}
+        /* Estilos para la barra inferior del modal */
+        .modal-footer {
+            width: 100%; /* Ocupa todo el ancho disponible del modal */
+            padding: 10px 20px; /* Espaciado dentro de la barra */
+            background: #fff; /* Fondo blanco */
+            border-top: 1px solid #eee; /* Borde superior para separar del contenido */
+            display: flex; /* Permite alinear los elementos dentro fácilmente */
+            justify-content: flex-end; /* Alinea el botón a la derecha */
+        }
     </style>        
     @if(getCrudConfig('Empresa')->delete or getCrudConfig('Empresa')->update)
         <td>
@@ -157,30 +156,32 @@
                 </div>
             @endif
 
-            @if(getCrudConfig('Empresa')->create)
             <button onclick="togglePersonalModal(true, {{ $empresa->id }})" class="btn text-success mt-1">
                 <i class="icon-user"></i> Personal
             </button>
             <!-- Modal de Personal -->
             <div style="display: none;" id="personalModal" class="cs-modal animate__animated animate__fadeIn">
                 <div class="bg-white shadow rounded p-5" onclick="event.stopPropagation()">
-                    <h5 class="pb-2 border-bottom">Personas de la Empresa: {{ $empresa->nombre }}</h5>
+
                     <!-- Aquí se insertará la vista parcial cargada vía AJAX -->
                     <div class="modal-body">
-                        <!-- El contenido del personal se cargará aquí -->
+                     
+                        
+               
                     </div>
                     <div class="modal-footer">
                         <button onclick="togglePersonalModal(false)" class="btn btn-danger">Cerrar</button>
                     </div>
                 </div>
             </div>
-            @endif
-            
+     
+              <!-- Modal -->
+  
 
         </td>
     @endif
 </tr>
-
+  
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <script>
@@ -189,6 +190,11 @@
             item.addEventListener('change', function () {
                 let estado = this.checked;
                 let empresaId = this.getAttribute('data-id');
+
+                // Imprimir en consola
+                console.log("Estado:", estado);
+                console.log("Empresa ID:", empresaId);
+
                 fetch(`/empresa/updateEstado/${empresaId}`, {
                     method: 'POST',
                     headers: {
@@ -196,11 +202,41 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({ estado })
+                    
                 })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Aquí puedes continuar manejando la respuesta
+                })
+                .then(data => console.log(data)) // Aquí puedes imprimir la respuesta del servidor
                 .catch(error => console.error('Error:', error));
             });
         });
     });
+</script>
+<script>
+    function consultaDNI() {
+        var dni = $("#input-dni").val();
+        var url = "https://facturae-garzasoft.com/facturacion/buscaCliente/BuscaCliente2.php";
+        if (location.protocol !== "https:") {
+            url = "http://facturae-garzasoft.com/facturacion/buscaCliente/BuscaCliente2.php";
+        }
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: "dni=" + dni + "&fe=N&token=qusEj_w7aHEpX",
+            success: function(data) {
+                data = JSON.parse(data);
+                var nombreCompleto = data.apepat + " " + data.apemat + " " + data.nombres;
+                document.getElementById('input-nombre').value = nombreCompleto;
+            },
+            error: function(xhr, status, error) {
+                console.error("Error al obtener datos: ", error);
+            }
+        });
+    }
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -214,11 +250,12 @@
                 modal.querySelector('.modal-body').innerHTML = html;
                 modal.style.display = 'flex';
             })
-            .catch(error => console.error('Error cargando el personal:', error));
-    } else {
-        modal.style.display = 'none';
-    }
-};
+
+                        .catch(error => console.error('Error cargando el personal:', error));
+                } else {
+                    modal.style.display = 'none';
+                }
+            };
 
         // Cerrar el modal si se hace clic fuera de él
         document.getElementById('personalModal').addEventListener('click', function(event) {
@@ -227,4 +264,112 @@
             }
         });
     });
+</script>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+    // Usar document o un selector más específico que ya exista en el DOM
+    document.addEventListener('change', function (e) {
+        if (e.target.matches('.switch2 input')) { // Verifica si el elemento que cambió es uno de tus inputs
+            let estado = e.target.checked;
+            let personalId = e.target.getAttribute('data-id');
+
+            fetch(`/personal/updateEstado/${personalId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ estado })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Respuesta del servidor:', data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
+    });
+
+</script>
+
+<script>
+    function abrirModalcrear() {
+        document.getElementById('crearPersonalForm').style.display = '';
+        document.getElementById('personalList').style.display = 'none';
+    }
+    
+    function cerrarModalcrear() {
+        document.getElementById('crearPersonalForm').style.display = 'none';
+        document.getElementById('personalList').style.display = '';
+    }
+</script>
+
+<script>
+function enviarDatos(empresaId) {
+    let formData = new FormData();
+    formData.append('dni', document.getElementById('input-dni').value);
+    formData.append('nombre', document.getElementById('input-nombre').value);
+    formData.append('correo', document.getElementById('input-correo').value);
+    formData.append('telefono', document.getElementById('input-telefono').value);
+    formData.append('cargo', document.getElementById('input-cargo').value);
+    formData.append('empresa', empresaId); // Utiliza el id de la empresa pasado como argumento
+    formData.append('estado', document.getElementById('input-estado').checked ? 1 : 0);
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+    fetch('{{ route("personals.create") }}', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Respuesta de red fallida');
+        }
+        return response.json();
+    })
+    .then(data => {
+        togglePersonalModal(true, empresaId); // Usa el id de la empresa pasado como argumento
+        cerrarModalcrear(); // Cierra el modal después de un registro exitoso
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al registrar los datos.');
+    });
+}
+
+
     </script>
+<script>
+function confirmDelete(personaId, empresaId) {
+    $('#deleteConfirmButton').off('click').on('click', function() {
+        $('#confirmDeleteModal').modal('hide');
+        
+        $.ajax({
+            url: "/persona/delete/" + personaId,
+            type: "GET",
+            success: function(response) {
+                if(response.success) {
+                    // Ahora, usa empresaId aquí para recargar o actualizar el modal
+                    togglePersonalModal(true, empresaId);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error en la solicitud AJAX: ", status, error);
+            }
+        });
+    });
+
+    $('#confirmDeleteModal').modal();
+}
+
+    </script>
+    
+
+        

@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\EncuestaController;
 use App\Http\Controllers\RespuestasController;
 use App\Http\Controllers\ModelosController;
+use App\Http\Controllers\PersonasEmpresaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,3 +69,5 @@ Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder
 Route::post('/personal/updateEstado/{id}', [ModelosController::class, 'updateEstadoPersona'])->name('personal.updateEstado');
 Route::post('/empresa/updateEstado/{id}', [ModelosController::class, 'updateEstadoEmpresa'])->name('empresa.updateEstado');
 Route::get('/empresa/personal/{empresaId}', [ModelosController::class, 'personal'])->name('empresa.personal');
+Route::post('/empresa/personal/', [PersonasEmpresaController::class, 'store'])->name('personals.create');
+Route::get('/persona/delete/{id}', [PersonasEmpresaController::class, 'eliminar'])->name('persona.delete');

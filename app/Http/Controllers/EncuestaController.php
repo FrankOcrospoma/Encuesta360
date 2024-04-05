@@ -35,7 +35,6 @@ class EncuestaController extends Controller
                 'empresa' => $request->input('empresa'),
                 'fecha' => $request->input('fecha'),
             ]);
-    
             // Registrar preguntas con respuestas seleccionadas
             foreach ($preguntasSeleccionadas as $preguntaId => $respuestas) {
                 foreach ($respuestas as $respuestaId) {
@@ -44,7 +43,7 @@ class EncuestaController extends Controller
                             'pregunta' => $preguntaId,
                             'respuesta' => $respuestaId,
                             'encuesta' => $encuesta->id,
-                        ]);
+                        ]); 
                     }
                 }
             }

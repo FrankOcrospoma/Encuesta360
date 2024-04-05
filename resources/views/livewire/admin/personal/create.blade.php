@@ -46,8 +46,14 @@
                 <input type='email' id='input-correo' wire:model.lazy='correo' class="form-control  @error('correo') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('correo') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
-            <!-- Cargo Input -->
+            <!-- Teléfono Input -->
             <div class='form-group'>
+            <label for='input-telefono' class='col-sm-2 control-label '> {{ __('Teléfono') }} <span style="color: red" class="required">*</span></label>
+            <input type='number' id='input-telefono' wire:model.lazy='telefono' class="form-control  @error('telefono') is-invalid @enderror" placeholder='' autocomplete='on'>
+            @error('telefono') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+            </div>
+            <!-- Cargo Input -->
+                <div class='form-group'>
                 <label for='input-cargo' class='col-sm-2 control-label '> {{ __('Cargo') }} <span style="color: red" class="required">*</span></label>
                 <select id='input-cargo' wire:model.lazy='cargo' class="form-control  @error('cargo') is-invalid @enderror">
                     @foreach(getCrudConfig('Personal')->inputs()['cargo']['select'] as $key => $value)
