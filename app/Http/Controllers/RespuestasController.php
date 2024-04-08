@@ -23,7 +23,7 @@ class RespuestasController extends Controller
     
             $personaId = $envio->persona;
             $respuestas = $request->input('detalle', []);
-            $respuestasAbiertas = $request->input('respuestaAbierta', []); 
+            $respuestasAbiertas = $request->textarea('respuestaAbierta', []); 
             $totalScore = 0;
     
             // Primero procesar respuestas predefinidas

@@ -14,24 +14,13 @@
 
         <div class="card-body">
 
-            <!-- Texto Input -->
+                        <!-- Texto Input -->
             <div class='form-group'>
                 <label for='input-texto' class='col-sm-2 control-label '> {{ __('Texto') }}</label>
                 <input type='text' id='input-texto' wire:model.lazy='texto' class="form-control  @error('texto') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('texto') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
-
-            <!-- Estado Input -->
-            <div class='form-group'>
-                <div class='form-check mt-4 mb-3'>
-                    <input wire:model.lazy='estado' id='input-estado' class='form-check-input ' type='checkbox' autocomplete='on'>
-                    <label class='form-check-label ' for='input-estado'>{{ __('(Con Respuestas)') }}</label>
-                </div>
-                @error('estado') <div class='invalid-feedback'>{{ $message }}</div> @enderror
-            </div>
-
-            <!-- Categoria Input, visible solo si estado es verdadero -->
-            @if($estado)
+            <!-- Categoria Input -->
             <div class='form-group'>
                 <label for='input-categoria' class='col-sm-2 control-label '> {{ __('Categoria') }}</label>
                 <select id='input-categoria' wire:model.lazy='categoria' class="form-control  @error('categoria') is-invalid @enderror">
@@ -41,7 +30,15 @@
                 </select>
                 @error('categoria') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
-            @endif
+            <!-- Estado Input -->
+            <div class='form-group'>
+                <div class='form-check mt-4 mb-3'>
+                    <input wire:model.lazy='estado' id='input-estado' class='form-check-input ' type='checkbox' autocomplete='on'>
+                    <label class='form-check-label ' for='input-estado'>{{ __('Estado') }}</label>
+                </div>
+                @error('estado') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+            </div>
+
 
         </div>
 

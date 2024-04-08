@@ -4,24 +4,24 @@ use App\Models\Pregunta;
 use App\Models\Respuesta;
 use App\Models\Encuesta;
 use App\Models\Envio;
-
-use App\Models\Detalle_pregunta;
-$uuid = request()->segment(3); // Ajusta el número de segmento según la estructura de tu URL.
+use App\Models\Detalle_Pregunta; 
+$uuid = request()->segment(3); 
 $envio = Envio::where('uuid', $uuid)->first();
 
-$encuesta = Encuesta::where('id',$envio->encuesta)->first(); // Obtener la primera encuesta de la base de datos
+$encuesta = Encuesta::where('id', $envio->encuesta)->first(); 
 
 $nombreModeloEncuesta = $encuesta->nombre;
 
 $preguntas = Pregunta::whereIn('id', function ($query) use ($encuesta) {
-    $query->select('pregunta')
-        ->from('detalle_preguntas')
-        ->where('encuesta', $encuesta->id);
+    $query->select('pregunta_id')
+          ->from('encuesta_preguntas')
+          ->where('encuesta_id', $encuesta->id);
 })->get();
 
-$respuestas = Respuesta::all()->take(5);
+$respuestas = Respuesta::all();
 
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -41,9 +41,7 @@ $respuestas = Respuesta::all()->take(5);
         body {
             background-color: var(--color-light);
         }
-        .container {
-            padding-top: 2rem;
-        }
+    
         .accordion-item {
             margin-bottom: 1rem;
             border: none;
@@ -90,98 +88,77 @@ $respuestas = Respuesta::all()->take(5);
             border-top-right-radius: 0.5rem;
         }
         .d-inline-block {
-    display: inline-block;
-            margin: 0 auto;
-}
+        display: inline-block;
+                margin: 0 auto;
+            }
+
 
     </style>
 </head>
 <body>
-    <?php if ($envio->estado=='Pendiente'): ?> <!-- Mostrar formulario solo si el estado de Envío es falso -->
-
-    <div class="container mt-5 shadow-sm p-3 mb-5 bg-body rounded">
-        <div class="text-center mb-4">
-            <h2 class="card-header-custom"><?php echo $nombreModeloEncuesta; ?></h2>
-        </div>
-        <form method="POST" action="{{ route('guardar.respuestas') }}" class="needs-validation" novalidate>
-            @csrf
-            <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
-            <div class="accordion" id="accordionExample">
-<?php foreach ($preguntas as $index => $pregunta): ?>
-<div class="accordion-item">
-    <h2 class="accordion-header" id="heading<?php echo $index; ?>">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
-            <?php echo $pregunta->texto; ?>
-        </button>
-    </h2>
-    <div id="collapse<?php echo $index; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-            <?php if ($pregunta->estado): // Suponiendo que 'estado' es un booleano donde true significa que hay opciones de respuesta ?>
-                <?php
-                $detalles = Detalle_pregunta::where('pregunta', $pregunta->id)->where('encuesta', $encuesta->id)->get();
-                foreach ($detalles as $detalle):
-                    $respuesta = Respuesta::find($detalle->respuesta);
-                ?>
-                <div class="form-check mb-2">
-                    <input type="radio" name="detalle[<?php echo $pregunta->id; ?>]" value="<?php echo $detalle->id; ?>" class="form-check-input" id="detalle<?php echo $detalle->id; ?>" required>
-                    <label class="form-check-label" for="detalle<?php echo $detalle->id; ?>"><?php echo $respuesta->texto; ?></label>
-                </div>
-                <?php endforeach; ?>
-            <?php else: // Preguntas de respuesta abierta ?>
-                <div class="mb-3">
-                    <label for="respuestaAbierta<?php echo $pregunta->id; ?>" class="form-label">Tu respuesta:</label>
-                    <input type="text" class="form-control" name="respuestaAbierta[<?php echo $pregunta->id; ?>]" id="respuestaAbierta<?php echo $pregunta->id; ?>" required>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
-<?php endforeach; ?>
-
-            </div>
-            <div class="d-grid gap-2 mt-4">
-            <div class="text-center">
-                <div class="d-inline-block">
-                    <button type="submit" class="btn btn-custom" style="color: #f5f5f5;"><i class="bi bi-send"></i> Enviar Respuestas</button>
-                </div>
+    <?php if ($envio->estado=='Pendiente'): ?>
+    <div class="container mt-5">
+        <div class="card">
+            <h2 class="text-center card-header-custom"><?php echo $nombreModeloEncuesta; ?></h2>
+            <div class="card-body">
+                <form method="POST" action="{{ route('guardar.respuestas') }}" class="needs-validation" novalidate>
+                    @csrf
+                    <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+                    <div class="accordion" id="accordionExample">
+                        <?php $index = 1; ?>
+                        <?php foreach ($preguntas as $pregunta): ?>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading<?php echo $index; ?>">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
+                                     <?php echo $index; ?>. <?php echo $pregunta->texto; ?>
+                                </button>
+                            </h2>
+                            <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <?php if ($pregunta->estado): ?>
+                                        <?php
+                                        $detalles = Detalle_pregunta::where('pregunta', $pregunta->id)->get();
+                                        foreach ($detalles as $detalle):
+                                            $respuesta = Respuesta::find($detalle->respuesta);
+                                        ?>
+                                        <div class="form-check">
+                                            <input type="radio" name="detalle[<?php echo $pregunta->id; ?>]" value="<?php echo $detalle->id; ?>" class="form-check-input" id="detalle<?php echo $detalle->id; ?>" required>
+                                            <label class="form-check-label" for="detalle<?php echo $detalle->id; ?>"><?php echo $respuesta->texto; ?></label>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <label for="respuestaAbierta<?php echo $pregunta->id; ?>">Tu respuesta:</label>
+                                        <textarea class="form-control" name="respuestaAbierta[<?php echo $pregunta->id; ?>]" id="respuestaAbierta<?php echo $pregunta->id; ?>" rows="4" required></textarea>
+                                        <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php $index++; ?>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Enviar Respuestas</button>
+                    </div>
+                </form>
             </div>
         </div>
-
-        </form>
     </div>
     <?php else: ?>
         <div class="container text-center mt-5">
-
-        <div class="row">
-            <div class="col">
-                <i class="bi bi-check-circle" style="font-size: 4rem; color: #28a745;"></i>
+            <div class="row">
+                <div class="col">
+                    <i class="bi bi-check-circle" style="font-size: 4rem; color: #28a745;"></i>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <h3>¡Respuestas enviadas con éxito!</h3>
+                </div>
             </div>
         </div>
-        <div class="row mt-3">
-            <div class="col">
-                <h3>¡Respuestas enviadas con éxito!</h3>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
+    <?php endif; ?>
 
     <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Activación de la validación de formularios de Bootstrap y mejora de la interactividad
-        (function() {
-            'use strict';
-            var forms = document.querySelectorAll('.needs-validation');
-            Array.prototype.slice.call(forms).forEach(function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-    </script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 </body>
 </html>

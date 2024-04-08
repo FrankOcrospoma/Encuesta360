@@ -1,5 +1,5 @@
-@if($personal->isNotEmpty())
 <div id="personalList">
+    @if($personal->isNotEmpty())
 
 <h5 class="pb-2 border-bottom">Personas de la Empresa: {{ $empresa->nombre }}</h5>
 <br>
@@ -110,11 +110,10 @@
                 @if(getCrudConfig('Personal')->delete or getCrudConfig('Personal')->update)
                     <td>
 
-                        @if(getCrudConfig('Personal')->update && hasPermission(getRouteName().'.personal.update', 1, 1, $persona))
-                            <a href="@route(getRouteName().'.personal.update', $persona->id)" class="btn text-primary mt-1">
-                                <i class="icon-pencil"></i>
-                            </a>
-                        @endif
+                        <a class="btn text-primary mt-1" onclick="editarPersonal({{ $persona->id }})">
+                            <i class="icon-pencil"></i>
+                        </a>
+                        
 
                         <button class="btn text-danger mt-1" onclick="confirmDelete('{{ $persona->id }}', '{{ $empresa->id }}')">
                             <i class="icon-trash"></i>
@@ -122,49 +121,55 @@
                         
                         
                         <!-- Modal de Confirmación -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document" style=" width: 30%; display: flex; align-items: center; justify-content: center; height: 100%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Confirmar Eliminación</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro de que quieres eliminar a esta persona?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="deleteConfirmButton">Eliminar</button>
-            </div>
-        </div>
-    </div>
-</div>
+                        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document" style=" width: 30%; display: flex; align-items: center; justify-content: center; height: 100%;">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel">Confirmar Eliminación</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Estás seguro de que quieres eliminar a esta persona?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-danger" id="deleteConfirmButton">Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         
                     </td>
                 @endif
             </tr>
              
-
-
-                
             @endforeach
         </tbody>
     </table>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-</div>
-@else
+    @else
     <p>No hay personal registrado para esta empresa.</p>
+    <div class="col-md-4 right-0">
+        <button id="btnCrearPersonal" onclick="abrirModalcrear()" class="btn btn-success">Crear {{ __('Personal')}}</button>
+    </div>
 @endif
+</div>
+
 
 <div id="crearPersonalForm" style="display: none;">
     <div class="card">
         <form class="form-horizontal" method="POST" action="{{ route('personals.create') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
+               
+
+                <!-- ID del personal, necesario solo para actualizar -->
+                <input type="hidden" name="personal_id" id="input-personal-id">
+                
+
                 <!-- Empresa Input -->
                 <div class='form-group'>
                     <label for='input-empresa' class='col-sm-2 control-label'>{{ __('Empresa') }} <span style="color: red" class="required" >*</span></label>
@@ -227,15 +232,17 @@
             </div>
         
             <div class="card-footer">
-                <button type="button" class="btn btn-info ml-4" onclick="enviarDatos({{ $empresa->id }})">Crear</button>
+                <button type="button" id="btnCrearActualizarPersonal" class="btn btn-info ml-4" onclick="enviarDatos({{ $empresa->id }})">Crear</button>
                 <a onclick="cerrarModalcrear()" class="btn btn-default float-left">{{ __('Cancel') }}</a>
             </div>
-        </form>
+        </form> 
         
     </div>
 
  
 </div>
+
+
 
 
 

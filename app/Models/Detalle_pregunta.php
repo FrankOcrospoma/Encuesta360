@@ -9,7 +9,7 @@ class Detalle_pregunta extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['pregunta', 'respuesta', 'encuesta'];
+    protected $fillable = ['pregunta', 'respuesta'];
     public function __toString()
     {
         return $this->id; 

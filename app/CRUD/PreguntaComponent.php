@@ -27,7 +27,7 @@ class PreguntaComponent implements CRUDComponent
     public function fields()
     {
         return [
-            'id',
+    
             'texto',
             'Categoria'
             , 'estado'

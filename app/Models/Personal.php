@@ -17,17 +17,13 @@ class Personal extends Model
         'correo',
         'telefono',
         'cargo',
-        'empresa',
         'estado'
     ];
     public function __toString()
     {
         return $this->nombre; 
     }
-    public function empresa()
-    {
-        return $this->belongsTo(Empresa::class, 'empresa');
-    }
+
 
     public function cargo()
     {

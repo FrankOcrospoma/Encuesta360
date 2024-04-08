@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Livewire\Admin\Respuesta;
+namespace App\Http\Livewire\Admin\Vinculo;
 
-use App\Models\Respuesta;
+use App\Models\Vinculo;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,13 +17,12 @@ class Read extends Component
 
     protected $queryString = ['search'];
 
-    protected $listeners = ['respuestaDeleted'];
+    protected $listeners = ['vinculoDeleted'];
 
     public $sortType;
     public $sortColumn;
 
-    public function respuestaDeleted()
-    {
+    public function vinculoDeleted(){
         // Nothing ..
     }
 
@@ -37,10 +36,9 @@ class Read extends Component
 
     public function render()
     {
-        // Inicia la consulta filtrando por estado true
-        $data = Respuesta::where('estado', true);
+        $data = Vinculo::query();
 
-        $instance = getCrudConfig('respuesta');
+        $instance = getCrudConfig('vinculo');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){
@@ -60,15 +58,13 @@ class Read extends Component
         if($this->sortColumn) {
             $data->orderBy($this->sortColumn, $this->sortType);
         } else {
-            // Ordena por defecto por la columna 'id' de forma descendente si no hay una columna de ordenación especificada
             $data->latest('id');
         }
 
-        // Pagina el resultado final
         $data = $data->paginate(config('easy_panel.pagination_count', 15));
 
-        return view('livewire.admin.respuesta.read', [
-            'respuestas' => $data
-        ])->layout('admin::layouts.app', ['title' => __(\Str::plural('Respuesta')) ]);
+        return view('livewire.admin.vinculo.read', [
+            'vinculos' => $data
+        ])->layout('admin::layouts.app', ['title' => __(\Str::plural('Vinculo')) ]);
     }
 }

@@ -175,7 +175,7 @@
                 </div>
             </div>
      
-              <!-- Modal -->
+      
   
 
         </td>
@@ -241,7 +241,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Lógica para el switch omitida para brevedad
-        window.togglePersonalModal = function(open, empresaId) {
+    window.togglePersonalModal = function(open, empresaId) {
     const modal = document.getElementById('personalModal');
     if (open) {
         fetch(`/empresa/personal/${empresaId}`)
@@ -299,15 +299,21 @@
 </script>
 
 <script>
-    function abrirModalcrear() {
-        document.getElementById('crearPersonalForm').style.display = '';
-        document.getElementById('personalList').style.display = 'none';
-    }
-    
+function abrirModalcrear() {
+    let personalId = document.getElementById('input-personal-id').value;
+    let botonTexto = personalId ? 'Actualizar' : 'Crear';
+
+    document.getElementById('btnCrearActualizarPersonal').textContent = botonTexto + ' Personal';
+
+    document.getElementById('crearPersonalForm').style.display = '';
+    document.getElementById('personalList').style.display = 'none';
+}
+
     function cerrarModalcrear() {
         document.getElementById('crearPersonalForm').style.display = 'none';
         document.getElementById('personalList').style.display = '';
     }
+
 </script>
 
 <script>
@@ -322,6 +328,12 @@ function enviarDatos(empresaId) {
     formData.append('estado', document.getElementById('input-estado').checked ? 1 : 0);
     formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
+    // Añadir el ID del personal si está presente
+    let personalId = document.getElementById('input-personal-id').value;
+    if (personalId) {
+        formData.append('personal_id', personalId);
+    }
+
     fetch('{{ route("personals.create") }}', {
         method: 'POST',
         body: formData,
@@ -333,8 +345,11 @@ function enviarDatos(empresaId) {
         return response.json();
     })
     .then(data => {
-        togglePersonalModal(true, empresaId); // Usa el id de la empresa pasado como argumento
-        cerrarModalcrear(); // Cierra el modal después de un registro exitoso
+        // Aquí puedes agregar lógica adicional para manejar la respuesta,
+        // como actualizar la interfaz de usuario o mostrar un mensaje de éxito/error.
+        console.log(data);
+        togglePersonalModal(true, empresaId); 
+        cerrarModalcrear(); 
     })
     .catch(error => {
         console.error('Error:', error);
@@ -343,6 +358,8 @@ function enviarDatos(empresaId) {
 }
 
 
+
+    
     </script>
 <script>
 function confirmDelete(personaId, empresaId) {
@@ -354,7 +371,6 @@ function confirmDelete(personaId, empresaId) {
             type: "GET",
             success: function(response) {
                 if(response.success) {
-                    // Ahora, usa empresaId aquí para recargar o actualizar el modal
                     togglePersonalModal(true, empresaId);
                 } else {
                     alert(response.message);
@@ -370,6 +386,29 @@ function confirmDelete(personaId, empresaId) {
 }
 
     </script>
-    
+        <script>
 
+    function editarPersonal(personalId) {
+        fetch(`/personal/editar/${personalId}`) // Asegúrate de tener esta ruta en tu controlador
+        .then(response => response.json())
+        .then(data => {
+            // Suponiendo que 'data' es el objeto con los datos del personal
+            document.getElementById('input-dni').value = data.dni;
+            document.getElementById('input-nombre').value = data.nombre;
+            document.getElementById('input-correo').value = data.correo;
+            document.getElementById('input-telefono').value = data.telefono;
+            document.getElementById('input-cargo').value = data.cargo;
+            document.getElementById('input-estado').checked = data.estado === 1;
+            document.getElementById('input-personal-id').value = personalId; // Para el campo oculto
+            console.log(personalId)
+            // Mostrar el formulario
+            abrirModalcrear();
+        })
+        .catch(error => console.error('Error:', error));
         
+    }
+        
+        </script>
+ 
+
+    
