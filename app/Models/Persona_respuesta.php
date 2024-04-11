@@ -9,7 +9,7 @@ class Persona_respuesta extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = [ 'persona', 'detalle_pregunta',];
+    protected $fillable = [ 'persona', 'detalle', 'encuesta_id'];
     public function __toString()
     {
         return $this->id; 

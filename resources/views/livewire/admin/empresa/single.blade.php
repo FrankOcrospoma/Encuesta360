@@ -325,7 +325,6 @@ function enviarDatos(empresaId) {
     formData.append('telefono', document.getElementById('input-telefono').value);
     formData.append('cargo', document.getElementById('input-cargo').value);
     formData.append('empresa', empresaId); // Utiliza el id de la empresa pasado como argumento
-    formData.append('estado', document.getElementById('input-estado').checked ? 1 : 0);
     formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
     // Añadir el ID del personal si está presente
@@ -353,7 +352,7 @@ function enviarDatos(empresaId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Ocurrió un error al registrar los datos.');
+        alert('El Dni ya esta registrado.');
     });
 }
 
@@ -398,7 +397,6 @@ function confirmDelete(personaId, empresaId) {
             document.getElementById('input-correo').value = data.correo;
             document.getElementById('input-telefono').value = data.telefono;
             document.getElementById('input-cargo').value = data.cargo;
-            document.getElementById('input-estado').checked = data.estado === 1;
             document.getElementById('input-personal-id').value = personalId; // Para el campo oculto
             console.log(personalId)
             // Mostrar el formulario

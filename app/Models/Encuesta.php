@@ -26,7 +26,7 @@ public function evaluados()
 }
 public function preguntas()
 {
-    return $this->belongsToMany(Pregunta::class, 'encuesta_preguntas', 'encuesta_id', 'pregunta_id');
+    return $this->belongsToMany(Pregunta::class, 'encuesta_preguntas', 'encuesta_id', 'detalle_id');
 }
 public function encuesta_preguntas()
 {

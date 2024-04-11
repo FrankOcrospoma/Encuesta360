@@ -37,9 +37,10 @@ class Evaluado extends Model
         return $this->belongsTo(Vinculo::class, 'vinculo_id');
     }
     // En tu modelo Evaluado
-        public function personal()
-        {
-            return $this->belongsTo(Personal::class, 'evaluado_id');
-        }
+    public function personal()
+    {
+        return $this->belongsTo(Personal::class, 'evaluado_id');
+    }
+       
 
 }

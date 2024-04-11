@@ -12,11 +12,17 @@ $encuesta = Encuesta::where('id', $envio->encuesta)->first();
 
 $nombreModeloEncuesta = $encuesta->nombre;
 
-$preguntas = Pregunta::whereIn('id', function ($query) use ($encuesta) {
-    $query->select('pregunta_id')
-          ->from('encuesta_preguntas')
-          ->where('encuesta_id', $encuesta->id);
-})->get();
+$preguntas = Pregunta::select('preguntas.*')
+    ->distinct()
+    ->join('detalle_preguntas as dp', 'dp.pregunta', '=', 'preguntas.id')
+    ->whereIn('dp.id', function($query) use ($encuesta) {
+        // Asegúrate de reemplazar 'tu_columna_encuesta_id' con el nombre real de la columna que contiene el ID de la encuesta en 'encuesta_preguntas'
+        $query->select('detalle_id')
+              ->from('encuesta_preguntas')
+              ->where('encuesta_id', $encuesta->id); // Filtrar por encuesta_id
+    })
+    ->get();
+
 
 $respuestas = Respuesta::all();
 
@@ -95,13 +101,22 @@ $respuestas = Respuesta::all();
 
     </style>
 </head>
+@if (session('error'))
+    <div class="alert alert-danger" role="alert">
+        {{ session('error') }}
+    </div>
+@endif
+
 <body>
     <?php if ($envio->estado=='Pendiente'): ?>
     <div class="container mt-5">
         <div class="card">
-            <h2 class="text-center card-header-custom"><?php echo $nombreModeloEncuesta; ?></h2>
-            <div class="card-body">
-                <form method="POST" action="{{ route('guardar.respuestas') }}" class="needs-validation" novalidate>
+            <div style="padding: 15px" class="card-header-custom d-flex justify-content-between align-items-center">
+                <h2> {{$encuesta->Empresa}}</h2>
+                <h2>{{$nombreModeloEncuesta}}   </h2>
+            </div>
+                        <div class="card-body">
+                <form method="POST" action="{{ route('guardar.respuestas') }}" class="needs-validation" id="formularioEncuesta">
                     @csrf
                     <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
                     <div class="accordion" id="accordionExample">
@@ -137,7 +152,7 @@ $respuestas = Respuesta::all();
                         <?php endforeach; ?>
                     </div>
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Enviar Respuestas</button>
+                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-send"></i> Enviar Respuestas</button>
                     </div>
                 </form>
             </div>
@@ -160,5 +175,34 @@ $respuestas = Respuesta::all();
 
     <!-- Bootstrap Bundle with Popper -->
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
+    <script>
+        document.getElementById('formularioEncuesta').addEventListener('submit', function(e) {
+            let todasRespondidas = true;
+            let preguntas = document.querySelectorAll('.accordion-item');
+        
+            preguntas.forEach(function(pregunta, index) {
+                if (pregunta.querySelector('textarea')) {
+                    // Para preguntas abiertas
+                    let respuestaAbierta = pregunta.querySelector('textarea').value.trim();
+                    if (!respuestaAbierta) {
+                        todasRespondidas = false;
+                    }
+                } else {
+                    // Para preguntas de opción múltiple
+                    let opciones = pregunta.querySelectorAll('input[type="radio"]');
+                    let algunaSeleccionada = Array.from(opciones).some(opcion => opcion.checked);
+                    if (!algunaSeleccionada) {
+                        todasRespondidas = false;
+                    }
+                }
+            });
+        
+            if (!todasRespondidas) {
+                e.preventDefault(); // Evita el envío del formulario
+                alert('Por favor, responda todas las preguntas de la encuesta.');
+            }
+        });
+        </script>
+        
 </body>
 </html>

@@ -13,42 +13,55 @@ use Illuminate\Support\Facades\Log;
 class PersonasEmpresaController extends Controller
 {
     public function store(Request $request)
-    {
-        try {
-            $personalId = $request->input('personal_id');
-    
-            $datos = [
-                'dni' => $request->input('dni'),
-                'nombre' => $request->input('nombre'),
-                'correo' => $request->input('correo'),
-                'telefono' => $request->input('telefono'),
-                'cargo' => $request->input('cargo'),
-                'estado' => $request->input('estado') ? 1 : 0, // Manejar el checkbox correctamente
-            ];
-    
-            if ($personalId) {
-                // Actualizar
-                $personal = Personal::findOrFail($personalId);
-                $personal->update($datos);
-            } else {
-                // Crear
-                $personal = Personal::create($datos);
-                // Crear un detalle de empresa si necesario
-                Detalle_empresa::create([
-                    'personal_id' => $personal->id,
-                    'empresa_id' => $request->input('empresa'),
-                ]);
-            }
-    
-            // Retornar solo los datos del personal sin mensaje
-            return response()->json(['data' => $personal]);
-    
-        } catch (\Exception $e) {
-            Log::error('Error al guardar el personal: ' . $e->getMessage());
-            // Retornar una respuesta con código de error y sin redireccionar
-            return response()->json(['error' => 'Hubo un error al procesar la solicitud.'], 500);
+{
+    try {
+        $personalId = $request->input('personal_id');
+        $dni = $request->input('dni');
+
+        // Validar si el DNI ya existe
+        $dniExists = Personal::where('dni', $dni)
+                        ->when($personalId, function ($query, $personalId) {
+                            // Excluir el registro actual en caso de actualización
+                            return $query->where('id', '!=', $personalId);
+                        })
+                        ->exists();
+
+        if ($dniExists) {
+            return response()->json(['error' => 'El DNI ya está registrado.'], 400);
         }
+
+        $datos = [
+            'dni' => $dni,
+            'nombre' => $request->input('nombre'),
+            'correo' => $request->input('correo'),
+            'telefono' => $request->input('telefono'),
+            'cargo' => $request->input('cargo'),
+        ];
+
+        if ($personalId) {
+            // Actualizar
+            $personal = Personal::findOrFail($personalId);
+            $personal->update($datos);
+        } else {
+            // Crear
+            $personal = Personal::create($datos);
+            // Crear un detalle de empresa si necesario
+            Detalle_empresa::create([
+                'personal_id' => $personal->id,
+                'empresa_id' => $request->input('empresa'),
+            ]);
+        }
+
+        // Retornar solo los datos del personal sin mensaje
+        return response()->json(['data' => $personal]);
+
+    } catch (\Exception $e) {
+        Log::error('Error al guardar el personal: ' . $e->getMessage());
+        // Retornar una respuesta con código de error y sin redireccionar
+        return response()->json(['error' => 'Hubo un error al procesar la solicitud.'], 500);
     }
+}
+
     
     
 

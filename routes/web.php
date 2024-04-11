@@ -76,3 +76,4 @@ Route::get('/encuestas/{id}/edit', [EncuestaController::class, 'edit'])->name('e
 Route::put('/encuestas', [EncuestaController::class, 'store'])->name('encuestas.update');
 Route::get('/encuestas/{id}/destroy', [EncuestaController::class, 'destroy'])->name('encuestas.destroy');
 Route::get('/usuarios-por-empresa/{empresaId}', [PersonasEmpresaController::class, 'usuariosPorEmpresa'])->name('usuarios.por.empresa');
+Route::get('/encuestas/ver/{persona_id}/{encuesta_id}', [EncuestaController::class, 'verRespuestas'])->name('encuestas.ver');

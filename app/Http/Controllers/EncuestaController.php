@@ -16,7 +16,7 @@ use App\Models\Personal; // Asegúrate de que el namespace sea correcto para tu 
 use App\Models\Envio; // Asegúrate de que el namespace sea correcto para tu modelo.
 use Illuminate\Support\Str; // Aquí se agrega la importación correcta
 use Barryvdh\DomPDF\Facade\PDF;
-
+use App\Models\Persona_respuesta;
 use App\Models\Empresa;
 use App\Models\Encuesta_pregunta;
 use App\Models\Evaluado;
@@ -39,6 +39,7 @@ class EncuestaController extends Controller
         // Evaluadores seleccionados y sus vínculos vienen como array de IDs y Vínculos desde el formulario
         $evaluadoresSeleccionados = $request->input('evaluadoresSeleccionados', []);
         $vinculosSeleccionados = $request->input('vinculosSeleccionados', []);
+
     
         DB::beginTransaction();
 
@@ -58,12 +59,15 @@ class EncuestaController extends Controller
 
                 // Insertamos las nuevas preguntas seleccionadas
                 foreach ($preguntasSeleccionadas as $preguntaId) {
-                    $detalle = Detalle_pregunta::where('pregunta', $preguntaId)->get();
+                    $detalles = Detalle_pregunta::where('pregunta', $preguntaId)->get();
+                    foreach ($detalles as $detalle) {
                     Encuesta_pregunta::create([
                         'encuesta_id' => $encuesta->id,
                         'detalle_id' => $detalle->id,
                     ]);
+                 }
                 }
+               
     
                 // Eliminamos los evaluadores existentes
                 Evaluado::where('encuesta_id', $encuestaId)->delete();
@@ -86,10 +90,13 @@ class EncuestaController extends Controller
                 ]);
                 // Para cada pregunta seleccionada, creamos una entrada en la tabla 'encuesta_preguntas'
                 foreach ($preguntasSeleccionadas as $preguntaId) {
-                Encuesta_pregunta::create([
-                    'encuesta_id' => $encuesta->id,
-                    'pregunta_id' => $preguntaId,
-                ]);
+                    $detalles = Detalle_pregunta::where('pregunta', $preguntaId)->get();
+                    foreach ($detalles as $detalle) {
+                    Encuesta_pregunta::create([
+                        'encuesta_id' => $encuesta->id,
+                        'detalle_id' => $detalle->id,
+                    ]);
+                 }
                 }
                 
                 // Creamos los registros de evaluadores asociados a la encuesta
@@ -102,7 +109,6 @@ class EncuestaController extends Controller
                     ]);
                 }
             }
-    
 
 
     
@@ -126,14 +132,17 @@ class EncuestaController extends Controller
         $per = Personal::where('id', $evaluado->evaluado_id)->first(); // Encuentra el Personal asociado
     }
         $encuesta_preguntas = Encuesta_pregunta::where('encuesta_id', $id)->get();
-    $preguntasEncuesta = [];
-    
-    foreach ($encuesta_preguntas as $encuesta_pregunta) {
-        $pregunta = Pregunta::find($encuesta_pregunta->pregunta_id);
-        if ($pregunta) {
-            $preguntasEncuesta[] = $pregunta;
+        $preguntasEncuesta = [];
+
+        foreach ($encuesta_preguntas as $encuesta_pregunta) {
+            $detalles = Detalle_pregunta::where('id', $encuesta_pregunta->detalle_id)->first();
+            $pregunta = Pregunta::find($detalles->pregunta);
+            if ($pregunta && !in_array($pregunta, $preguntasEncuesta)) {
+                $preguntasEncuesta[] = $pregunta;
+            }
         }
-    }
+        
+
     $usuarios = Personal::all();
     $vinculos = Vinculo::all();
     $empresas = Empresa::all(); // Asegúrate de tener este modelo y consulta disponibles.
@@ -152,7 +161,7 @@ public function destroy($id)
         Encuesta_pregunta::where('encuesta_id', $encuesta->id)->delete();
         Evaluado::where('encuesta_id', $encuesta->id)->delete();
         Envio::where('encuesta', $encuesta->id)->delete();
-
+        Persona_respuesta::where('encuesta_id', $encuesta->id)->delete();
         // Finalmente, elimina la encuesta
         $encuesta->delete();
 
@@ -173,6 +182,7 @@ public function destroy($id)
     public function enviarEncuesta($id)
     {
         try {
+            $encuesta = Encuesta::where('id',$id)->first();
         $evaluados = Evaluado::where('encuesta_id',$id)->get();
         foreach($evaluados as $evaluado) {
             $uuid = Str::uuid()->toString();
@@ -198,7 +208,7 @@ public function destroy($id)
             $link = route('encuestas.responder', ['uuid' => $uuid]); // Asegúrate de que la ruta y sus parámetros sean correctos.
 
             // Envía el correo electrónico con el enlace
-            Mail::to($per->correo)->send(new EncuestaMailable($link));
+            Mail::to($per->correo)->send(new EncuestaMailable($link, $encuesta->Empresa));
 
         }
      
@@ -224,13 +234,18 @@ public function destroy($id)
     public function generarPDF($encuestaId)
     {
         // Buscar la encuesta por el ID proporcionado
-        $encuesta = Encuesta::with('empresa') // Asumiendo una relación con 'empresas'
-            ->findOrFail($encuestaId);
+        $encuesta = Encuesta::find($encuestaId);
+        $encuesta_pre = Encuesta_pregunta::where('encuesta_id', $encuestaId)
+        ->first(); // Usamos first() en lugar de get() para obtener solo un objeto en lugar de una colección
+        
+        if ($encuesta_pre) {
+            // Esto asume una estructura donde 'detalle_preguntas' conecta 'preguntas' y 'respuestas' con 'encuestas'
+            $detallePreguntas = Detalle_pregunta::with(['pregunta', 'respuesta'])
+                ->where('id', $encuesta_pre->detalle_id)
+                ->get();
+        }
+        $evaluado = Evaluado::where('encuesta_id', $encuestaId)->firstOrFail();
 
-        // Esto asume una estructura donde 'detalle_preguntas' conecta 'preguntas' y 'respuestas' con 'encuestas'
-        $detallePreguntas = Detalle_pregunta::with(['pregunta', 'respuesta'])
-            ->where('encuesta', $encuestaId)
-            ->get();
 
 
         $empresa = Empresa::where('id', $encuesta->empresa)->firstOrFail();
@@ -238,7 +253,7 @@ public function destroy($id)
         $preguntas = Pregunta::where('estado', true)->get();
         $preguntasAbiertas = Pregunta::where('preguntas.estado', false)
         ->join('detalle_preguntas', 'preguntas.id', '=', 'detalle_preguntas.pregunta')
-        ->join('persona_respuestas', 'detalle_preguntas.id', '=', 'persona_respuestas.detalle_pregunta')
+        ->join('persona_respuestas', 'detalle_preguntas.id', '=', 'persona_respuestas.detalle')
         ->join('personals', 'persona_respuestas.persona', '=', 'personals.id')
         ->join('cargos', 'personals.cargo', '=', 'cargos.id')
         ->leftJoin('respuestas', function ($join) {
@@ -250,25 +265,17 @@ public function destroy($id)
         ->groupBy('preguntas.texto', 'cargos.nombre', 'cargos.id')
         ->get();
     
-    
-    
-        
         $categorias = Categoria::all();
-
 
         $respuestas = Respuesta::where('estado', true)->get();
         $respuestasAbiertas = Respuesta::where('estado', false)->get();
 
-        $envios = Envio::with(['persona' => function ($query) {
-            $query->with('cargo', 'empresa'); // Asumiendo relaciones 'cargo' y 'empresa' en el modelo 'personal'
-        }])
+        $envios = Envio::with('persona')
             ->where('encuesta', $encuestaId)
             ->get();
 
-        // Preparar todos los datos para pasar a la vista
-        // Obtener los envíos de la encuesta
 
-        $results = DB::select('CALL ObtenerDatosCargo(?)', array($encuestaId));
+        $results = DB::select('CALL ObtenerDatosCargo(?,?)', array($encuestaId,$evaluado->evaluado_id));
         $Top5 = DB::select('CALL ObtenerTop5PorCargo(?)', array($encuestaId));
         $categoria_1 = DB::select('CALL ObtenerResumenEnviosPorCategoria(1,?)', array($encuestaId));
         $categoria_2 = DB::select('CALL ObtenerResumenEnviosPorCategoria(2,?)', array($encuestaId));
@@ -279,8 +286,8 @@ public function destroy($id)
         $categoria_1Array = [];
         foreach ($categoria_1 as $item) {
             $categoria_1Array[] = [
-                'nombre' => $item->nombre,
-                'promedio_rango' => number_format($item->promedio_rango, 2), // Formatear a dos decimales
+                'nombre' => $item->nombre_vinculo,
+                'promedio_rango' => number_format($item->promedio_score, 2), // Formatear a dos decimales
                 'cantidad_envios' => $item->cantidad_envios,
                 'cantidad_rango_1' => $item->cantidad_rango_1,
                 'cantidad_rango_2' => $item->cantidad_rango_2,
@@ -330,7 +337,6 @@ public function destroy($id)
             ];
         }
 
-        // Preparar todos los datos para pasar a la vista
         $datos = [
             'encuesta' => $encuesta,
             'detallePreguntas' => $detallePreguntas,
@@ -349,7 +355,7 @@ public function destroy($id)
             'categoria_3Array' => $categoria_3Array,
             'categoria_4Array' => $categoria_4Array,
             'categoria_5Array' => $categoria_5Array,
-
+            'evaluado' => $evaluado
 
 
         ];
@@ -361,4 +367,31 @@ public function destroy($id)
         // Retornar el PDF al navegador
         return $pdf->stream();
     }
+    public function verRespuestas($persona_id, $encuesta_id)
+    {
+        // Obtener las respuestas de la persona correspondiente al ID proporcionado
+        $respuestas = Persona_Respuesta::where('persona', $persona_id)->where('encuesta_id', $encuesta_id)->get();
+        
+        $detallesp = [];
+        
+        foreach ($respuestas as $key => $rpt) {
+            // Obtener las preguntas de la encuesta correspondiente al ID proporcionado y al detalle de respuesta
+            $e_preguntas = Encuesta_Pregunta::where('encuesta_id', $encuesta_id)->where('detalle_id', $rpt->detalle)->get();
+            
+            foreach ($e_preguntas as $key => $ep) {
+                // Obtener los detalles de la pregunta
+                $detalle = Detalle_Pregunta::where('id', $ep->detalle_id)->first();
+                
+                if ($detalle) {
+                    // Agregar el detalle de pregunta al array
+                    $detallesp[] = $detalle;
+                }
+            }
+        }
+        
+        // Devolver los datos en formato JSON
+        return view('partials.partial_respuestas', compact('respuestas', 'detallesp'))->render();
+    }
+    
+    
 }

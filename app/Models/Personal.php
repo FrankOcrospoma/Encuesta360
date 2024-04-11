@@ -23,7 +23,12 @@ class Personal extends Model
     {
         return $this->nombre; 
     }
-
+    public function envios()
+    {
+        // Asumiendo que 'persona_id' es la clave foránea en la tabla 'envio'
+        // y 'id' es la clave primaria de 'personal'
+        return $this->hasMany(Envio::class, 'persona', 'id');
+    }
 
     public function cargo()
     {

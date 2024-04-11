@@ -15,13 +15,13 @@ class Detalle_pregunta extends Model
         return $this->id; 
     }
 
-    public function pregunta()
+    public function Pregunta()
     {
         return $this->belongsTo(Pregunta::class, 'pregunta', 'id');
     }
 
     // Definición de la relación con Respuesta
-    public function respuesta()
+    public function Respuesta()
     {
         return $this->belongsTo(Respuesta::class, 'respuesta', 'id');
     }

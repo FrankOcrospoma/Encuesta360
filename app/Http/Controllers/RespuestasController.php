@@ -7,8 +7,8 @@ use App\Models\Persona_Respuesta;
 use App\Models\Envio; 
 use App\Models\Respuesta; 
 
-use App\Models\Detalle_Pregunta; 
-
+use App\Models\Detalle_Pregunta;
+use App\Models\Encuesta_pregunta;
 use Illuminate\Support\Facades\DB; // Importar Facade para las transacciones
 
 class RespuestasController extends Controller
@@ -23,7 +23,7 @@ class RespuestasController extends Controller
     
             $personaId = $envio->persona;
             $respuestas = $request->input('detalle', []);
-            $respuestasAbiertas = $request->textarea('respuestaAbierta', []); 
+            $respuestasAbiertas = $request->input('respuestaAbierta', []);
             $totalScore = 0;
     
             // Primero procesar respuestas predefinidas
@@ -37,7 +37,8 @@ class RespuestasController extends Controller
                         // Registrar en persona_respuestas
                         Persona_Respuesta::create([
                             'persona' => $personaId,
-                            'detalle_pregunta' => $detallePreguntaId,
+                            'detalle' => $detallePreguntaId,
+                            'encuesta_id' => $envio->encuesta,
                         ]);
                     }
                 }
@@ -54,17 +55,22 @@ class RespuestasController extends Controller
                     $detalle =  Detalle_Pregunta::create([
                         'pregunta' => $preguntaId,
                         'respuesta' => $nuevaRespuesta->id,
-                        'encuesta' => $envio->encuesta, // Asume que tienes un campo 'encuesta' en tu modelo Envio
                     ]);
+                                    // Crear un nuevo registro en encuesta_preguntas
+
     
                     if ($detalle) {
                         $detalle->respuesta = $nuevaRespuesta->id;
                         $detalle->save();
-    
+                        Encuesta_pregunta::create([
+                            'encuesta_id' =>  $envio->encuesta,
+                            'detalle_id' => $detalle->id,
+                        ]);
                         // También registrar esta respuesta en persona_respuestas
                         Persona_Respuesta::create([
                             'persona' => $personaId,
-                            'detalle_pregunta' => $detalle->id, // Usar el ID del detalle actualizado
+                            'detalle' => $detalle->id, 
+                            'encuesta_id' => $envio->encuesta,
                         ]);
                     } else {
                         // Manejar el caso donde no existe el detalle (opcional)

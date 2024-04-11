@@ -34,7 +34,7 @@
         <p>Por favor, toma unos minutos para completar nuestra encuesta.</p>
         <a href="{{ $urlEncuesta }}" target="_blank"style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; margin: 20px 0; border-radius: 5px; text-decoration: none;">Iniciar Encuesta</a>
         <p>Gracias por tu tiempo,</p>
-        <p><strong>El Equipo de [Nombre de tu Empresa/Proyecto]</strong></p>
+        <p><strong>El Equipo de {{$encuesta}}</strong></p>
     </div>
 </body>
 </html>

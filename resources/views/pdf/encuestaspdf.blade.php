@@ -382,18 +382,24 @@
     <div class="header-section">
         <h1>Informe de Feedback 360</h1>
         <br><br><br><br><br><br><br>
-
-        <h2>{{ ucfirst(\Carbon\Carbon::parse($encuesta->fecha)->locale('es')->isoFormat('MMMM [de] YYYY')) }}</h2>
         <?php
-        $nombreCompleto = $empresa->representante;
+        $nombreCompleto = $evaluado->personal;
         $partes = explode(' ', $nombreCompleto);
+        
+        $numeroDePartes = count($partes);
+        
+        $nombreModificado = $nombreCompleto;
+        
 
-        // Reorganizamos las partes. Asumiendo el formato Apellido Paterno, Apellido Materno, Primer Nombre, Segundo Nombre
-        $nombreModificado = $partes[2] . " " . $partes[0]; // Primer Nombre + Apellido Paterno
-        $nombreModificado = strtolower($nombreModificado); // Convertimos toda la cadena a minúsculas
-        $nombreModificado = ucwords($nombreModificado); // Convertimos a mayúscula la primera letra de cada palabra
-
+        if ($numeroDePartes > 2) {
+            $nombreModificado = $partes[2] . " " . $partes[0]; // Primer Nombre + Apellido Paterno
+        } elseif ($numeroDePartes == 2) {
+            $nombreModificado = $partes[1] . " " . $partes[0]; // Primer Nombre + Apellido Paterno
+        } 
+        // Convertimos toda la cadena a minúsculas y luego a formato de título
+        $nombreModificado = ucwords(strtolower($nombreModificado));
         ?>
+        
         <p> {{ $nombreModificado }}</p>
         <br><br>
         <img src="images/confidencial.png" alt="logo" class="img-fluid" style="max-width: 60%; max-height: 60%; ">

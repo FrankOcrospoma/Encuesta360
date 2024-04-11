@@ -221,14 +221,7 @@
                     @error('cargo') <div class='invalid-feedback'>{{ $message }}</div> @enderror
                 </div>
                 
-                <!-- Estado Input -->
-                <div class='form-group'>            
-                    <div class='form-check mt-4 mb-3'>
-                        <input name='estado' id='input-estado' class='form-check-input' type='checkbox' {{ old('estado') ? 'checked' : '' }}>
-                        <label class='form-check-label' for='input-estado'>{{ __('Estado') }}</label>
-                    </div>
-                    @error('estado') <div class='invalid-feedback'>{{ $message }}</div> @enderror
-                </div>
+                
             </div>
         
             <div class="card-footer">
