@@ -273,67 +273,38 @@ public function destroy($id)
         $envios = Envio::with('persona')
             ->where('encuesta', $encuestaId)
             ->get();
+        $vinculos = Vinculo::all();
 
+        $results = DB::select('CALL ObtenerDatosResumen(?)', array($encuestaId));
 
-        $results = DB::select('CALL ObtenerDatosCargo(?,?)', array($encuestaId,$evaluado->evaluado_id));
-        $Top5 = DB::select('CALL ObtenerTop5PorCargo(?)', array($encuestaId));
-        $categoria_1 = DB::select('CALL ObtenerResumenEnviosPorCategoria(1,?)', array($encuestaId));
-        $categoria_2 = DB::select('CALL ObtenerResumenEnviosPorCategoria(2,?)', array($encuestaId));
-        $categoria_3 = DB::select('CALL ObtenerResumenEnviosPorCategoria(3,?)', array($encuestaId));
-        $categoria_4 = DB::select('CALL ObtenerResumenEnviosPorCategoria(4,?)', array($encuestaId));
-        $categoria_5 = DB::select('CALL ObtenerResumenEnviosPorCategoria(5,?)', array($encuestaId));
+        foreach ($categorias as $key => $cats) {
+            $resultadosPorCategoria[$cats->id] = DB::select('CALL ObtenerResumenEnviosPorCategoria(?,?)', array($cats->id, $encuestaId));
 
-        $categoria_1Array = [];
-        foreach ($categoria_1 as $item) {
-            $categoria_1Array[] = [
-                'nombre' => $item->nombre_vinculo,
-                'promedio_rango' => number_format($item->promedio_score, 2), // Formatear a dos decimales
-                'cantidad_envios' => $item->cantidad_envios,
-                'cantidad_rango_1' => $item->cantidad_rango_1,
-                'cantidad_rango_2' => $item->cantidad_rango_2,
-                'cantidad_rango_3' => $item->cantidad_rango_3,
-                'cantidad_rango_4' => $item->cantidad_rango_4,
-                'cantidad_rango_5' => $item->cantidad_rango_5,
-            ];
         }
-        $categoria_2Array = [];
-        foreach ($categoria_2 as $item) {
-            $categoria_2Array[] = (array)$item;
+        foreach ($preguntas as $key => $pregs) {
+            $resultadosPorPregunta[$pregs->id] = DB::select('CALL ObtenerResumenEnviosPorPregunta(?,?)', array( $encuestaId,$pregs->id));
         }
-        $categoria_3Array = [];
-        foreach ($categoria_3 as $item) {
-            $categoria_3Array[] = (array)$item;
-        }
-        $categoria_4Array = [];
-        foreach ($categoria_4 as $item) {
-            $categoria_4Array[] = (array)$item;
-        }
-        $categoria_5Array = [];
-        foreach ($categoria_5 as $item) {
-            $categoria_5Array[] = (array)$item;
-        }
+        foreach ($vinculos as $key => $vin) {
+         
+            $Top5[$vin->nombre]  = DB::select('CALL ObtenerTop5PorCargo(?,?)', array($encuestaId,$vin->id));
+            $Bottom5[$vin->nombre] = DB::select('CALL ObtenerBottom5PorCargo(?,?)', array($encuestaId,$vin->id));
 
-        $top5Array = [];
-        foreach ($Top5 as $item) {
-            $top5Array[] = (array)$item;
         }
-        $Bottom5 = DB::select('CALL ObtenerBottom5PorCargo(?)', array($encuestaId));
-        $Bottom5Array = [];
-        foreach ($Bottom5 as $item) {
-            $Bottom5Array[] = (array)$item;
-        }
+        $Top5["Your Average"]  = DB::select('CALL ObtenerTop5PorCargo(?,0)', array($encuestaId));
+
+        $Bottom5["Your Average"] = DB::select('CALL ObtenerBottom5PorCargo(?,0)', array($encuestaId));
         // Convertir los resultados a un array asociativo
         $enviosPorCargoscore = [];
         foreach ($results as $item) {
             $enviosPorCargoscore[] = [
-                'cargo' => $item->nombre,
-                'promedio_rango' => number_format($item->promedio_rango, 2), // Formatear a dos decimales
-                'cantidad_envios' => $item->cantidad_envios,
-                'cantidad_rango_1' => $item->cantidad_rango_1,
-                'cantidad_rango_2' => $item->cantidad_rango_2,
-                'cantidad_rango_3' => $item->cantidad_rango_3,
-                'cantidad_rango_4' => $item->cantidad_rango_4,
-                'cantidad_rango_5' => $item->cantidad_rango_5,
+                'cargo' => $item->nombre_vinculo,
+                'promedio_rango' => number_format($item->promedio_score, 2), // Formatear a dos decimales
+                'cantidad_envios' => $item->cantidad_respuestas,
+                'cantidad_rango_1' => $item->Oportunidad_Crítica,
+                'cantidad_rango_2' => $item->Debe_Mejorar,
+                'cantidad_rango_3' => $item->Regular,
+                'cantidad_rango_4' => $item->Hábil,
+                'cantidad_rango_5' => $item->Destaca,
             ];
         }
 
@@ -346,16 +317,13 @@ public function destroy($id)
             'preguntas' => $preguntas,
             'categorias' => $categorias,
             'empresa' => $empresa,
-            'top5' => $top5Array,
-            'Bottom5' => $Bottom5Array,
+            'top5' => $Top5,
+            'Bottom5' => $Bottom5,
             'respuestasAbiertas' => $respuestasAbiertas,
             'preguntasAbiertas' => $preguntasAbiertas,
-            'categoria_1Array' => $categoria_1Array,
-            'categoria_2Array' => $categoria_2Array,
-            'categoria_3Array' => $categoria_3Array,
-            'categoria_4Array' => $categoria_4Array,
-            'categoria_5Array' => $categoria_5Array,
-            'evaluado' => $evaluado
+            'resultadosPorCategoria' => $resultadosPorCategoria,
+            'evaluado' => $evaluado,
+            'resultadosPorPregunta' => $resultadosPorPregunta
 
 
         ];
