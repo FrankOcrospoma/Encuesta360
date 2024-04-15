@@ -988,36 +988,36 @@
     <div class="page-break"></div>
     @endif
     @endforeach
-    <?php
+
+
+    {{-- PREGUNTAS ABIERTAS --}}
+    @php
     $preguntasAgrupadas = $preguntasAbiertas->groupBy('preguntaTexto');
-    ?>
+    @endphp
 
-    @foreach ($preguntasAgrupadas as $preguntaTexto => $preguntas)
-    <div class="container">
-
-        <h2 class="headerdrecho">Comentarios Abiertos</h2>
-
-        <h2 style="font-size: 14px; width: 85%; margin-left: 50px; background-color: gainsboro;">
-            {{ $preguntaTexto }}
-        </h2>
-        @foreach ($preguntas as $preg)
-        @if ($preg->respuestaTexto)
-        <h2 class="@if($preg->cargoNombre == 'Par') blue-line
-                                @elseif($preg->cargoNombre == 'Auto Evaluación') red-line
-                                @elseif($preg->cargoNombre == 'Reporte Directo') green-line
-                                @elseif($preg->cargoNombre == 'Cliente') purple-line
-                                @elseif($preg->cargoNombre == 'Your Average') orange-line
-                                @else yellow-line
-                                @endif" style="font-size: 14px;height: 18px; margin-left: 50px; width: 85%;">
-            {{ $preg->cargoNombre }}
-        </h2>
-
-        <p style="margin-left: 100px;">{{ $preg->respuestaTexto }}</p>
-        @endif
-        @endforeach
-    </div>
-    <div class="page-break"></div>
+@foreach ($preguntasAbiertas->groupBy('preguntaTexto') as $preguntaTexto => $vinculos)
+<div class="container">
+    <h2 class="headerderecho">Comentarios Abiertos</h2>
+    <h2 style="font-size: 14px; width: 85%; margin-left: 50px; background-color: gainsboro;">
+        {{ $preguntaTexto }}
+    </h2>
+    @foreach ($vinculos as $preg)
+    <h2 class="@if($preg->nombreVinculos == 'Auto Evaluación') blue-line
+                @elseif($preg->nombreVinculos == 'Par') red-line
+                @elseif($preg->nombreVinculos == 'Reporte Directo') green-line
+                @elseif($preg->nombreVinculos == 'Cliente') purple-line
+                @else yellow-line
+                @endif" style="font-size: 14px;height: 18px; margin-left: 50px; width: 85%;">
+        {{ $preg->nombreVinculos }}
+    </h2>
+    <p style="margin-left: 100px;">{!! nl2br(e($preg->respuestaTexto)) !!}</p>
     @endforeach
+    @if (!$loop->last)
+    <div class="page-break"></div>
+    @endif
+</div>
+
+@endforeach
 
 
 

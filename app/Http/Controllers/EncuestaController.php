@@ -252,23 +252,31 @@ public function destroy($id)
 
         $preguntas = Pregunta::where('estado', true)->get();
         $preguntasAbiertas = Pregunta::where('preguntas.estado', false)
-        ->join('detalle_preguntas', 'preguntas.id', '=', 'detalle_preguntas.pregunta')
-        ->join('persona_respuestas', 'detalle_preguntas.id', '=', 'persona_respuestas.detalle')
-        ->join('personals', 'persona_respuestas.persona', '=', 'personals.id')
-        ->join('cargos', 'personals.cargo', '=', 'cargos.id')
-        ->leftJoin('respuestas', function ($join) {
-            $join->on('detalle_preguntas.respuesta', '=', 'respuestas.id')
-                 ->where('respuestas.estado', false);
-        })
-        ->select('preguntas.texto as preguntaTexto', 'cargos.nombre as cargoNombre')
-        ->selectRaw('GROUP_CONCAT(DISTINCT respuestas.texto ORDER BY respuestas.id SEPARATOR ", ") as respuestaTexto')
-        ->groupBy('preguntas.texto', 'cargos.nombre', 'cargos.id')
-        ->get();
+                ->join('detalle_preguntas', 'preguntas.id', '=', 'detalle_preguntas.pregunta')
+                ->join('persona_respuestas', 'detalle_preguntas.id', '=', 'persona_respuestas.detalle')
+                ->join('personals', 'persona_respuestas.persona', '=', 'personals.id')
+                ->join('evaluados', 'personals.id', '=', 'evaluados.evaluador_id')
+                ->join('vinculos', 'evaluados.vinculo_id', '=', 'vinculos.id')
+                ->leftJoin('respuestas', function ($join) {
+                    $join->on('detalle_preguntas.respuesta', '=', 'respuestas.id')
+                        ->where('respuestas.estado', false);
+                })
+                ->where('persona_respuestas.encuesta_id', $encuestaId)
+                ->where('evaluados.encuesta_id', $encuestaId)
+                ->select('preguntas.texto as preguntaTexto', 'vinculos.nombre as nombreVinculos')
+                ->selectRaw("GROUP_CONCAT(DISTINCT respuestas.texto ORDER BY respuestas.id SEPARATOR '\n') as respuestaTexto")
+                ->groupBy('preguntas.texto', 'vinculos.nombre')
+                ->get();
+
+    
+    
+    
+    
+    
     
         $categorias = Categoria::all();
 
         $respuestas = Respuesta::where('estado', true)->get();
-        $respuestasAbiertas = Respuesta::where('estado', false)->get();
 
         $envios = Envio::with('persona')
             ->where('encuesta', $encuestaId)
@@ -319,7 +327,6 @@ public function destroy($id)
             'empresa' => $empresa,
             'top5' => $Top5,
             'Bottom5' => $Bottom5,
-            'respuestasAbiertas' => $respuestasAbiertas,
             'preguntasAbiertas' => $preguntasAbiertas,
             'resultadosPorCategoria' => $resultadosPorCategoria,
             'evaluado' => $evaluado,
