@@ -139,8 +139,10 @@
         <!-- End Container fluid  -->
 
         <!-- footer -->
-        <footer class="footer text-center text-muted">Adminmart Template, <a href="https://github.com/rezaamini-ir/laravel-easypanel">EasyPanel</a> Package.</footer>
-        <!-- End footer -->
+        <footer class="footer text-center text-muted">
+            &copy; 2024 GarzaSoft. Todos los derechos reservados.
+        </footer>
+                <!-- End footer -->
     </div>
 </div>
 <!-- End Wrapper -->

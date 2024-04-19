@@ -29,23 +29,22 @@ class EncuestaController extends Controller
     public function store(Request $request)
     {
         // Obtenemos los datos necesarios del request
-        $nombre = $request->input('nombre');
+      
         $empresaId = $request->input('empresa');
         $fecha = $request->input('fecha');
-        $evaluado = $request->input('evaluado');
+
         // Preguntas seleccionadas vienen como un array de IDs desde el formulario
         $preguntasSeleccionadas = $request->input('preguntasSeleccionadas', []);
     
         // Evaluadores seleccionados y sus vínculos vienen como array de IDs y Vínculos desde el formulario
-        $evaluadoresSeleccionados = $request->input('evaluadoresSeleccionados', []);
-        $vinculosSeleccionados = $request->input('vinculosSeleccionados', []);
+        $evaluadosSeleccionados = $request->input('evaluadosSeleccionados', []);
 
-    
+   
         DB::beginTransaction();
 
         try {
             $encuestaId = $request->input('encuesta_id');
-    
+            
             if ($encuestaId) {
                 $encuesta = Encuesta::findOrFail($encuestaId);
                 $encuesta->update([
@@ -73,41 +72,48 @@ class EncuestaController extends Controller
                 Evaluado::where('encuesta_id', $encuestaId)->delete();
     
                 // Añadimos los nuevos evaluadores seleccionados
-                foreach ($evaluadoresSeleccionados as $index => $evaluadorId) {
+                foreach ($evaluadosSeleccionados as $index => $evaluadorId) {
                     Evaluado::create([
                         'evaluado_id' => $evaluado,
                         'evaluador_id' => $evaluadorId,
                         'encuesta_id' => $encuesta->id,
-                        'vinculo_id' => $vinculosSeleccionados[$index],
                     ]);
                 }
             } else {
-                // Si no existe, estamos creando una nueva encuesta
-                $encuesta = Encuesta::create([
-                    'nombre' => $nombre,
-                    'empresa' => $empresaId,
-                    'fecha' => $fecha,
-                ]);
-                // Para cada pregunta seleccionada, creamos una entrada en la tabla 'encuesta_preguntas'
-                foreach ($preguntasSeleccionadas as $preguntaId) {
-                    $detalles = Detalle_pregunta::where('pregunta', $preguntaId)->get();
-                    foreach ($detalles as $detalle) {
-                    Encuesta_pregunta::create([
-                        'encuesta_id' => $encuesta->id,
-                        'detalle_id' => $detalle->id,
+                foreach ($evaluadosSeleccionados as $key => $evsel) {
+                    $persona = Personal::find($evsel);
+                    $empresa = Empresa::find($empresaId);
+                    $encuesta = Encuesta::create([
+                        'nombre' => 'Evaluación a ' . $persona->nombre . ' en ' . $empresa->nombre,
+                        'empresa' => $empresaId,
+                        'fecha' => $fecha,
                     ]);
-                 }
+                    // Para cada pregunta seleccionada, creamos una entrada en la tabla 'encuesta_preguntas'
+                    foreach ($preguntasSeleccionadas as $preguntaId) {
+                        $detalles = Detalle_pregunta::where('pregunta', $preguntaId)->get();
+                        foreach ($detalles as $detalle) {
+                        Encuesta_pregunta::create([
+                            'encuesta_id' => $encuesta->id,
+                            'detalle_id' => $detalle->id,
+                        ]);
+                     }
+                    }
+                    $evaluados  = Evaluado::where('empresa_id', $empresaId)->where('evaluado_id',$evsel)->where('encuesta_id', null)->get();
+                    // Añadimos los nuevos evaluadores seleccionados
+                    foreach ($evaluados as $evs) {
+                        Evaluado::updateOrCreate(
+                            [
+                                'id' => $evs->id,      // clave(s) por las que buscar
+                            ],
+                            [
+                                'encuesta_id' => $encuesta->id,  // atributo a actualizar
+                            ]
+                        );
+                    }
+
+                    
                 }
-                
-                // Creamos los registros de evaluadores asociados a la encuesta
-                foreach ($evaluadoresSeleccionados as $index => $evaluadorId) {
-                    Evaluado::create([
-                        'evaluado_id' => $evaluado,
-                        'evaluador_id' => $evaluadorId,
-                        'encuesta_id' => $encuesta->id,
-                        'vinculo_id' => $vinculosSeleccionados[$index],
-                    ]);
-                }
+
             }
 
 

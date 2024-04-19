@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Detalle_empresa;
 use Illuminate\Http\Request;
 use App\Models\Personal; 
-use App\Models\Empresa; 
-
-
+use App\Models\Empresa;
+use App\Models\Evaluado;
+use App\Models\Vinculo;
 
 class ModelosController extends Controller
 {
@@ -62,10 +62,10 @@ class ModelosController extends Controller
             // Si estás buscando múltiples registros en Detalle_empresa, debes iterar sobre cada uno para obtener los respectivos Personal
             $personalIds = $detalle->pluck('personal_id'); // Esto obtendrá una colección de todos los personal_id encontrados
             $personal = Personal::whereIn('id', $personalIds)->get(); // Esto buscará todos los Personal que coincidan con los IDs
-    
+            $vinculos = Vinculo::all();
             $empresa = Empresa::findOrFail($empresaId); // Esto lanzará una excepción si no se encuentra el registro
-    
-            return view('partials.personal_details', compact('personal', 'empresa'));
+            $vinculados = Evaluado::where('empresa_id', $empresaId)->get();
+            return view('partials.personal_details', compact('personal', 'empresa', 'vinculados', 'vinculos'));
         } catch (\Exception $e) {
             // Aquí manejas lo que sucede si hay un error, por ejemplo, redirigir al usuario a otra página o mostrar un mensaje de error
             return back()->withErrors(['error' => 'Error al buscar los detalles del personal: ' . $e->getMessage()]);

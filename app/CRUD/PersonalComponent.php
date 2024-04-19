@@ -4,7 +4,6 @@ namespace App\CRUD;
 
 use EasyPanel\Contracts\CRUDComponent;
 use App\Models\Personal;
-use App\Models\Cargo;
 use App\Models\Empresa;
 
 class PersonalComponent implements CRUDComponent
@@ -26,13 +25,13 @@ class PersonalComponent implements CRUDComponent
     // which kind of data should be showed in list page
     public function fields()
     {
-        return ['dni', 'nombre', 'correo', 'telefono','Cargo', 'Empresa','estado'];
+        return ['dni', 'nombre', 'correo', 'telefono','cargo', 'Empresa','estado'];
     }
     
     // Searchable fields, if you dont want search feature, remove it
     public function searchable()
     {
-        return ['dni', 'nombre','correo', 'telefono', 'cargo.nombre', 'empresa.nombre','estado'];
+        return ['dni', 'nombre','correo', 'telefono', 'cargo', 'empresa.nombre','estado'];
     }
 
     // Write every fields in your db which you want to have a input
@@ -47,9 +46,7 @@ class PersonalComponent implements CRUDComponent
             'nombre' => 'text',
             'correo' => 'email', // Campo de tipo correo electrónico
             'telefono' => 'number',
-            'cargo' => [
-                'select' => $options['cargos'],
-            ],
+            'cargo' => 'text',
             'empresa' => [
                 'select' => $options['empresas'],
             ],
@@ -66,7 +63,7 @@ class PersonalComponent implements CRUDComponent
             'nombre' => 'required|string|max:255',
             'correo' => 'required|email|max:255',
             'telefono' => 'required|max:15',
-            'cargo' => 'required|integer|exists:cargos,id',
+            'cargo' => 'required',
             'empresa' => 'required|integer|exists:empresas,id',
         ];
     }
@@ -78,15 +75,14 @@ class PersonalComponent implements CRUDComponent
 
     public function options()
     {
-        $cargos = Cargo::pluck('nombre', 'id')->toArray();
         $empresas = Empresa::pluck('nombre', 'id')->toArray();
     
         // Agregar la opción por defecto en los arreglos de cargos y empresas
-        $cargos = ['' => 'Selecciona una opción'] + $cargos;
+    
         $empresas = ['' => 'Selecciona una opción'] + $empresas;
     
         return [
-            'cargos' => $cargos,
+       
             'empresas' => $empresas,
         ];
     }

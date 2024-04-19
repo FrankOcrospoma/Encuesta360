@@ -7,61 +7,50 @@ use Illuminate\Http\Request;
 use App\Models\Personal; 
 use App\Models\Empresa; 
 use Illuminate\Support\Facades\Log;
-
+use App\Imports\PersonasImport;
+use App\Models\Evaluado;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class PersonasEmpresaController extends Controller
 {
     public function store(Request $request)
-{
-    try {
-        $personalId = $request->input('personal_id');
-        $dni = $request->input('dni');
-
-        // Validar si el DNI ya existe
-        $dniExists = Personal::where('dni', $dni)
-                        ->when($personalId, function ($query, $personalId) {
-                            // Excluir el registro actual en caso de actualización
-                            return $query->where('id', '!=', $personalId);
-                        })
-                        ->exists();
-
-        if ($dniExists) {
-            return response()->json(['error' => 'El DNI ya está registrado.'], 400);
+    {
+        try {
+            $personalId = $request->input('personal_id');
+            $dni = $request->input('dni');
+    
+    
+            $datos = [
+                'dni' => $dni,
+                'nombre' => $request->input('nombre'),
+                'correo' => $request->input('correo'),
+                'telefono' => $request->input('telefono'),
+                'cargo' => $request->input('cargo'),
+            ];
+    
+            if ($personalId) {
+                // Actualizar
+                $personal = Personal::findOrFail($personalId);
+                $personal->update($datos);
+            } else {
+                // Crear nuevo registro
+                $personal = Personal::create($datos);
+                // Crear un detalle de empresa si es necesario
+                Detalle_empresa::create([
+                    'personal_id' => $personal->id,
+                    'empresa_id' => $request->input('empresa'),
+                ]);
+            }
+    
+            return response()->json(['data' => $personal]);
+    
+        } catch (\Exception $e) {
+            Log::error('Error al guardar el personal: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al procesar la solicitud.'], 500);
         }
-
-        $datos = [
-            'dni' => $dni,
-            'nombre' => $request->input('nombre'),
-            'correo' => $request->input('correo'),
-            'telefono' => $request->input('telefono'),
-            'cargo' => $request->input('cargo'),
-        ];
-
-        if ($personalId) {
-            // Actualizar
-            $personal = Personal::findOrFail($personalId);
-            $personal->update($datos);
-        } else {
-            // Crear
-            $personal = Personal::create($datos);
-            // Crear un detalle de empresa si necesario
-            Detalle_empresa::create([
-                'personal_id' => $personal->id,
-                'empresa_id' => $request->input('empresa'),
-            ]);
-        }
-
-        // Retornar solo los datos del personal sin mensaje
-        return response()->json(['data' => $personal]);
-
-    } catch (\Exception $e) {
-        Log::error('Error al guardar el personal: ' . $e->getMessage());
-        // Retornar una respuesta con código de error y sin redireccionar
-        return response()->json(['error' => 'Hubo un error al procesar la solicitud.'], 500);
     }
-}
-
+    
     
     
 
@@ -70,7 +59,6 @@ class PersonasEmpresaController extends Controller
         $persona = Personal::find($id);
         if($persona) {
             $persona->delete();
-            // Retornar una respuesta JSON en lugar de redirigir
             return response()->json(['success' => true, 'message' => 'Persona eliminada correctamente.']);
         } else {
             return response()->json(['success' => false, 'message' => 'Persona no encontrada.']);
@@ -85,13 +73,35 @@ class PersonasEmpresaController extends Controller
     
     public function usuariosPorEmpresa($empresaId)
     {
-        $detalle = Detalle_empresa::where('empresa_id', $empresaId)->get(); // Asegúrate que la columna se llame 'empresa_id' o ajusta según tu esquema de BD.
-    
-        // Si estás buscando múltiples registros en Detalle_empresa, debes iterar sobre cada uno para obtener los respectivos Personal
-        $personalIds = $detalle->pluck('personal_id'); // Esto obtendrá una colección de todos los personal_id encontrados
-        $usuarios = Personal::whereIn('id', $personalIds)->get(); // Esto buscará todos los Personal que coincidan con los IDs
+        $usuarios = Evaluado::select('personals.id','personals.dni', 'personals.nombre', 'personals.correo')  // Selecciona todos los campos de personal
+        ->join('personals', 'personals.id', '=', 'evaluados.evaluado_id')
+        ->where('evaluados.empresa_id', $empresaId)
+        ->groupBy('personals.id','personals.dni', 'personals.nombre', 'personals.correo')  // Asegúrate de agrupar por el ID de personal para evitar duplicados
+        ->get();
+
+
         return response()->json($usuarios);
     }
     
+    public function importarPersonas(Request $request)
+    {
+        $file = $request->file('file');
+        $empresaId = $request->input('empresa_id'); // Asegúrate de obtener el ID de la empresa correctamente
+        Excel::import(new PersonasImport($empresaId), $file);
     
+        return back()->with('success', 'Importación de personas completada con éxito para la empresa seleccionada.');
+    }
+    public function agregarVinculo(Request $request) {
+ 
+        $vinculo = Evaluado::create([
+            'evaluado_id' => $request->persona_id,
+            'evaluador_id' => $request->evaluado_id,
+            'vinculo_id' => $request->tipo_vinculo,
+            'empresa_id' => $request->empresa_id,
+        ]);
+        return response()->json([
+            'nombre' => $vinculo->evaluador->nombre,  // Asegúrate que el modelo Personal tiene un campo nombre
+            'vinculo' => $vinculo->Vinculo->nombre  // Asumiendo que el modelo Vinculo tiene un campo nombre
+        ]);
+    }    
 }

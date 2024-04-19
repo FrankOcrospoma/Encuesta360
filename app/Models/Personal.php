@@ -30,8 +30,4 @@ class Personal extends Model
         return $this->hasMany(Envio::class, 'persona', 'id');
     }
 
-    public function cargo()
-    {
-        return $this->belongsTo(Cargo::class, 'cargo');
-    }
 }

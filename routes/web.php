@@ -72,8 +72,11 @@ Route::get('/empresa/personal/{empresaId}', [ModelosController::class, 'personal
 Route::post('/empresa/personal/', [PersonasEmpresaController::class, 'store'])->name('personals.create');
 Route::get('/persona/delete/{id}', [PersonasEmpresaController::class, 'eliminar'])->name('persona.delete');
 Route::get('/personal/editar/{id}', [PersonasEmpresaController::class, 'editar'])->name('personal.editar');
+Route::post('/importar-personas', [PersonasEmpresaController::class, 'importarPersonas'])->name('importar.personas');
 Route::get('/encuestas/{id}/edit', [EncuestaController::class, 'edit'])->name('encuestas.edit');
 Route::put('/encuestas', [EncuestaController::class, 'store'])->name('encuestas.update');
 Route::get('/encuestas/{id}/destroy', [EncuestaController::class, 'destroy'])->name('encuestas.destroy');
 Route::get('/usuarios-por-empresa/{empresaId}', [PersonasEmpresaController::class, 'usuariosPorEmpresa'])->name('usuarios.por.empresa');
 Route::get('/encuestas/ver/{persona_id}/{encuesta_id}', [EncuestaController::class, 'verRespuestas'])->name('encuestas.ver');
+Route::get('/personal/search', [PersonasEmpresaController::class, 'search'])->name('personals.search');
+Route::post('/agregar-vinculo', [PersonasEmpresaController::class, 'agregarVinculo'])->name('agregar-vinculo');

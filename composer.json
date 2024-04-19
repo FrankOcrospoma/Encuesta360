@@ -16,9 +16,11 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "laraveles/spanish": "^1.5",
+        "maatwebsite/excel": "^3.1",
         "rezaamini-ir/laravel-easypanel": "^2.3",
         "select2/select2": "^4.0",
-        "tightenco/ziggy": "^2.0"
+        "tightenco/ziggy": "^2.0",
+        "yajra/laravel-datatables-oracle": "^10.11"
     },
     "require-dev": {
         "enlightn/enlightn": "^2.7",

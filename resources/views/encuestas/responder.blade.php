@@ -16,12 +16,13 @@ $preguntas = Pregunta::select('preguntas.*')
     ->distinct()
     ->join('detalle_preguntas as dp', 'dp.pregunta', '=', 'preguntas.id')
     ->whereIn('dp.id', function($query) use ($encuesta) {
-        // Asegúrate de reemplazar 'tu_columna_encuesta_id' con el nombre real de la columna que contiene el ID de la encuesta en 'encuesta_preguntas'
         $query->select('detalle_id')
               ->from('encuesta_preguntas')
-              ->where('encuesta_id', $encuesta->id); // Filtrar por encuesta_id
+              ->where('encuesta_id', $encuesta->id); 
     })
+    ->orderBy('preguntas.categoria')  
     ->get();
+
 
 
 $respuestas = Respuesta::all();
@@ -47,7 +48,15 @@ $respuestas = Respuesta::all();
         body {
             background-color: var(--color-light);
         }
-    
+
+    .categoria-titulo {
+        font-size: 1.5rem; /* Tamaño de fuente */
+        font-weight: bold; /* Negrita */
+        color: var(--color-primary); /* Color primario */
+        margin-top: 2rem; /* Margen superior */
+    }
+
+
         .accordion-item {
             margin-bottom: 1rem;
             border: none;
@@ -115,42 +124,71 @@ $respuestas = Respuesta::all();
                 <h2> {{$encuesta->Empresa}}</h2>
                 <h2>{{$nombreModeloEncuesta}}   </h2>
             </div>
-                        <div class="card-body">
+            <div class="card-body">
                 <form method="POST" action="{{ route('guardar.respuestas') }}" class="needs-validation" id="formularioEncuesta">
                     @csrf
                     <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+                    
                     <div class="accordion" id="accordionExample">
                         <?php $index = 1; ?>
-                        <?php foreach ($preguntas as $pregunta): ?>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="heading<?php echo $index; ?>">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
-                                     <?php echo $index; ?>. <?php echo $pregunta->texto; ?>
-                                </button>
-                            </h2>
-                            <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
-                                <div class="accordion-body">
-                                    <?php if ($pregunta->estado): ?>
+                        <?php $currentCategoria = null; ?>
+                        {{-- Mostrar preguntas de opción múltiple --}}
+                        @foreach ($preguntas->where('estado', true) as $pregunta)
+                            <?php
+                            if ($currentCategoria != $pregunta->Categoria) {
+                                $currentCategoria = $pregunta->Categoria;
+                                echo "<h2 class='categoria-titulo'>{$currentCategoria}</h2>"; // Imprimir el título de la categoría
+                            }
+                            ?>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading<?php echo $index; ?>">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
+                                        <?php echo $index; ?>. <?php echo $pregunta->texto; ?>
+                                    </button>
+                                </h2>
+                                <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
                                         <?php
-                                        $detalles = Detalle_pregunta::where('pregunta', $pregunta->id)->get();
+                                        $detalles = Detalle_Pregunta::where('pregunta', $pregunta->id)->get();
                                         foreach ($detalles as $detalle):
                                             $respuesta = Respuesta::find($detalle->respuesta);
-                                        ?>
-                                        <div class="form-check">
-                                            <input type="radio" name="detalle[<?php echo $pregunta->id; ?>]" value="<?php echo $detalle->id; ?>" class="form-check-input" id="detalle<?php echo $detalle->id; ?>" required>
-                                            <label class="form-check-label" for="detalle<?php echo $detalle->id; ?>"><?php echo $respuesta->texto; ?></label>
-                                        </div>
+                                            ?>
+                                            <div class="form-check">
+                                                <input type="radio" name="detalle[<?php echo $pregunta->id; ?>]" value="<?php echo $detalle->id; ?>" class="form-check-input" id="detalle<?php echo $detalle->id; ?>" required>
+                                                <label class="form-check-label" for="detalle<?php echo $detalle->id; ?>"><?php echo $respuesta->texto; ?></label>
+                                            </div>
                                         <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <label for="respuestaAbierta<?php echo $pregunta->id; ?>">Tu respuesta:</label>
-                                        <textarea class="form-control" name="respuestaAbierta[<?php echo $pregunta->id; ?>]" id="respuestaAbierta<?php echo $pregunta->id; ?>" rows="4" required></textarea>
-                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <?php $index++; ?>
-                        <?php endforeach; ?>
+                            <?php $index++; ?>
+                        @endforeach
+                        
+                        {{-- Mostrar preguntas abiertas --}}
+                        @foreach ($preguntas->where('estado', false) as $pregunta)
+                            <?php
+                            if ($currentCategoria != $pregunta->categoria) {
+                                $currentCategoria = $pregunta->categoria;
+                                echo "<h2 class='mt-4'>{$currentCategoria}</h2>"; // Imprimir el título de la categoría
+                            }
+                            ?>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading<?php echo $index; ?>">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
+                                        <?php echo $index; ?>. <?php echo $pregunta->texto; ?>
+                                    </button>
+                                </h2>
+                                <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        <label for="respuestaAbierta<?php echo $pregunta->id; ?>">Tu respuesta:</label>
+                                        <textarea class="form-control" name="respuestaAbierta[<?php echo $pregunta->id; ?>]" id="respuestaAbierta<?php echo $pregunta->id; ?>" rows="4" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php $index++; ?>
+                        @endforeach
                     </div>
+                    
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-outline-primary"><i class="bi bi-send"></i> Enviar Respuestas</button>
                     </div>
@@ -158,6 +196,7 @@ $respuestas = Respuesta::all();
             </div>
         </div>
     </div>
+    
     <?php else: ?>
         <div class="container text-center mt-5">
             <div class="row">

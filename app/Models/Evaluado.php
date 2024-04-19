@@ -16,6 +16,7 @@ class Evaluado extends Model
         'evaluador_id',
         'encuesta_id',
         'vinculo_id',
+        'empresa_id'
     ];
     public function __toString()
     {

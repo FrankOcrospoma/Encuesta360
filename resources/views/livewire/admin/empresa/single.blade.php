@@ -299,93 +299,97 @@
 </script>
 
 <script>
-function abrirModalcrear() {
-    let personalId = document.getElementById('input-personal-id').value;
-    let botonTexto = personalId ? 'Actualizar' : 'Crear';
+    document.addEventListener('DOMContentLoaded', function () {
+    bsCustomFileInput.init(); // Si estás usando Bootstrap 4, esto mejora los input de archivo.
+    });
 
-    document.getElementById('btnCrearActualizarPersonal').textContent = botonTexto + ' Personal';
+    function abrirModalcrear() {
+        let personalId = document.getElementById('input-personal-id').value;
+        let botonTexto = personalId ? 'Actualizar' : 'Crear';
 
-    document.getElementById('crearPersonalForm').style.display = '';
-    document.getElementById('personalList').style.display = 'none';
-}
+        document.getElementById('btnCrearActualizarPersonal').textContent = botonTexto + ' Personal';
 
-    function cerrarModalcrear() {
-        document.getElementById('crearPersonalForm').style.display = 'none';
-        document.getElementById('personalList').style.display = '';
+        document.getElementById('crearPersonalForm').style.display = '';
+        document.getElementById('personalList').style.display = 'none';
     }
+
+        function cerrarModalcrear() {
+            document.getElementById('crearPersonalForm').style.display = 'none';
+            document.getElementById('personalList').style.display = '';
+        }
 
 </script>
 
 <script>
-function enviarDatos(empresaId) {
-    let formData = new FormData();
-    formData.append('dni', document.getElementById('input-dni').value);
-    formData.append('nombre', document.getElementById('input-nombre').value);
-    formData.append('correo', document.getElementById('input-correo').value);
-    formData.append('telefono', document.getElementById('input-telefono').value);
-    formData.append('cargo', document.getElementById('input-cargo').value);
-    formData.append('empresa', empresaId); // Utiliza el id de la empresa pasado como argumento
-    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+    function enviarDatos(empresaId) {
+        let formData = new FormData();
+        formData.append('dni', document.getElementById('input-dni').value);
+        formData.append('nombre', document.getElementById('input-nombre').value);
+        formData.append('correo', document.getElementById('input-correo').value);
+        formData.append('telefono', document.getElementById('input-telefono').value);
+        formData.append('cargo', document.getElementById('input-cargo').value);
+        formData.append('empresa', empresaId); // Utiliza el id de la empresa pasado como argumento
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
-    // Añadir el ID del personal si está presente
-    let personalId = document.getElementById('input-personal-id').value;
-    if (personalId) {
-        formData.append('personal_id', personalId);
-    }
-
-    fetch('{{ route("personals.create") }}', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Respuesta de red fallida');
+        // Añadir el ID del personal si está presente
+        let personalId = document.getElementById('input-personal-id').value;
+        if (personalId) {
+            formData.append('personal_id', personalId);
         }
-        return response.json();
-    })
-    .then(data => {
-        // Aquí puedes agregar lógica adicional para manejar la respuesta,
-        // como actualizar la interfaz de usuario o mostrar un mensaje de éxito/error.
-        console.log(data);
-        togglePersonalModal(true, empresaId); 
-        cerrarModalcrear(); 
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('El Dni ya esta registrado.');
-    });
-}
+
+        fetch('{{ route("personals.create") }}', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Respuesta de red fallida');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Aquí puedes agregar lógica adicional para manejar la respuesta,
+            // como actualizar la interfaz de usuario o mostrar un mensaje de éxito/error.
+            console.log(data);
+            togglePersonalModal(true, empresaId); 
+            cerrarModalcrear(); 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('El Dni ya esta registrado.');
+        });
+    }
 
 
 
     
-    </script>
+</script>
 <script>
-function confirmDelete(personaId, empresaId) {
-    $('#deleteConfirmButton').off('click').on('click', function() {
-        $('#confirmDeleteModal').modal('hide');
-        
-        $.ajax({
-            url: "/persona/delete/" + personaId,
-            type: "GET",
-            success: function(response) {
-                if(response.success) {
-                    togglePersonalModal(true, empresaId);
-                } else {
-                    alert(response.message);
+    function confirmDelete(personaId, empresaId) {
+        $('#deleteConfirmButton').off('click').on('click', function() {
+            $('#confirmDeleteModal').modal('hide');
+            
+            $.ajax({
+                url: "/persona/delete/" + personaId,
+                type: "GET",
+                success: function(response) {
+                    if(response.success) {
+                        togglePersonalModal(true, empresaId);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX: ", status, error);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error en la solicitud AJAX: ", status, error);
-            }
+            });
         });
-    });
 
-    $('#confirmDeleteModal').modal();
-}
+        $('#confirmDeleteModal').modal();
+    }
 
-    </script>
-        <script>
+</script>
+<script>
 
     function editarPersonal(personalId) {
         fetch(`/personal/editar/${personalId}`) // Asegúrate de tener esta ruta en tu controlador
@@ -406,7 +410,77 @@ function confirmDelete(personaId, empresaId) {
         
     }
         
-        </script>
+</script>
  
+<script>
+    function mostrarVinculos() {
+        var personalList = document.getElementById("personalList");
+        var vinculosSection = document.getElementById("vinculosSection");
+        
+        if (personalList.style.display === "none") {
+            personalList.style.display = "block";
+            vinculosSection.style.display = "none";
+        } else {
+            personalList.style.display = "none";
+            vinculosSection.style.display = "block";
+        }
+    }
+  
+</script>
 
+<script>
+    function toggleDropdown(collapseId) {
+        var x = document.getElementById(collapseId);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+function agregarVinculo(personaId, empresaId) {
+    var evaluadoId = document.getElementById("nuevoVinculo" + personaId).value;
+    var tipoVinculo = document.getElementById("tipoVinculo" + personaId).value;
+    $.ajax({
+        url: '/agregar-vinculo',
+        type: 'POST',
+        data: {
+            _token: "{{ csrf_token() }}",
+            persona_id: personaId,
+            evaluado_id: evaluadoId,
+            tipo_vinculo: tipoVinculo,
+            empresa_id: empresaId
+        },
+        success: function(response) {
+            // Añadir el nuevo elemento a la lista sin recargar la página
+            var ul = document.getElementById("vinculosLista" + personaId);
+            var li = document.createElement("li");
+            li.textContent = response.nombre + " - " + response.vinculo;
+            ul.appendChild(li);
+
+            // Actualizar el select, eliminando la opción añadida
+            var select = document.getElementById("nuevoVinculo" + personaId);
+            for (var i = 0; i < select.options.length; i++) {
+                if (select.options[i].value == evaluadoId) {
+                    select.remove(i);
+                    break;
+                }
+            }
+
+            // Opcional: limpiar el formulario
+            document.getElementById("tipoVinculo" + personaId).value = '';
+        },
+        error: function(xhr) {
+            var errorMessage = 'Error al guardar el vínculo.';
+            if(xhr.responseJSON && xhr.responseJSON.error) {
+                errorMessage += " Detalle: " + xhr.responseJSON.error;
+            } else if(xhr.responseText) {
+                errorMessage += " Detalle: " + xhr.responseText;
+            }
+            alert(errorMessage);
+        }
+    });
+}
+
+
+</script>
     
