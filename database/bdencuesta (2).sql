@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-04-2024 a las 06:04:20
+-- Tiempo de generación: 20-04-2024 a las 01:44:53
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -323,26 +323,6 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `cargos`
---
-
-CREATE TABLE `cargos` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `cargos`
---
-
-INSERT INTO `cargos` (`id`, `nombre`) VALUES
-(1, 'Jefe de área'),
-(2, 'Gerente'),
-(3, 'Desarrollador');
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `categorias`
 --
 
@@ -388,11 +368,10 @@ CREATE TABLE `cruds` (
 
 INSERT INTO `cruds` (`id`, `name`, `model`, `route`, `icon`, `active`, `built`, `with_acl`, `with_policy`, `created_at`, `updated_at`) VALUES
 (1, 'Empresa', 'App\\Models\\Empresa', 'empresa', 'fa fa-building', 1, 1, 1, 1, '2024-03-20 07:56:59', '2024-04-02 16:05:47'),
-(2, 'Cargo', 'App\\Models\\Cargo', 'cargo', 'fa fa-address-card', 1, 1, 1, 1, '2024-03-20 11:52:19', '2024-04-01 02:07:45'),
 (4, 'Personal', 'App\\Models\\Personal', 'personal', 'fa fa-user', 0, 1, 1, 1, '2024-03-20 12:17:15', '2024-04-06 07:41:43'),
 (8, 'Respuesta', 'App\\Models\\Respuesta', 'respuesta', 'fa fa-comments', 1, 1, 1, 1, '2024-03-22 11:29:00', '2024-04-01 02:07:45'),
 (9, 'Pregunta', 'App\\Models\\Pregunta', 'pregunta', 'fa fa-question', 1, 1, 1, 1, '2024-03-22 11:41:04', '2024-04-06 16:26:49'),
-(11, 'Encuesta', 'App\\Models\\Encuesta', 'encuesta', 'fa fa-file', 1, 1, 1, 1, '2024-03-23 10:07:55', '2024-04-01 02:07:45'),
+(11, 'Encuesta', 'App\\Models\\Encuesta', 'encuesta', 'fa fa-file', 0, 1, 1, 1, '2024-03-23 10:07:55', '2024-04-18 03:24:09'),
 (12, 'Envio', 'App\\Models\\Envio', 'envio', 'fa fa-paper-plane', 1, 1, 1, 1, '2024-03-26 09:51:02', '2024-04-01 02:07:45'),
 (13, 'Categoria', 'App\\Models\\Categoria', 'categoria', 'fa fa-bars', 1, 1, 1, 1, '2024-03-28 11:00:07', '2024-04-01 02:07:45'),
 (14, 'Vinculo', 'App\\Models\\Vinculo', 'vinculo', 'fa fa-link', 1, 1, 1, 1, '2024-04-07 02:08:34', '2024-04-07 02:11:31');
@@ -418,7 +397,16 @@ INSERT INTO `detalle_empresas` (`personal_id`, `empresa_id`) VALUES
 (45, 12),
 (46, 12),
 (47, 12),
-(49, 12);
+(49, 12),
+(161, 13),
+(167, 14),
+(168, 14),
+(233, 22),
+(234, 22),
+(235, 22),
+(236, 22),
+(237, 22),
+(238, 22);
 
 -- --------------------------------------------------------
 
@@ -520,6 +508,8 @@ INSERT INTO `detalle_preguntas` (`id`, `pregunta`, `respuesta`) VALUES
 (118, 49, 59),
 (121, 49, 62),
 (124, 49, 65),
+(127, 49, 68),
+(130, 49, 71),
 (92, 50, NULL),
 (102, 50, 48),
 (110, 50, 51),
@@ -528,6 +518,8 @@ INSERT INTO `detalle_preguntas` (`id`, `pregunta`, `respuesta`) VALUES
 (119, 50, 60),
 (122, 50, 63),
 (125, 50, 66),
+(128, 50, 69),
+(131, 50, 72),
 (93, 51, NULL),
 (103, 51, 49),
 (111, 51, 52),
@@ -536,6 +528,8 @@ INSERT INTO `detalle_preguntas` (`id`, `pregunta`, `respuesta`) VALUES
 (120, 51, 61),
 (123, 51, 64),
 (126, 51, 67),
+(129, 51, 70),
+(132, 51, 73),
 (104, 52, 1),
 (105, 52, 2),
 (106, 52, 3),
@@ -565,7 +559,8 @@ INSERT INTO `empresas` (`id`, `ruc`, `nombre`, `direccion`, `representante`, `es
 (12, '20602871119', 'GARZASOFT E.I.R.L.', 'CAL.NICOLAS LA TORRE NRO. 126 URB. MAGISTERIAL LAMBAYEQUE - CHICLAYO - CHICLAYO', 'GUZMAN MORI CARLOS GUSTAVO', 1),
 (13, '20100151384', 'SOFTWARE S A', 'AV. MANUEL OLGUIN NRO. 375 INT. 501C URB. LOS GRANADOS LIMA LIMA SANTIAGO DE SURCO', 'OCROSPOMA UGAZ FRANK ANTHONY', 1),
 (14, '20513613009', 'SOFTWARE ENTERPRISE SERVICES SOCIEDAD ANONIMA CERRADA', 'JR. SANTA ROSA NRO. 191 INT. 206 LIMA LIMA LIMA', NULL, 1),
-(22, '20611644940', 'TARMA & HERNANDEZ INVERSIONES E.I.R.L.', '---- LAS PAMPAS MZA. U LOTE. 22 H.U. SOL DE PIMENTEL LAMBAYEQUE CHICLAYO PIMENTEL', 'OCROSPOMA UGAZ FRANK ANTHONY', 1);
+(22, '20611644940', 'TARMA & HERNANDEZ INVERSIONES E.I.R.L.', '---- LAS PAMPAS MZA. U LOTE. 22 H.U. SOL DE PIMENTEL LAMBAYEQUE CHICLAYO PIMENTEL', 'OCROSPOMA UGAZ FRANK ANTHONY', 1),
+(23, '20539111702', 'YANSUMI MOTOR EIRL', 'CAL. 6 MZA. X LOTE. 22 OTR. PARQUE INDUSTRIAL EL ASES LIMA LIMA ATE', 'GUZMAN MORI CARLOS GUSTAVO', 1);
 
 -- --------------------------------------------------------
 
@@ -587,7 +582,9 @@ CREATE TABLE `encuestas` (
 INSERT INTO `encuestas` (`id`, `nombre`, `empresa`, `fecha`) VALUES
 (51, 'Evaluación a Edu', 12, '2024-04-10'),
 (54, 'Evaluación a Frank', 12, '2024-04-10'),
-(55, 'Evaluación a Alex', 12, '2024-04-11');
+(55, 'Evaluación a Alex', 12, '2024-04-11'),
+(58, 'Evaluación a Jose Luis Garcia en SOFTWARE ENTERPRISE SERVICES SOCIEDAD ANONIMA CERRADA', 14, '2024-04-19'),
+(59, 'Evaluación a Frank Anthony Ocrospoma en SOFTWARE ENTERPRISE SERVICES SOCIEDAD ANONIMA CERRADA', 14, '2024-04-19');
 
 -- --------------------------------------------------------
 
@@ -816,7 +813,221 @@ INSERT INTO `encuesta_preguntas` (`encuesta_id`, `detalle_id`) VALUES
 (55, 120),
 (55, 121),
 (55, 122),
-(55, 123);
+(55, 123),
+(58, 11),
+(58, 12),
+(58, 13),
+(58, 14),
+(58, 15),
+(58, 16),
+(58, 17),
+(58, 18),
+(58, 19),
+(58, 20),
+(58, 21),
+(58, 22),
+(58, 23),
+(58, 24),
+(58, 25),
+(58, 26),
+(58, 27),
+(58, 28),
+(58, 29),
+(58, 30),
+(58, 31),
+(58, 32),
+(58, 33),
+(58, 34),
+(58, 35),
+(58, 36),
+(58, 37),
+(58, 38),
+(58, 39),
+(58, 40),
+(58, 41),
+(58, 42),
+(58, 43),
+(58, 44),
+(58, 45),
+(58, 46),
+(58, 47),
+(58, 48),
+(58, 49),
+(58, 50),
+(58, 51),
+(58, 52),
+(58, 53),
+(58, 54),
+(58, 55),
+(58, 56),
+(58, 57),
+(58, 58),
+(58, 59),
+(58, 60),
+(58, 61),
+(58, 62),
+(58, 63),
+(58, 64),
+(58, 65),
+(58, 66),
+(58, 67),
+(58, 68),
+(58, 69),
+(58, 70),
+(58, 71),
+(58, 72),
+(58, 73),
+(58, 74),
+(58, 75),
+(58, 76),
+(58, 77),
+(58, 78),
+(58, 79),
+(58, 80),
+(58, 81),
+(58, 82),
+(58, 83),
+(58, 84),
+(58, 85),
+(58, 91),
+(58, 92),
+(58, 93),
+(58, 101),
+(58, 102),
+(58, 103),
+(58, 104),
+(58, 105),
+(58, 106),
+(58, 107),
+(58, 108),
+(58, 109),
+(58, 110),
+(58, 111),
+(58, 112),
+(58, 113),
+(58, 114),
+(58, 115),
+(58, 116),
+(58, 117),
+(58, 118),
+(58, 119),
+(58, 120),
+(58, 121),
+(58, 122),
+(58, 123),
+(58, 124),
+(58, 125),
+(58, 126),
+(58, 127),
+(58, 128),
+(58, 129),
+(58, 130),
+(58, 131),
+(58, 132),
+(59, 11),
+(59, 12),
+(59, 13),
+(59, 14),
+(59, 15),
+(59, 16),
+(59, 17),
+(59, 18),
+(59, 19),
+(59, 20),
+(59, 21),
+(59, 22),
+(59, 23),
+(59, 24),
+(59, 25),
+(59, 26),
+(59, 27),
+(59, 28),
+(59, 29),
+(59, 30),
+(59, 31),
+(59, 32),
+(59, 33),
+(59, 34),
+(59, 35),
+(59, 36),
+(59, 37),
+(59, 38),
+(59, 39),
+(59, 40),
+(59, 41),
+(59, 42),
+(59, 43),
+(59, 44),
+(59, 45),
+(59, 46),
+(59, 47),
+(59, 48),
+(59, 49),
+(59, 50),
+(59, 51),
+(59, 52),
+(59, 53),
+(59, 54),
+(59, 55),
+(59, 56),
+(59, 57),
+(59, 58),
+(59, 59),
+(59, 60),
+(59, 61),
+(59, 62),
+(59, 63),
+(59, 64),
+(59, 65),
+(59, 66),
+(59, 67),
+(59, 68),
+(59, 69),
+(59, 70),
+(59, 71),
+(59, 72),
+(59, 73),
+(59, 74),
+(59, 75),
+(59, 76),
+(59, 77),
+(59, 78),
+(59, 79),
+(59, 80),
+(59, 81),
+(59, 82),
+(59, 83),
+(59, 84),
+(59, 85),
+(59, 91),
+(59, 92),
+(59, 93),
+(59, 101),
+(59, 102),
+(59, 103),
+(59, 104),
+(59, 105),
+(59, 106),
+(59, 107),
+(59, 108),
+(59, 109),
+(59, 110),
+(59, 111),
+(59, 112),
+(59, 113),
+(59, 114),
+(59, 115),
+(59, 116),
+(59, 117),
+(59, 118),
+(59, 119),
+(59, 120),
+(59, 121),
+(59, 122),
+(59, 123),
+(59, 124),
+(59, 125),
+(59, 126);
 
 -- --------------------------------------------------------
 
@@ -844,7 +1055,9 @@ INSERT INTO `envios` (`id`, `persona`, `encuesta`, `estado`, `uuid`, `rango`) VA
 (68, 42, 54, 0, 'ffe8bc17-4c37-4b46-8f9e-5731c6d8cf6d', NULL),
 (69, 43, 54, 0, 'c9e7c36f-f867-4c58-9399-6add749bc084', NULL),
 (70, 45, 55, 0, 'f8920f3f-6625-4876-83bd-223f5359f76e', NULL),
-(71, 42, 55, 1, 'cc866ab8-f84e-4480-b2af-5c50ea46aea8', 3.69);
+(71, 42, 55, 1, 'cc866ab8-f84e-4480-b2af-5c50ea46aea8', 3.69),
+(73, 167, 58, 1, '54920bf7-17f7-484a-bd6e-6f8c673735a2', 2.75),
+(74, 168, 58, 1, '94bfa89a-b128-46ba-b6d7-f66bd3719d90', 3.50);
 
 -- --------------------------------------------------------
 
@@ -856,22 +1069,63 @@ CREATE TABLE `evaluados` (
   `id` int(11) NOT NULL,
   `evaluado_id` int(11) NOT NULL,
   `evaluador_id` int(11) NOT NULL,
-  `encuesta_id` int(11) NOT NULL,
-  `vinculo_id` int(11) NOT NULL
+  `encuesta_id` int(11) DEFAULT NULL,
+  `vinculo_id` int(11) NOT NULL,
+  `empresa_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `evaluados`
 --
 
-INSERT INTO `evaluados` (`id`, `evaluado_id`, `evaluador_id`, `encuesta_id`, `vinculo_id`) VALUES
-(84, 43, 42, 51, 2),
-(85, 43, 43, 51, 1),
-(86, 43, 47, 51, 3),
-(91, 42, 42, 54, 1),
-(92, 42, 43, 54, 3),
-(93, 45, 45, 55, 1),
-(94, 45, 42, 55, 3);
+INSERT INTO `evaluados` (`id`, `evaluado_id`, `evaluador_id`, `encuesta_id`, `vinculo_id`, `empresa_id`) VALUES
+(84, 43, 42, 51, 2, NULL),
+(85, 43, 43, 51, 1, NULL),
+(86, 43, 47, 51, 3, NULL),
+(91, 42, 42, 54, 1, NULL),
+(92, 42, 43, 54, 3, NULL),
+(93, 45, 45, 55, 1, NULL),
+(94, 45, 42, 55, 3, NULL),
+(174, 233, 233, NULL, 1, 22),
+(175, 233, 234, NULL, 2, 22),
+(176, 233, 235, NULL, 3, 22),
+(177, 233, 236, NULL, 5, 22),
+(178, 233, 237, NULL, 6, 22),
+(179, 233, 238, NULL, 7, 22),
+(186, 234, 234, NULL, 1, 22),
+(187, 235, 235, NULL, 1, 22),
+(188, 236, 236, NULL, 1, 22),
+(189, 237, 237, NULL, 1, 22),
+(190, 238, 238, NULL, 1, 22),
+(191, 234, 233, NULL, 2, 22),
+(192, 234, 235, NULL, 3, 22),
+(193, 234, 236, NULL, 5, 22),
+(194, 234, 237, NULL, 7, 22),
+(195, 234, 238, NULL, 6, 22),
+(196, 235, 233, NULL, 5, 22),
+(197, 235, 234, NULL, 2, 22),
+(198, 235, 238, NULL, 6, 22),
+(199, 235, 237, NULL, 3, 22),
+(200, 235, 236, NULL, 4, 22),
+(201, 236, 233, NULL, 2, 22),
+(202, 236, 237, NULL, 4, 22),
+(203, 236, 238, NULL, 6, 22),
+(204, 236, 234, NULL, 3, 22),
+(205, 236, 235, NULL, 4, 22),
+(206, 237, 234, NULL, 5, 22),
+(207, 237, 235, NULL, 3, 22),
+(208, 237, 236, NULL, 6, 22),
+(209, 237, 238, NULL, 7, 22),
+(210, 237, 233, NULL, 2, 22),
+(211, 238, 233, NULL, 3, 22),
+(212, 238, 236, NULL, 2, 22),
+(213, 238, 234, NULL, 6, 22),
+(214, 238, 235, NULL, 4, 22),
+(215, 238, 237, NULL, 7, 22),
+(216, 167, 167, 58, 1, 14),
+(217, 167, 168, 58, 3, 14),
+(218, 168, 168, 59, 1, 14),
+(219, 168, 167, 59, 3, 14);
 
 -- --------------------------------------------------------
 
@@ -960,12 +1214,12 @@ CREATE TABLE `password_reset_tokens` (
 
 CREATE TABLE `personals` (
   `id` int(11) NOT NULL,
-  `dni` varchar(20) NOT NULL,
+  `dni` varchar(20) DEFAULT NULL,
   `nombre` varchar(255) NOT NULL,
-  `correo` varchar(255) DEFAULT NULL,
+  `correo` varchar(255) NOT NULL,
   `telefono` varchar(15) DEFAULT NULL,
-  `cargo` int(11) DEFAULT NULL,
-  `estado` tinyint(1) NOT NULL DEFAULT 1
+  `cargo` text DEFAULT NULL,
+  `estado` varchar(255) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -973,12 +1227,21 @@ CREATE TABLE `personals` (
 --
 
 INSERT INTO `personals` (`id`, `dni`, `nombre`, `correo`, `telefono`, `cargo`, `estado`) VALUES
-(42, '77231754', 'OCROSPOMA UGAZ FRANK ANTHONY', 'frankocrospomaugaz@gmail.com', '920532729', 1, 1),
-(43, '72050992', 'FERNANDEZ ALVA EDU', 'frankocrospomaugaz@gmail.com', '987546213', 3, 1),
-(45, '47071856', 'SAMAME NIZAMA JOSE ALEXANDER', 'alex_3849@hotmail.com', '956930067', 1, 1),
-(46, '16734323', 'AMPUERO PASCO GILBERTO MARTIN', 'martinampuero@hotmail.com', '958746123', 2, 1),
-(47, '75010274', 'GUZMAN MORI CARLOS GUSTAVO', 'frankocrospomaugaz@gmail.com', '985472163', 3, 1),
-(49, '75376346', 'GIL FERNANDEZ GEANCARLOS', 'zcuak1221@gmail.com', '958741263', 3, 1);
+(42, '77231754', 'OCROSPOMA UGAZ FRANK ANTHONY', 'frankocrospomaugaz@gmail.com', '920532729', 'Tester', '1'),
+(43, '72050992', 'FERNANDEZ ALVA EDU', 'frankocrospomaugaz@gmail.com', '987546213', 'Administrador', '1'),
+(45, '47071856', 'SAMAME NIZAMA JOSE ALEXANDER', 'alex_3849@hotmail.com', '956930067', 'Jefe de area', '1'),
+(46, '16734323', 'AMPUERO PASCO GILBERTO MARTIN', 'martinampuero@hotmail.com', '958746123', 'Gerente', '1'),
+(47, '75010274', 'GUZMAN MORI CARLOS GUSTAVO', 'frankocrospomaugaz@gmail.com', '985472163', 'Desarrollador', '1'),
+(49, '75376346', 'GIL FERNANDEZ GEANCARLOS', 'zcuak1221@gmail.com', '958741263', 'Desarrollador', '1'),
+(161, NULL, 'Jose Luis Garcia ', 'jl.garcia.rivera.cix@gmail.com', NULL, NULL, '1'),
+(167, NULL, 'Jose Luis Garcia', 'frankocrospomaugaz@gmail.com', NULL, NULL, '1'),
+(168, NULL, 'Frank Anthony Ocrospoma', 'frankocrospomaugaz@gmail.com', NULL, NULL, '1'),
+(233, NULL, 'Jose Luis Garcia ', 'jl.garcia.rivera.cix@gmail.com', NULL, NULL, '1'),
+(234, NULL, 'Frank Anthony Ocrospoma', 'frankocrospomaugaz@gmail.com', NULL, NULL, '1'),
+(235, NULL, 'Pedro Jose Suarez', 'psuarez@gmail.com', NULL, NULL, '1'),
+(236, NULL, 'Juan Manuel Perez', 'jmperz@gmail.com', NULL, NULL, '1'),
+(237, NULL, 'Robert Luis Sosa', 'rsosa@gmail.com', NULL, NULL, '1'),
+(238, NULL, 'Ana Lorena Purisaca', 'lorenap@gmail.com', NULL, NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -1092,7 +1355,45 @@ INSERT INTO `persona_respuestas` (`id`, `persona`, `detalle`, `encuesta_id`) VAL
 (958, 42, 106, 51),
 (959, 42, 124, 51),
 (960, 42, 125, 51),
-(961, 42, 126, 51);
+(961, 42, 126, 51),
+(962, 167, 12, 58),
+(963, 167, 20, 58),
+(964, 167, 21, 58),
+(965, 167, 29, 58),
+(966, 167, 31, 58),
+(967, 167, 36, 58),
+(968, 167, 43, 58),
+(969, 167, 50, 58),
+(970, 167, 51, 58),
+(971, 167, 57, 58),
+(972, 167, 62, 58),
+(973, 167, 70, 58),
+(974, 167, 72, 58),
+(975, 167, 77, 58),
+(976, 167, 84, 58),
+(977, 167, 107, 58),
+(978, 167, 127, 58),
+(979, 167, 128, 58),
+(980, 167, 129, 58),
+(981, 168, 12, 58),
+(982, 168, 18, 58),
+(983, 168, 24, 58),
+(984, 168, 30, 58),
+(985, 168, 33, 58),
+(986, 168, 37, 58),
+(987, 168, 43, 58),
+(988, 168, 46, 58),
+(989, 168, 53, 58),
+(990, 168, 59, 58),
+(991, 168, 65, 58),
+(992, 168, 70, 58),
+(993, 168, 73, 58),
+(994, 168, 79, 58),
+(995, 168, 85, 58),
+(996, 168, 107, 58),
+(997, 168, 130, 58),
+(998, 168, 131, 58),
+(999, 168, 132, 58);
 
 -- --------------------------------------------------------
 
@@ -1175,7 +1476,13 @@ INSERT INTO `respuestas` (`id`, `texto`, `score`, `estado`) VALUES
 (64, 'vbn', NULL, 0),
 (65, 'wrevfr', NULL, 0),
 (66, 'sdvs', NULL, 0),
-(67, 'sdvasd', NULL, 0);
+(67, 'sdvasd', NULL, 0),
+(68, 'weaa', NULL, 0),
+(69, 'sisi', NULL, 0),
+(70, 'aeaaaa', NULL, 0),
+(71, 'df', NULL, 0),
+(72, 'sdvwsd', NULL, 0),
+(73, 'sadvc', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -1236,7 +1543,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('OHxsCATcGwAroekkF9vA3i5yRpPnOdGN6arAMAY9', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiQ2dKTm5abFVNVFFVY01QYThaMjNnaTFYVTFxcWVvTTQ1TjVtSWR3VSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9lbmN1ZXN0YXBkZi81MSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1713085495);
+('yGnNEeqVaRgVCrif6fzlhrOIp157xMAHA6g2vluX', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiY1kzRUtzWkIwcDFZQzFiNktPV3RXakE4U1UxVENwRFBJdE5XYXpRaSI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozNToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2VtcHJlc2EiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1713570102);
 
 -- --------------------------------------------------------
 
@@ -1265,7 +1572,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at`, `remember_token`, `current_team_id`, `profile_photo_path`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@gmail.com', NULL, '$2y$12$xG8hU7uHlLxstTwu9Nt7bu0p/ncg5y92.ER0yh4vCgApXVRr8ucZ.', NULL, NULL, NULL, 'zMqPZAg0SArUSalMJSp4MVT00tQdG9QpTBbasYFaFUSmgTTx06pG92PILgdM', NULL, NULL, '2024-03-20 07:10:54', '2024-03-20 07:10:54');
+(1, 'admin', 'admin@gmail.com', NULL, '$2y$12$xG8hU7uHlLxstTwu9Nt7bu0p/ncg5y92.ER0yh4vCgApXVRr8ucZ.', NULL, NULL, NULL, 'ZUcdOTdRiK0p6J6jbklJZYoFgJd9NmUDMi0DXjVg0h8fK2wEmHFlaCx3OMC3', NULL, NULL, '2024-03-20 07:10:54', '2024-03-20 07:10:54');
 
 -- --------------------------------------------------------
 
@@ -1286,17 +1593,14 @@ INSERT INTO `vinculos` (`id`, `nombre`) VALUES
 (1, 'Auto Evaluación'),
 (2, 'Reporte Directo'),
 (3, 'Par'),
-(4, 'Cliente');
+(4, 'Cliente'),
+(5, 'Colega'),
+(6, 'Jefe Directo'),
+(7, 'Jefe Matricial');
 
 --
 -- Índices para tablas volcadas
 --
-
---
--- Indices de la tabla `cargos`
---
-ALTER TABLE `cargos`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `categorias`
@@ -1368,7 +1672,8 @@ ALTER TABLE `evaluados`
   ADD KEY `evaluado_id` (`evaluado_id`),
   ADD KEY `evaluador_id` (`evaluador_id`),
   ADD KEY `encuesta_id` (`encuesta_id`),
-  ADD KEY `vinculo_id` (`vinculo_id`);
+  ADD KEY `vinculo_id` (`vinculo_id`),
+  ADD KEY `empresa_id` (`empresa_id`);
 
 --
 -- Indices de la tabla `failed_jobs`
@@ -1400,8 +1705,7 @@ ALTER TABLE `password_reset_tokens`
 -- Indices de la tabla `personals`
 --
 ALTER TABLE `personals`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `cargo` (`cargo`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `personal_access_tokens`
@@ -1472,12 +1776,6 @@ ALTER TABLE `vinculos`
 --
 
 --
--- AUTO_INCREMENT de la tabla `cargos`
---
-ALTER TABLE `cargos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
@@ -1493,31 +1791,31 @@ ALTER TABLE `cruds`
 -- AUTO_INCREMENT de la tabla `detalle_preguntas`
 --
 ALTER TABLE `detalle_preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
 
 --
 -- AUTO_INCREMENT de la tabla `empresas`
 --
 ALTER TABLE `empresas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `encuestas`
 --
 ALTER TABLE `encuestas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT de la tabla `envios`
 --
 ALTER TABLE `envios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT de la tabla `evaluados`
 --
 ALTER TABLE `evaluados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=220;
 
 --
 -- AUTO_INCREMENT de la tabla `failed_jobs`
@@ -1541,7 +1839,7 @@ ALTER TABLE `panel_admins`
 -- AUTO_INCREMENT de la tabla `personals`
 --
 ALTER TABLE `personals`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=239;
 
 --
 -- AUTO_INCREMENT de la tabla `personal_access_tokens`
@@ -1553,7 +1851,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT de la tabla `persona_respuestas`
 --
 ALTER TABLE `persona_respuestas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=962;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
 
 --
 -- AUTO_INCREMENT de la tabla `preguntas`
@@ -1565,7 +1863,7 @@ ALTER TABLE `preguntas`
 -- AUTO_INCREMENT de la tabla `respuestas`
 --
 ALTER TABLE `respuestas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -1583,7 +1881,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `vinculos`
 --
 ALTER TABLE `vinculos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Restricciones para tablas volcadas
@@ -1630,19 +1928,14 @@ ALTER TABLE `evaluados`
   ADD CONSTRAINT `evaluados_ibfk_1` FOREIGN KEY (`evaluado_id`) REFERENCES `personals` (`id`),
   ADD CONSTRAINT `evaluados_ibfk_2` FOREIGN KEY (`evaluador_id`) REFERENCES `personals` (`id`),
   ADD CONSTRAINT `evaluados_ibfk_3` FOREIGN KEY (`encuesta_id`) REFERENCES `encuestas` (`id`),
-  ADD CONSTRAINT `evaluados_ibfk_4` FOREIGN KEY (`vinculo_id`) REFERENCES `vinculos` (`id`);
+  ADD CONSTRAINT `evaluados_ibfk_4` FOREIGN KEY (`vinculo_id`) REFERENCES `vinculos` (`id`),
+  ADD CONSTRAINT `evaluados_ibfk_5` FOREIGN KEY (`empresa_id`) REFERENCES `empresas` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
 
 --
 -- Filtros para la tabla `panel_admins`
 --
 ALTER TABLE `panel_admins`
   ADD CONSTRAINT `panel_admins_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Filtros para la tabla `personals`
---
-ALTER TABLE `personals`
-  ADD CONSTRAINT `personals_ibfk_2` FOREIGN KEY (`cargo`) REFERENCES `cargos` (`id`);
 
 --
 -- Filtros para la tabla `persona_respuestas`
