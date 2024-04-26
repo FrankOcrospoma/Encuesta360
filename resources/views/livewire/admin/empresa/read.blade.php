@@ -7,7 +7,7 @@
                 <div class="px-2 mt-4">
 
                     <ul class="breadcrumb mt-3 py-3 px-4 rounded">
-                        <li class="breadcrumb-item"><a href="@route(getRouteName().'.home')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
+                        <li class="breadcrumb-item"><a href="@route(getRouteName().'')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
                         <li class="breadcrumb-item active">{{ __(\Illuminate\Support\Str::plural('Empresa')) }}</li>
                     </ul>
 
@@ -51,6 +51,12 @@
                     </thead>
                     <tbody>
                         @foreach($empresas as $empresa)
+                        @style('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css')
+                   
+                        @script('https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.2/dist/alpine.min.js')
+                        @script("https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js")
+                        @script("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js")
+                        
                             @livewire('admin.empresa.single', [$empresa], key($empresa->id))
                         @endforeach
                     </tbody>

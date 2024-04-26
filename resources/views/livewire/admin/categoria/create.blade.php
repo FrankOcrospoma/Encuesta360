@@ -3,7 +3,7 @@
         <h3 class="card-title">{{ __('CreateTitle', ['name' => __('Categoria') ]) }}</h3>
         <div class="px-2 mt-4">
             <ul class="breadcrumb mt-3 py-3 px-4 rounded">
-                <li class="breadcrumb-item"><a href="@route(getRouteName().'.home')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
+                <li class="breadcrumb-item"><a href="@route(getRouteName().'')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
                 <li class="breadcrumb-item"><a href="@route(getRouteName().'.categoria.read')" class="text-decoration-none">{{ __(\Illuminate\Support\Str::plural('Categoria')) }}</a></li>
                 <li class="breadcrumb-item active">{{ __('Create') }}</li>
             </ul>

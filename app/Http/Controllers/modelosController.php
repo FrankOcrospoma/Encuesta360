@@ -14,7 +14,6 @@ class ModelosController extends Controller
     public function store(Request $request)
     {
 
-        // Aquí puedes crear una nueva instancia del modelo y guardar los datos.
          Personal::create([
             'dni' => $request->input('dni'),
             'nombre' => $request->input('nombre'),
@@ -27,7 +26,6 @@ class ModelosController extends Controller
         // Añade un mensaje flash a la sesión.
         session()->flash('success', 'Guardado correctamente');
     
-        // Redirige a donde necesites después de guardar los datos.
         return redirect()->route('algunaRutaDeÉxito')->with('success', 'Encuesta creada con éxito.');
     }
 
@@ -46,7 +44,7 @@ class ModelosController extends Controller
     public function updateEstadoEmpresa(Request $request, $id)
     {
         try {
-            $empresa = Empresa::findOrFail($id); // Esto lanzará una excepción si no se encuentra el registro
+            $empresa = Empresa::findOrFail($id);
             $empresa->estado = filter_var($request->estado, FILTER_VALIDATE_BOOLEAN);
             $empresa->save();
     
@@ -58,16 +56,16 @@ class ModelosController extends Controller
     public function personal($empresaId)
     {
         try {
-            $detalle = Detalle_empresa::where('empresa_id', $empresaId)->get(); // Asegúrate que la columna se llame 'empresa_id' o ajusta según tu esquema de BD.
-            // Si estás buscando múltiples registros en Detalle_empresa, debes iterar sobre cada uno para obtener los respectivos Personal
-            $personalIds = $detalle->pluck('personal_id'); // Esto obtendrá una colección de todos los personal_id encontrados
-            $personal = Personal::whereIn('id', $personalIds)->get(); // Esto buscará todos los Personal que coincidan con los IDs
+            $detalle = Detalle_empresa::where('empresa_id', $empresaId)->get(); 
+            $personalIds = $detalle->pluck('personal_id'); 
+            $personal = Personal::whereIn('id', $personalIds)->get(); 
             $vinculos = Vinculo::all();
-            $empresa = Empresa::findOrFail($empresaId); // Esto lanzará una excepción si no se encuentra el registro
-            $vinculados = Evaluado::where('empresa_id', $empresaId)->get();
+            $empresa = Empresa::findOrFail($empresaId); 
+            $vinculados = Evaluado::where('empresa_id', $empresaId)->where('encuesta_id', null)->get();
+
+        
             return view('partials.personal_details', compact('personal', 'empresa', 'vinculados', 'vinculos'));
         } catch (\Exception $e) {
-            // Aquí manejas lo que sucede si hay un error, por ejemplo, redirigir al usuario a otra página o mostrar un mensaje de error
             return back()->withErrors(['error' => 'Error al buscar los detalles del personal: ' . $e->getMessage()]);
         }
     }

@@ -109,5 +109,10 @@
     "Categoria__nombre": "Categoria__nombre",
     "Id": "Id",
     "Vinculo": "Vinculo",
-    "Vinculos": "Vinculos"
+    "Vinculos": "Vinculos",
+    "Name": "Name",
+    "Email": "Email",
+    "Password": "Password",
+    "User": "User",
+    "Users": "Users"
 }

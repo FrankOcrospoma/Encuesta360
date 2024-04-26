@@ -12,8 +12,8 @@
 
             <ul id="sidebarnav">
                 <li class="nav-small-cap"><span class="hide-menu">{{ __('Applications') }}</span></li>
-                <li class="sidebar-item @isActive(getRouteName().'.home', 'selected')">
-                    <a class="sidebar-link @isActive(getRouteName().'.home', 'active') " href="@route(getRouteName().'.home')" aria-expanded="false">
+                <li class="sidebar-item @isActive(getRouteName().'', 'selected')">
+                    <a class="sidebar-link @isActive(getRouteName().'', 'active') " href="@route(getRouteName().'')" aria-expanded="false">
                         <i data-feather="home" class="feather-icon"></i>
                         <span class="hide-menu">{{ __('Home') }}</span>
                     </a>

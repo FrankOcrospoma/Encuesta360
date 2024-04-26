@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\Admin\Respuesta;
 
+use App\Models\Detalle_pregunta;
+use App\Models\Pregunta;
 use App\Models\Respuesta;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -31,12 +33,24 @@ class Create extends Component
 
         $this->dispatchBrowserEvent('show-message', ['type' => 'success', 'message' => __('CreatedMessage', ['name' => __('Respuesta') ])]);
         
-        Respuesta::create([
+        $respuesta = Respuesta::create([
             'texto' => $this->texto,
             'score' => $this->score,
             'estado' => $this->estado,
             'user_id' => auth()->id(),
         ]);
+        $preguntas = Pregunta::where('estado', true)->get();
+
+            foreach ($preguntas as $pregunta) {
+                if ($pregunta) {
+                    Detalle_pregunta::create([
+                        'pregunta' => $pregunta->id,
+                        'respuesta' => $respuesta->id,
+                    ]);                 
+                }
+            }
+   
+      
 
         $this->reset();
     }

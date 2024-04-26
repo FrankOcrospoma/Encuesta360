@@ -13,7 +13,7 @@
             </div>
 
             <ul class="breadcrumb mt-3 py-3 px-4 rounded">
-                <li class="breadcrumb-item"><a href="@route(getRouteName().'.home')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
+                <li class="breadcrumb-item"><a href="@route(getRouteName().'')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
                 <li class="breadcrumb-item active">{{ __('Translation') }}</li>
             </ul>
         </div>
@@ -51,7 +51,7 @@
 
             <div class="card-footer">
                 <button type="submit" class="btn btn-info ml-4">{{ __('Update') }}</button>
-                <a href="@route(getRouteName().'.home')" class="btn btn-default float-left">{{ __('Cancel') }}</a>
+                <a href="@route(getRouteName().'')" class="btn btn-default float-left">{{ __('Cancel') }}</a>
             </div>
         </form>
     </div>

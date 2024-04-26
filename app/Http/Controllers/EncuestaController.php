@@ -32,7 +32,7 @@ class EncuestaController extends Controller
       
         $empresaId = $request->input('empresa');
         $fecha = $request->input('fecha');
-
+        $proceso = $request->input('proceso');
         // Preguntas seleccionadas vienen como un array de IDs desde el formulario
         $preguntasSeleccionadas = $request->input('preguntasSeleccionadas', []);
     
@@ -46,9 +46,12 @@ class EncuestaController extends Controller
             $encuestaId = $request->input('encuesta_id');
             
             if ($encuestaId) {
+                foreach ($evaluadosSeleccionados as $key => $evsel) {
+
+                $persona = Personal::find($evsel);
                 $encuesta = Encuesta::findOrFail($encuestaId);
                 $encuesta->update([
-                    'nombre' => $nombre,
+                    'nombre' => 'Evaluación a ' . $persona->nombre ,
                     'empresa' => $empresaId,
                     'fecha' => $fecha,
                 ]);
@@ -69,24 +72,28 @@ class EncuestaController extends Controller
                
     
                 // Eliminamos los evaluadores existentes
-                Evaluado::where('encuesta_id', $encuestaId)->delete();
+                $evaluados  = Evaluado::where('empresa_id', $empresaId)->where('evaluado_id',$evsel)->get();
     
                 // Añadimos los nuevos evaluadores seleccionados
-                foreach ($evaluadosSeleccionados as $index => $evaluadorId) {
-                    Evaluado::create([
-                        'evaluado_id' => $evaluado,
-                        'evaluador_id' => $evaluadorId,
+                foreach ($evaluados as $evs) {
+                    Evaluado::updateOrCreate([
+                        [
+                            'id' => $evs->id,      // clave(s) por las que buscar
+                        ],
+                        'evaluado_id' => $evsel,
+                        'evaluador_id' => $persona->id,
                         'encuesta_id' => $encuesta->id,
                     ]);
                 }
+            }
             } else {
                 foreach ($evaluadosSeleccionados as $key => $evsel) {
                     $persona = Personal::find($evsel);
-                    $empresa = Empresa::find($empresaId);
                     $encuesta = Encuesta::create([
-                        'nombre' => 'Evaluación a ' . $persona->nombre . ' en ' . $empresa->nombre,
+                        'nombre' => 'Evaluación a ' . $persona->nombre ,
                         'empresa' => $empresaId,
                         'fecha' => $fecha,
+                        'proceso' => $proceso
                     ]);
                     // Para cada pregunta seleccionada, creamos una entrada en la tabla 'encuesta_preguntas'
                     foreach ($preguntasSeleccionadas as $preguntaId) {
@@ -240,7 +247,20 @@ public function destroy($id)
     public function generarPDF($encuestaId)
     {
         // Buscar la encuesta por el ID proporcionado
-        $encuesta = Encuesta::find($encuestaId);
+            // Buscar la encuesta por el ID proporcionado
+    $encuesta = Encuesta::find($encuestaId);
+
+    if (!$encuesta) {
+        return redirect()->back()->withErrors(['error' => 'La encuesta no existe.']);
+    }
+
+    $envios = Envio::where('encuesta', $encuestaId)->where('estado', true)->get();
+
+    if ($envios->isEmpty()) {
+        // Redirigir con un mensaje si no hay envíos en estado "True"
+        return redirect()->back()->with('error', 'No hay envíos completados para esta encuesta.');
+    }
+
         $encuesta_pre = Encuesta_pregunta::where('encuesta_id', $encuestaId)
         ->first(); // Usamos first() en lugar de get() para obtener solo un objeto en lugar de una colección
         
@@ -256,7 +276,14 @@ public function destroy($id)
 
         $empresa = Empresa::where('id', $encuesta->empresa)->firstOrFail();
 
-        $preguntas = Pregunta::where('estado', true)->get();
+        $preguntas = Pregunta::select('preguntas.*')  // Selecciona todas las columnas de preguntas
+                ->distinct()  // Asegúrate de que las preguntas sean únicas
+                ->where('estado', true)
+                ->join('detalle_preguntas', 'preguntas.id', '=', 'detalle_preguntas.pregunta')
+                ->join('persona_respuestas', 'detalle_preguntas.id', '=', 'persona_respuestas.detalle')
+                ->where('persona_respuestas.encuesta_id', $encuestaId)
+                ->get();
+
         $preguntasAbiertas = Pregunta::where('preguntas.estado', false)
                 ->join('detalle_preguntas', 'preguntas.id', '=', 'detalle_preguntas.pregunta')
                 ->join('persona_respuestas', 'detalle_preguntas.id', '=', 'persona_respuestas.detalle')
@@ -273,16 +300,11 @@ public function destroy($id)
                 ->selectRaw("GROUP_CONCAT(DISTINCT respuestas.texto ORDER BY respuestas.id SEPARATOR '\n') as respuestaTexto")
                 ->groupBy('preguntas.texto', 'vinculos.nombre')
                 ->get();
-
-    
-    
-    
-    
-    
-    
+       
         $categorias = Categoria::all();
 
-        $respuestas = Respuesta::where('estado', true)->get();
+        $respuestas = Respuesta::where('estado', true)->where('score', '!=', 0)->get();
+
 
         $envios = Envio::with('persona')
             ->where('encuesta', $encuestaId)
@@ -314,11 +336,11 @@ public function destroy($id)
                 'cargo' => $item->nombre_vinculo,
                 'promedio_rango' => number_format($item->promedio_score, 2), // Formatear a dos decimales
                 'cantidad_envios' => $item->cantidad_respuestas,
-                'cantidad_rango_1' => $item->Oportunidad_Crítica,
-                'cantidad_rango_2' => $item->Debe_Mejorar,
-                'cantidad_rango_3' => $item->Regular,
-                'cantidad_rango_4' => $item->Hábil,
-                'cantidad_rango_5' => $item->Destaca,
+                'cantidad_rango_1' => $item->Oportunidad_Crítica ?? 0,
+                'cantidad_rango_2' => $item->Debe_Mejorar ?? 0,
+                'cantidad_rango_3' => $item->Regular ?? 0,
+                'cantidad_rango_4' => $item->Hábil ?? 0,
+                'cantidad_rango_5' => $item->Destaca ?? 0,
             ];
         }
 

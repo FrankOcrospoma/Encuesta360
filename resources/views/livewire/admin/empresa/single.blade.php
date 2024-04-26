@@ -184,6 +184,7 @@
   
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.switch input').forEach(item => {
@@ -428,7 +429,14 @@
   
 </script>
 
+    
 <script>
+        function quitarEvaluador(element) {
+        var evaluadoId = $(element).data('evaluado-id');
+        console.log("Eliminando evaluado con ID: ", evaluadoId);
+        // Subir hasta el ancestro correcto que sea un <li>
+        $(element).closest('div.list-group-item').remove();
+    }
     function toggleDropdown(collapseId) {
         var x = document.getElementById(collapseId);
         if (x.style.display === "none") {
@@ -437,50 +445,141 @@
             x.style.display = "none";
         }
     }
-function agregarVinculo(personaId, empresaId) {
-    var evaluadoId = document.getElementById("nuevoVinculo" + personaId).value;
-    var tipoVinculo = document.getElementById("tipoVinculo" + personaId).value;
-    $.ajax({
-        url: '/agregar-vinculo',
-        type: 'POST',
-        data: {
-            _token: "{{ csrf_token() }}",
-            persona_id: personaId,
-            evaluado_id: evaluadoId,
-            tipo_vinculo: tipoVinculo,
-            empresa_id: empresaId
-        },
-        success: function(response) {
-            // Añadir el nuevo elemento a la lista sin recargar la página
-            var ul = document.getElementById("vinculosLista" + personaId);
-            var li = document.createElement("li");
-            li.textContent = response.nombre + " - " + response.vinculo;
-            ul.appendChild(li);
+  // Variable global para mantener el conteo de los índices por persona
+var indicesPorPersona = {};
 
-            // Actualizar el select, eliminando la opción añadida
-            var select = document.getElementById("nuevoVinculo" + personaId);
-            for (var i = 0; i < select.options.length; i++) {
-                if (select.options[i].value == evaluadoId) {
-                    select.remove(i);
+function agregarVinculo(personaId) {
+    var selectEvaluados = document.getElementById('input-evaluadores-' + personaId);
+    var evaluadorId = selectEvaluados.value;
+    var evaluadorNombre = selectEvaluados.options[selectEvaluados.selectedIndex].text;
+    var tipoVinculo = document.getElementById('tipoVinculo-' + personaId);
+    var vinculoId = tipoVinculo.value;
+    var vinculoNombre = tipoVinculo.options[tipoVinculo.selectedIndex].text;
+
+    // Verifica si la personaId ya tiene un contador, si no, lo inicializa a 0
+    if (!indicesPorPersona[personaId]) {
+        indicesPorPersona[personaId] = 0;
+    }
+
+    // Incrementa el índice para la persona actual
+    indicesPorPersona[personaId]++;
+
+    var listaEvaluadores = document.getElementById('lista-evaluadores-ul-' + personaId);
+    var li = document.createElement('div');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+    li.draggable = true;
+    li.innerHTML = `
+        <span class="col-1">${indicesPorPersona[personaId]}</span>
+        <span class="col-3">${evaluadorNombre}</span>
+        <span class="col-3">${vinculoNombre}</span>
+        <input type="hidden" name="evaluadoresSeleccionados[]" value="${evaluadorId}">
+        <input type="hidden" name="evaluadoresVinculos[]" value="${vinculoId}">
+        <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluador" data-evaluado-id="${evaluadorId}" onclick="quitarEvaluador(this)">
+            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+        </button>
+    `;
+    listaEvaluadores.appendChild(li);
+
+    // Lógica para actualizar el select y remover la opción añadida
+    selectEvaluados.remove(selectEvaluados.selectedIndex);
+}
+
+
+function guardarVinculos(index) {
+    const evaluadoresSeleccionados = [];
+    const evaluadoresVinculos = [];
+    const listaEvaluadores = document.querySelectorAll(`#lista-evaluadores-ul-${index} input[name="evaluadoresSeleccionados[]"]`);
+
+    listaEvaluadores.forEach(input => {
+        evaluadoresSeleccionados.push(input.value);
+    });
+
+    const listaVinculos = document.querySelectorAll(`#lista-evaluadores-ul-${index} input[name="evaluadoresVinculos[]"]`);
+
+    listaVinculos.forEach(input => {
+        evaluadoresVinculos.push(input.value);
+    });
+
+    const empresaId = document.querySelector('input[name="empresa_id"]').value;
+
+    const dataToSend = {
+        evaluadores: evaluadoresSeleccionados,
+        empresa_id: empresaId,
+        personal_id: index,
+        vinculos: evaluadoresVinculos
+    };
+
+    console.log(dataToSend); // Depuración para ver los datos que se enviarán
+
+    fetch('{{ route("agregar-vinculo") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify(dataToSend)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Respuesta del servidor:', data); // Más depuración
+        alert('Vínculos guardados correctamente.');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al guardar los vínculos: ' + error.message);
+    });
+}
+
+function recuperarUltimosVinculos() {
+    const empresaId = document.querySelector('input[name="empresa_id"]').value;
+
+    fetch(`/recuperar-ultimos-vinculos?empresa_id=${empresaId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        data.forEach(vinculo => {
+            const evaluadorId = vinculo.evaluador_id;
+            const vinculoId = vinculo.vinculo_id;
+            const evaluadorNombre = vinculo.evaluador.nombre;
+            const vinculoNombre = vinculo.vinculo.nombre;
+            const personaId = vinculo.evaluado_id;
+            const listaEvaluadores = document.getElementById(`lista-evaluadores-ul-${personaId}`);
+            const selectEvaluados = document.getElementById(`input-evaluadores-${personaId}`);
+
+            // Crear el elemento de la lista
+            const li = document.createElement('div');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.draggable = true;
+            li.innerHTML = `
+                <span class="col-1">${personaId}</span>
+                <span class="col-3">${evaluadorNombre}</span>
+                <span class="col-3">${vinculoNombre}</span>
+                <input type="hidden" name="evaluadoresSeleccionados[]" value="${evaluadorId}">
+                <input type="hidden" name="evaluadoresVinculos[]" value="${vinculoId}">
+                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluador" data-evaluado-id="${evaluadorId}" onclick="quitarEvaluador(this)">  <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+            `;
+            listaEvaluadores.appendChild(li);
+
+            // Eliminar la opción del selector si ya está en la lista
+            for (let i = 0; i < selectEvaluados.options.length; i++) {
+                if (selectEvaluados.options[i].value == evaluadorId) {
+                    selectEvaluados.remove(i);
                     break;
                 }
             }
-
-            // Opcional: limpiar el formulario
-            document.getElementById("tipoVinculo" + personaId).value = '';
-        },
-        error: function(xhr) {
-            var errorMessage = 'Error al guardar el vínculo.';
-            if(xhr.responseJSON && xhr.responseJSON.error) {
-                errorMessage += " Detalle: " + xhr.responseJSON.error;
-            } else if(xhr.responseText) {
-                errorMessage += " Detalle: " + xhr.responseText;
-            }
-            alert(errorMessage);
-        }
+        });
+        alert('Últimos vínculos recuperados y agregados a las listas.');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al recuperar los últimos vínculos: ' + error.message);
     });
 }
 
 
 </script>
-    

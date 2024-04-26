@@ -92,8 +92,7 @@
             table-layout: fixed;
             /* Establecer un ancho fijo para las celdas */
             margin-left: 5%;
-            /* Agregar margen a la izquierda */
-        }
+            margin-bottom:-30px        }
 
         .table th,
         .table td {
@@ -1001,13 +1000,17 @@
     <h2 style="font-size: 14px; width: 85%; margin-left: 50px; background-color: gainsboro;">
         {{ $preguntaTexto }}
     </h2>
-    @foreach ($vinculos as $preg)
-    <h2 class="@if($preg->nombreVinculos == 'Auto Evaluación') blue-line
-                @elseif($preg->nombreVinculos == 'Par') red-line
-                @elseif($preg->nombreVinculos == 'Reporte Directo') green-line
-                @elseif($preg->nombreVinculos == 'Cliente') purple-line
-                @else yellow-line
-                @endif" style="font-size: 14px;height: 18px; margin-left: 50px; width: 85%;">
+    @foreach ($vinculos as $index => $preg)
+
+ 
+
+    <h2 class="@if($index % 6 == 0) blue-line
+    @elseif($index % 6 == 1) red-line
+    @elseif($index % 6 == 2) green-line
+    @elseif($index % 6 == 3) purple-line
+    @elseif($index % 6 == 4) orange-line
+    @else yellow-line
+    @endif" style="font-size: 14px;height: 18px; margin-left: 50px; width: 85%;">
         {{ $preg->nombreVinculos }}
     </h2>
     <p style="margin-left: 100px;">{!! nl2br(e($preg->respuestaTexto)) !!}</p>

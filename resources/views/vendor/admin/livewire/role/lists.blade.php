@@ -10,7 +10,7 @@
             </div>
 
             <ul class="breadcrumb mt-3 py-3 px-4 rounded">
-                <li class="breadcrumb-item"><a href="@route(getRouteName().'.home')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
+                <li class="breadcrumb-item"><a href="@route(getRouteName().'')" class="text-decoration-none">{{ __('Dashboard') }}</a></li>
                 <li class="breadcrumb-item active">{{ __('Role Manager') }}</li>
             </ul>
         </div>

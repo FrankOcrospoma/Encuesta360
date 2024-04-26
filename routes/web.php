@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Models\Encuesta;
 use Barryvdh\DomPDF\Facade\PDF;
-use Inertia\Inertia;
 use App\Http\Controllers\EncuestaController;
 use App\Http\Controllers\RespuestasController;
 use App\Http\Controllers\ModelosController;
@@ -20,25 +18,31 @@ use App\Http\Controllers\PersonasEmpresaController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return view('auth.login');
 });
+Route::get('/', function () {
+    return redirect('/login');
+});
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         // 'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-    
+    Route::get('/admin', function () {
+        return view('admin::home');
+    })->name('admin');
+    // Route::get('/admin', [LoginController::class, 'index'])->name('admin');
+
     Route::get('/encuestas', function () {
         return view('admin::encuestas');
     })->name('encuestas');
@@ -80,3 +84,4 @@ Route::get('/usuarios-por-empresa/{empresaId}', [PersonasEmpresaController::clas
 Route::get('/encuestas/ver/{persona_id}/{encuesta_id}', [EncuestaController::class, 'verRespuestas'])->name('encuestas.ver');
 Route::get('/personal/search', [PersonasEmpresaController::class, 'search'])->name('personals.search');
 Route::post('/agregar-vinculo', [PersonasEmpresaController::class, 'agregarVinculo'])->name('agregar-vinculo');
+Route::get('/recuperar-ultimos-vinculos', [PersonasEmpresaController::class, 'recuperarUltimosVinculos'])->name('recuperar-ultimos-vinculos');

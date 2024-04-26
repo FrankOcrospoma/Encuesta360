@@ -92,16 +92,37 @@ class PersonasEmpresaController extends Controller
         return back()->with('success', 'Importación de personas completada con éxito para la empresa seleccionada.');
     }
     public function agregarVinculo(Request $request) {
- 
-        $vinculo = Evaluado::create([
-            'evaluado_id' => $request->persona_id,
-            'evaluador_id' => $request->evaluado_id,
-            'vinculo_id' => $request->tipo_vinculo,
-            'empresa_id' => $request->empresa_id,
-        ]);
-        return response()->json([
-            'nombre' => $vinculo->evaluador->nombre,  // Asegúrate que el modelo Personal tiene un campo nombre
-            'vinculo' => $vinculo->Vinculo->nombre  // Asumiendo que el modelo Vinculo tiene un campo nombre
-        ]);
-    }    
+        try {
+            Evaluado::where('evaluado_id', $request->personal_id)->where('empresa_id', $request->empresa_id)->where('encuesta_id', null)->delete();
+            foreach ($request->evaluadores as $index => $evaluadorId) {
+                Evaluado::create([
+                    'evaluado_id' => $request->personal_id,
+                    'evaluador_id' => $evaluadorId,
+                    'vinculo_id' => $request->vinculos[$index],
+                    'empresa_id' => $request->empresa_id,
+                ]);
+            }
+            
+            return response()->json(['message' => 'Vínculos guardados correctamente']);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['error' => 'Error al guardar los vínculos: ' . $e->getMessage()], 500);
+        }
+        
+    }
+
+    public function recuperarUltimosVinculos(Request $request)
+{
+    $empresaId = $request->empresa_id;
+    $ultimosVinculos = Evaluado::with(['evaluador', 'vinculo'])
+                                ->where('empresa_id', $empresaId)
+                                ->whereNotNull('encuesta_id')
+                                ->orderBy('encuesta_id', 'desc')
+                                ->get();
+
+    return response()->json($ultimosVinculos);
 }
+
+
+}
+

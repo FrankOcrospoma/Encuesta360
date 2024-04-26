@@ -7,6 +7,7 @@ use App\Models\Pregunta;
 use App\Models\Respuesta;
 use App\Models\Personal; 
 use App\Models\Encuesta;
+use App\Models\Empresa;
 
 use App\Models\Vinculo;
 use App\Models\Envio;
@@ -20,20 +21,38 @@ $encuestas = Encuesta::with('evaluados.personal')->get();
 $vinculos = Vinculo::all();
 $evals = Evaluado::all();
 $envios = Envio::all();
-?>
 
+?>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
 <style>
     .list-group-item.over {
   border: 1px dashed #000;
   
 }
 
+.pdf-export-btn {
+        background-color: #d9534f; /* Rojo Bootstrap para el botón de PDF */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .pdf-export-btn:hover {
+        background-color: #c9302c; /* Rojo más oscuro para hover */
+        color: white;
+        text-decoration: none;
+    }
 
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
 
 <style>
+        .btn-rounded {
+        border-radius: 5px; /* Ajusta este valor según tus necesidades para más o menos redondeo */
+    }
     .dragging {
         border: 2px dashed #000000; /* Usa el color que prefieras */
     }
@@ -92,14 +111,22 @@ $envios = Envio::all();
             @csrf
             <div class="card-body">
                 <input type='hidden' name='encuesta_id' value="{{ $encuesta->id ?? '' }}">
-
+                <!-- Proceso Input -->
+                <div class='form-group'>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for='input-proceso' class='col-sm-2 control-label'> {{ __('Proceso') }}</label>
+                            <input type='text' name='proceso' id='input-proceso' class="form-control @error('proceso') is-invalid @enderror" placeholder='' autocomplete='on'>
+                            @error('proceso') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+                </div>
     
                 <div class='form-group'>
-                    <div class='row'>
-                        <!-- Empresa Input -->
-                        <div class='col-sm-6'>
+                    <div class="row">
+                        <div class="col-md-6">
                             <label for='input-empresa' class='control-label'> {{ __('Empresa') }}</label>
-                            <select name='empresa' id='input-empresa' class="form-control @error('empresa') is-invalid @enderror">
+                            <select name='empresa'  id='input-empresa' class="form-control @error('empresa') is-invalid @enderror">
                                 @foreach(getCrudConfig('Personal')->inputs()['empresa']['select'] as $key => $value)
                                     <option value='{{ $key }}' {{ isset($encuesta) && $encuesta->empresa == $key ? 'selected' : '' }}>{{ $value }}</option>
                                 @endforeach
@@ -108,7 +135,7 @@ $envios = Envio::all();
                         </div>
                 
                         <!-- Fecha Input -->
-                        <div class='col-sm-6'>
+                        <div class="col-md-6">
                             <label for='input-fecha' class='control-label'> {{ __('Fecha') }}</label>
                             <input type='date' name='fecha' id='input-fecha' class="form-control @error('fecha') is-invalid @enderror" autocomplete='on' value="{{ $encuesta->fecha ?? ''}}">
                             @error('fecha') <div class='invalid-feedback'>{{ $message }}</div> @enderror
@@ -123,7 +150,7 @@ $envios = Envio::all();
                 <div class='form-group'>
                     <label for='input-evaluados' class='form-label'>{{ __('Evaluado') }}</label>
 
-                    <div class="d-flex" style="align-items: stretch;">
+                    <div class="d-flex" >
        
                         <select name='evaluado' id='input-evaluados' class="form-control @error('evaluado') is-invalid @enderror">
                             @isset($evaluados)
@@ -284,7 +311,7 @@ $envios = Envio::all();
 <!-- Modal -->
 @foreach($encuestas as $index => $encuesta)
 <!-- Modal -->
-<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+<div style="z-index: 9999; margin-left: 9px" class="modal fade" id="modal" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -309,64 +336,179 @@ $envios = Envio::all();
 
 
 <div id="listarEncuestaBlock" class="mt-4">
-    <h2></h2>
-    <div class="card">
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Evaluado</th> <!-- Nueva columna -->
-                        <th>Empresa</th>
-                        <th>Fecha</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($encuestas as $encuesta)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $encuesta->nombre }}</td>
-                        <td>
-                            @php
-                            // Crear una colección a partir de los evaluados para filtrar y mostrar nombres únicos
-                            $nombresUnicos = $encuesta->evaluados->map(function($evaluado) {
-                                return $evaluado->personal->nombre;
-                            })->unique();
-                            @endphp
-                        
-                            @foreach($nombresUnicos as $nombre)
-                                {{ $nombre }}<br>
-                            @endforeach
-                        </td>
-                        
-                        <td>{{ $encuesta->Empresa }}</td> <!-- Asumiendo que empresa es accesible directamente -->
-                        <td>{{ \Carbon\Carbon::parse($encuesta->fecha)->format('d/m/Y') }}</td>
+    <div id="accordion">
+        @php
+        $encuestasPorEmpresa = $encuestas->groupBy('empresa');
+        @endphp
 
-                        <td>
-                            @php
-                           $envios = Envio::where('encuesta',$encuesta->id)->get();
-                            
-                            @endphp
-                        @if($envios->isNotEmpty())
-                        <button class="btn btn-primary btn-sm" disabled><i class="icon-pencil"></i></button>
-                        <button class="btn btn-warning btn-sm" disabled><i class="fas fa-paper-plane"></i></button>
-                          
-                        @else
-                        <a href="{{ route('encuestas.edit', $encuesta->id) }}" class="btn btn-primary btn-sm"><i class="icon-pencil"></i></a>
-                        <a href="{{ route('enviar.encuesta', $encuesta->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-paper-plane"></i></a>
-                        @endif
-                            <a href="{{ route('encuestas.destroy', $encuesta->id) }}" class="btn btn-danger btn-sm"> <i class="icon-trash"></i></a>
-                            
-                        </td>
-                    </tr>
+        @foreach($encuestasPorEmpresa as $empresaId => $encuestasDeEmpresa)
+        @php
+        $empresa = Empresa::find($empresaId);
+        $encuestasPorProceso = $encuestasDeEmpresa->groupBy('proceso');
+        @endphp
+        <div class="card">
+            <div class="card-header" id="headingEmpresa{{ $empresaId }}">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseEmpresa{{ $empresaId }}" aria-expanded="true" aria-controls="collapseEmpresa{{ $empresaId }}">
+                        {{ $empresa->nombre ?? 'Empresa no encontrada' }}
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseEmpresa{{ $empresaId }}" class="collapse" aria-labelledby="headingEmpresa{{ $empresaId }}" data-parent="#accordion">
+                <div class="card-body">
+                    @foreach($encuestasPorProceso as $proceso => $encuestasDelProceso)
+                    <div class="card">
+                        <div class="card-header" id="headingProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" aria-expanded="true" aria-controls="collapseProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}">
+                                    {{ $proceso }}
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" class="collapse" aria-labelledby="headingProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" data-parent="#collapseEmpresa{{ $empresaId }}">
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Nombre</th>
+                                            <th>Evaluado</th>
+                                            <th>Fecha</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($encuestasDelProceso as $encuesta)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $encuesta->nombre }}</td>
+                                            <td>
+                                                @php
+                                                // Crear una colección a partir de los evaluados para filtrar y mostrar nombres únicos
+                                                $nombresUnicos = $encuesta->evaluados->map(function($evaluado) {
+                                                    return $evaluado->personal->nombre;
+                                                })->unique();
+                                                @endphp
+
+                                                @foreach($nombresUnicos as $nombre)
+                                                {{ $nombre }}<br>
+                                                @endforeach
+                                            </td>
+                                            <td>{{ \Carbon\Carbon::parse($encuesta->fecha)->format('d/m/Y') }}</td>
+                                            <td>
+                                                @php
+                                                $envios = Envio::where('encuesta',$encuesta->id)->get();
+                                                @endphp
+                                                @if($envios->isNotEmpty())
+                                                <a title="PDF" href="{{ route('encuestas.pdf', ['encuesta' => $encuesta->id]) }}" class="btn pdf-export-btn btn-rounded" target="_blank">
+                                                    <i class="bi bi-file-earmark-pdf"></i>
+                                                </a>
+                                                <button title="Ver Envíos" class="btn btn-info btn-sm btn-rounded" data-toggle="modal" data-target="#enviosModal{{$encuesta->id}}">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                
+                                                @else
+                                                <a href="{{ route('encuestas.edit', $encuesta->id) }}" class="btn btn-primary btn-sm btn-rounded"><i class="icon-pencil"></i></a>
+                                                <button title="Enviar encuesta" class="btn btn-warning btn-sm abrirModalEnvio btn-rounded" data-id="{{ $encuesta->id }}"><i class="fas fa-paper-plane"></i></button>
+                                                @endif
+                                                <button class="btn btn-danger btn-sm abrirModalEliminacion btn-rounded" data-id="{{ $encuesta->id }}"><i class="fas fa-trash-alt"></i></button>
+                                            </td>
+                                        </tr>
+                                        <!-- Modal para mostrar los envíos de la encuesta -->
+                                        <div class="modal fade" id="enviosModal{{$encuesta->id}}" tabindex="-1" role="dialog" aria-labelledby="enviosModalLabel{{$encuesta->id}}" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="enviosModalLabel{{$encuesta->id}}">Detalles de los Envíos para {{ $encuesta->nombre }}</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!-- Cuerpo del modal con detalles de los envíos -->
+                                                        @foreach($evals as $eval)
+                                                            @if($eval->encuesta_id == $encuesta->id)
+                                                            <div class="card mb-3">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title">{{ $eval->evaluador }}</h5>
+                                                                    @php
+                                                                        $send = Envio::where('persona', $eval->evaluador_id)->where('encuesta', $encuesta->id)->first();
+                                                                    @endphp
+                                                                    @isset($send)
+                                                                        <p class="card-text">Estado: {{$send->estado}}</p>
+                                                                        @if($send->estado == 'Respondido')
+                                                                            <button type="button" class="btn btn-primary ver-respuestas" data-toggle="modal" data-target="#modal{{$index}}" data-encuesta-id="{{ $eval->encuesta_id }}" data-persona-id="{{ $eval->evaluador_id }}">Ver</button>
+                                                                        @endif
+                                                                    @endisset
+                                                                </div>
+                                                            </div>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                     @endforeach
-                </tbody>
-            </table>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Enviar Encuesta -->
+<div class="modal fade" id="confirmacionEnvioModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionEnvioModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmacionEnvioModalLabel">Confirmar Envío</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas enviar esta encuesta?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmarEnvio">Enviar</button>
+            </div>
         </div>
     </div>
 </div>
+<!-- Modal de Confirmación para Eliminar Encuesta -->
+<div class="modal fade" id="confirmacionEliminacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionEliminacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmacionEliminacionModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar esta encuesta? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarEliminacion">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 
 <!-- Incluir CSS de Select2 -->
@@ -375,33 +517,76 @@ $envios = Envio::all();
 
 <!-- Incluir JS de Select2 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
 <script>
-$(document).ready(function() {
-    $('#lista-evaluados').on('click', '.quitar-evaluado', function() {
-        $(this).closest('li').remove();  // Elimina el <li> del evaluado
-        actualizarIndicesEvaluados();   // Actualiza los índices después de eliminar
+    $(document).ready(function() {
+        // Al hacer clic en el botón que debería abrir el modal de confirmación de eliminación
+        $('.abrirModalEliminacion').click(function() {
+            var encuestaId = $(this).data('id'); // Asegúrate de que el ID se está pasando correctamente
+            $('#confirmacionEliminacionModal').modal('show');
+    
+            // Al hacer clic en confirmar en el modal de eliminación
+            $('#confirmarEliminacion').off('click').on('click', function() {
+                $('#confirmacionEliminacionModal').modal('hide');
+                // Redireccionar para eliminar la encuesta de forma segura
+                window.location.href = '/encuestas/destroy/' + encuestaId;
+            });
+        });
     });
-    $('#input-preguntas').select2({
-        placeholder: "Seleccione una opción",
-        allowClear: true,
-        width: '100%',
-  
-
+    </script>
+    
+<script>
+    $(document).ready(function() {
+        // Al hacer clic en el botón que debería abrir el modal de confirmación
+        $('.abrirModalEnvio').click(function() {
+            var encuestaId = $(this).data('id'); // Asegúrate de que el ID se está pasando correctamente
+            $('#confirmacionEnvioModal').modal('show');
+    
+            // Al hacer clic en confirmar en el modal
+            $('#confirmarEnvio').off('click').on('click', function() {
+                $('#confirmacionEnvioModal').modal('hide');
+                // Redireccionar para enviar la encuesta
+                window.location.href = '/enviar-encuesta/' + encuestaId;
+            });
+        });
     });
-    $('#input-evaluados').select2({
-        placeholder: "Seleccione una opción",
-        allowClear: true,
-        width: '100%',
-  
-
-    });
+    </script>
     
 
-    $('.select2-container--default .select2-selection--single').css({'height': '100%'});
+<script>
+    $(document).ready(function() {
+        // Delegación de eventos para manejar clicks en botones de eliminar que se añaden dinámicamente
+        $('#lista-evaluados').on('click', '.quitar-evaluado', function() {
+            $(this).closest('li').remove();  // Elimina el <li> del evaluado
+            actualizarIndicesEvaluados();   // Actualiza los índices después de eliminar
+        });
+        $('#input-preguntas').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true,
+            width: '100%',
+    
+
+        });
+        $('#input-empresa').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true,
+            width: '100%',
+    
+
+        });
+        $('#input-evaluados').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true,
+            width: '100%',
+    
+
+        });
+
+        
+
+        $('.select2-container--default .select2-selection--single').css({'height': '100%'});
 
 
-});
+    });
 
 </script>
 
@@ -528,93 +713,105 @@ $(document).ready(function() {
     }
 
     function añadirEvaluado() {
-    var selectEvaluados = document.getElementById('input-evaluados');
-    var evaluadorId = selectEvaluados.value;
-    var evaluadorNombre = selectEvaluados.options[selectEvaluados.selectedIndex].text;
+        var selectEvaluados = document.getElementById('input-evaluados');
+        var evaluadorId = selectEvaluados.value;
+        var evaluadorNombre = selectEvaluados.options[selectEvaluados.selectedIndex].text;
 
-    // Combinar el nombre del evaluador y la relación para formar una cadena única
-    var combinacionEvaluador = evaluadorNombre ;
-    var totalFilas = document.querySelectorAll('#lista-evaluados .list-group-item').length;
-    var indice = totalFilas; // Calcular el índice sumando 1 al número total de filas
-    if (indice === 0){
-        indice = 1 ;
-    } 
-    // Verificar si el evaluador ya ha sido añadido
-    var evaluadorYaAgregado = false;
-    document.querySelectorAll('#lista-evaluados input[type="hidden"]').forEach(function(input) {
-        if (input.value === evaluadorId) {
-            evaluadorYaAgregado = true;
+        // Combinar el nombre del evaluador y la relación para formar una cadena única
+        var combinacionEvaluador = evaluadorNombre ;
+        var totalFilas = document.querySelectorAll('#lista-evaluados .list-group-item').length;
+        var indice = totalFilas; // Calcular el índice sumando 1 al número total de filas
+        if (indice === 0){
+            indice = 1 ;
+        } 
+        // Verificar si el evaluador ya ha sido añadido
+        var evaluadorYaAgregado = false;
+        document.querySelectorAll('#lista-evaluados input[type="hidden"]').forEach(function(input) {
+            if (input.value === evaluadorId) {
+                evaluadorYaAgregado = true;
+            }
+        });
+
+        if (!evaluadorYaAgregado) {
+            agregarCabezalEvaluados();
+            var li = document.createElement('div');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.draggable = true;
+            li.innerHTML = `
+                <span class="col-1">${indice}</span>
+
+                <span class="col-3">${evaluadorNombre}</span>
+        
+                <input type="hidden" name="evaluadosSeleccionados[]" value="${evaluadorId}">
+        
+                <button style="border-radius: 15%; width: 67px;"  class="btn btn-danger btn-sm quitar-evaluado" data-evaluado-id="${ evaluadorId }">  <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+            `;
+
+            li.querySelector('.quitar-evaluado').addEventListener('click', function() {
+                li.remove();
+                actualizarIndicesEvaluados();
+            });
+            // Añadir a la lista
+            document.getElementById('lista-evaluados').querySelector('.list-group').appendChild(li);
+            // Agregar cabezal si no está presente
+        
+        } else {
+            alert("Este evaluado ya ha sido seleccionado.");
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+    // Adjuntar un manejador de eventos al contenedor de la lista para manejar los clics en los botones de quitar
+    document.getElementById('lista-evaluados').addEventListener('click', function(event) {
+        if (event.target.classList.contains('quitar-evaluado') || event.target.parentNode.classList.contains('quitar-evaluado')) {
+            var li = event.target.closest('.list-group-item');
+            li.remove();
+            actualizarIndicesEvaluados();
         }
     });
 
-    if (!evaluadorYaAgregado) {
-        agregarCabezalEvaluados();
-        var li = document.createElement('div');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        li.draggable = true;
-        li.innerHTML = `
-            <span class="col-1">${indice}</span>
+    // Tu función existente añadirTodosLosEvaluados aquí
+});
 
-            <span class="col-3">${evaluadorNombre}</span>
-      
-            <input type="hidden" name="evaluadosSeleccionados[]" value="${evaluadorId}">
-       
-            <button style="border-radius: 15%; width: 67px;"  class="btn btn-danger btn-sm quitar-evaluado" data-evaluado-id="${ evaluadorId }">  <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
-        `;
-
-        li.querySelector('.quitar-evaluado').addEventListener('click', function() {
-            li.remove();
-            actualizarIndicesEvaluados();
-        });
-        // Añadir a la lista
-        document.getElementById('lista-evaluados').querySelector('.list-group').appendChild(li);
-        // Agregar cabezal si no está presente
-       
-    } else {
-        alert("Este evaluado ya ha sido seleccionado.");
-    }
-    }
-    function añadirTodosLosEvaluados() {
+function añadirTodosLosEvaluados() {
     var selectEvaluados = document.getElementById('input-evaluados');
     var evaluados = selectEvaluados.options;
 
     for (var i = 0; i < evaluados.length; i++) {
-        var evaluadoId = evaluados[i].value;
+        var evaluadorId = evaluados[i].value;
         var evaluadoNombre = evaluados[i].text;
 
         // Verificar si el evaluador ya ha sido añadido
         var evaluadorYaAgregado = false;
         document.querySelectorAll('#lista-evaluados input[type="hidden"]').forEach(function(input) {
-            if (input.value === evaluadoId) {
+            if (input.value === evaluadorId) {
                 evaluadorYaAgregado = true;
             }
         });
 
         if (!evaluadorYaAgregado) {
             var totalFilas = document.querySelectorAll('#lista-evaluados .list-group-item').length;
-            var indice = totalFilas + 1; // Calcular el índice sumando 1 al número total de filas
-            if (indice === 0){
-                indice = 1 ;
-            } 
+            var indice = totalFilas + 1;
+            agregarCabezalEvaluados();
             var li = document.createElement('div');
             li.className = 'list-group-item d-flex justify-content-between align-items-center';
             li.draggable = true;
             li.innerHTML = `
-            <span class="col-1">${indice}</span>
-
-            <span class="col-3">${evaluadoNombre}</span>
-      
-            <input type="hidden" name="evaluadosSeleccionados[]" value="${evaluadoId}">
-       
-            <button style="border-radius: 15%; width: 67px;"  class="btn btn-danger btn-sm quitar-evaluado" data-evaluado-id="${ evaluadoId }">  <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+                <span class="col-1">${indice}</span>
+                <span class="col-3">${evaluadoNombre}</span>
+                <input type="hidden" name="evaluadosSeleccionados[]" value="${evaluadorId}">
+                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluado" data-evaluado-id="${evaluadorId}">
+                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                </button>
             `;
 
-
-            document.getElementById('lista-evaluados-ul').appendChild(li);
+            document.getElementById('lista-evaluados').querySelector('.list-group').appendChild(li);
+        } else {
+            alert("Este evaluado ya ha sido seleccionado.");
         }
     }
-    actualizarIndicesEvaluados(); // Actualizar los índices después de añadir todos los evaluados
 }
+
+
 
 
 

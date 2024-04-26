@@ -12,10 +12,7 @@
 
     {{--Scripts which must load before full loading--}}
     @style('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css')
-    @script('https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
-    @script('https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
-    @script('https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.2/dist/alpine.min.js')
-    @script("/assets/admin/js/ckeditor.min.js")
+
     @script("https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js")
     @script("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js")
     {{--Styles--}}
@@ -49,7 +46,7 @@
 
                 <!-- Logo -->
                 <div class="navbar-brand">
-                    <a href="@route(getRouteName().'.home')">
+                    <a href="/encuestas">
                         <span class="logo-text">{{ __('Encuesta') }}</span>
                     </a>
 

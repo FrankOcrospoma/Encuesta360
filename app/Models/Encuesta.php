@@ -9,7 +9,7 @@ class Encuesta extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['nombre', 'empresa', 'fecha'];
+    protected $fillable = ['nombre', 'empresa', 'fecha', 'proceso'];
     protected $dates = ['fecha'];
     public function __toString()
     {

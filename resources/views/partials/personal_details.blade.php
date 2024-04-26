@@ -1,16 +1,22 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
 <!-- CSS de Bootstrap -->
 
-
-
+<?php
+use App\Models\Evaluado;
+$ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
+                        ->where('empresa_id', $empresa->id)
+                        ->whereNotNull('encuesta_id')
+                        ->orderBy('encuesta_id', 'desc')
+                        ->get();
+?>
 
 <div id="personalList">
     @if($personal->isNotEmpty())
 
-<h5 class="pb-2 border-bottom">Personas de la Empresa: {{ $empresa->nombre }}</h5>
-<br>
-@if(getCrudConfig('Personal')->create && hasPermission(getRouteName().'.personal.create', 1, 1))
-<div class="col-md-4 d-flex justify-content-between align-items-center">
+    <h5 class="pb-2 border-bottom">Personas de la Empresa: {{ $empresa->nombre }}</h5>
+    <br>
+    @if(getCrudConfig('Personal')->create && hasPermission(getRouteName().'.personal.create', 1, 1))
+    <div class="col-md-4 d-flex justify-content-between align-items-center">
     <button id="btnCrearPersonal" onclick="abrirModalcrear()" class="btn btn-success">Crear {{ __('Personal')}}</button>
     <button  id="btnVinculos" onclick="mostrarVinculos()" class="btn btn-primary mt-3">Vínculos</button>
     @if(getCrudConfig('Personal')->searchable())
@@ -216,8 +222,19 @@
 
 <div id="vinculosSection" style="display: none;">
     <h5 class="pb-2 border-bottom">Relacionar Personas</h5>
+
+    @if (!$ultimosVin->isEmpty())
+    <div class="col-md-4">
+        <button class="btn btn-info" onclick="recuperarUltimosVinculos()">Recuperar Últimos Vínculos</button>
+    </div>
+@endif
+    <br>
+    
     <div class="accordion" id="accordionVinculos">
+        
         @foreach($personal as $index => $persona)
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
         <div class="card">
             <div class="card-header" id="heading{{ $index }}">
                 <h2 class="mb-0">
@@ -228,38 +245,72 @@
             </div>
             <div id="collapse{{ $index }}" class="collapse" aria-labelledby="heading{{ $index }}" data-parent="#accordionVinculos">
                 <div class="card-body">
-                    <h6>Agregar nuevo vínculo:</h6>
-                    <form id="form{{ $persona->id }}" onsubmit="event.preventDefault(); agregarVinculo({{ $persona->id }}, {{ $empresa->id }});">
-                        <div class="form-group">
-                            <label for="nuevoVinculo{{ $persona->id }}">Seleccionar persona:</label>
-                            @php
-                                // Obtener IDs de personas ya vinculadas
-                                $vinculadosIds = $vinculados->where('evaluado_id', $persona->id)->pluck('evaluador_id')->toArray();
-                            @endphp
-                            <select class="form-control" id="nuevoVinculo{{ $persona->id }}">
-                                @foreach ($personal as $otraPersona)
-                                    @if (!in_array($otraPersona->id, $vinculadosIds))
-                                        <option value="{{ $otraPersona->id }}">{{ $otraPersona->nombre }}</option>
-                                    @endif
-                                @endforeach
-                            </select>
+                    <input type="hidden" name="empresa_id" value="{{ $empresa->id }}">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label for="input-evaluadores">Seleccionar persona:</label>
+                                @php
+                                    // Obtener IDs de personas ya vinculadas
+                                    $vinculadosIds = $vinculados->where('evaluado_id', $persona->id)->pluck('evaluador_id')->toArray();
+                                @endphp
+                               <select class="form-control" id="input-evaluadores-{{ $persona->id }}">
+
+
+                                    @foreach ($personal as $otraPersona)
+                                        @if (!in_array($otraPersona->id, $vinculadosIds))
+                                            <option value="{{ $otraPersona->id }}">{{ $otraPersona->nombre }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label>Seleccionar el vinculo:</label>
+                                <select class="form-control" id="tipoVinculo-{{ $persona->id }}">
+                                    @foreach ($vinculos as $vinculo)
+                                        <option value="{{ $vinculo->id }}" >{{ $vinculo->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2 align-self-end">
+                                <label></label><br>
+                                <button class="btn btn-outline-secondary ml-2" type="button" onclick="agregarVinculo({{ $persona->id }})">Añadir</button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <select class="form-control" id="tipoVinculo{{ $persona->id }}">
-                                @foreach ($vinculos as $vinculo)
-                                    <option value="{{ $vinculo->id }}">{{ $vinculo->nombre }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </form>
-                    <ul id="vinculosLista{{ $persona->id }}">
-                        @foreach ($vinculados as $vinculado)
-                            @if ($vinculado->evaluado_id == $persona->id)
-                                <li>{{ $vinculado->evaluador->nombre }} - {{ $vinculado->vinculo->nombre }}</li>
-                            @endif
-                        @endforeach
-                    </ul>
+                    </div>
+                        
+                        
+                    <div id="lista-evaluadores">
+                        <ul class="list-group" id="lista-evaluadores-ul-{{ $persona->id }}">
+                            <li class="list-group-item list-group-item-info d-flex justify-content-between align-items-center" >
+                                <span class="col-1">#</span>
+                                <span class="col-3">Evaluador</span>
+                                <span class="col-3">Vínculo</span>
+                
+                                <span>Acciones</span>
+                            </li>
+                    @foreach ($vinculados as $index => $vinculado)
+                        @if ($vinculado->evaluado_id == $persona->id)
+                            <div  class="list-group-item d-flex justify-content-between align-items-center" draggable = true>
+                                <span class="col-1">{{ $index + 1 }}</span> <!-- Índice incremental -->
+
+                                <span class="col-3"> {{ $vinculado->evaluador->nombre }} </span> 
+                                <span class="col-3"> {{ $vinculado->vinculo->nombre }} </span> 
+                                <input type="hidden" name="evaluadoresSeleccionados[]" value="{{ $vinculado->evaluador_id }}">
+                                <input type="hidden" name="evaluadoresVinculos[]" value="{{ $vinculado->vinculo_id }}">
+
+                                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluador" data-evaluado-id="{{ $vinculado->evaluador_id }}" onclick="quitarEvaluador(this)">
+                                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                </button>
+                                
+
+                            </div>
+                        @endif
+                    @endforeach
+                        </ul>
+                    </div>
+                    <button id="btnGuardarVinculos" class="btn btn-success mt-3" onclick="guardarVinculos({{ $persona->id }})">Guardar Vínculos</button>
+
                 </div>
             </div>
         </div>
@@ -270,13 +321,13 @@
 
 
 
+
 <div id="crearPersonalForm" style="display: none;">
     <div class="card">
         <form class="form-horizontal" method="POST" action="{{ route('personals.create') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                
-
                 <!-- ID del personal, necesario solo para actualizar -->
                 <input type="hidden" name="personal_id" id="input-personal-id">
                 
@@ -341,7 +392,3 @@
 
  
 </div>
-
-
-
-    
