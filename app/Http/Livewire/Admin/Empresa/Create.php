@@ -14,7 +14,7 @@ class Create extends Component
     public $nombre;
     public $direccion;
     public $representante;
-    public $estado = false;
+    public $estado;
     
     protected $rules = [
         'ruc' => 'required|string|max:11',

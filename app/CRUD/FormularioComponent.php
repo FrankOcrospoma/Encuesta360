@@ -2,12 +2,11 @@
 
 namespace App\CRUD;
 
-use App\Models\Empresa;
 use EasyPanel\Contracts\CRUDComponent;
 use EasyPanel\Parsers\Fields\Field;
-use App\Models\User;
+use App\Models\Formulario;
 
-class UserComponent implements CRUDComponent
+class FormularioComponent implements CRUDComponent
 {
     // Manage actions in crud
     public $create = true;
@@ -20,19 +19,19 @@ class UserComponent implements CRUDComponent
 
     public function getModel()
     {
-        return User::class;
+        return Formulario::class;
     }
 
     // which kind of data should be showed in list page
     public function fields()
     {
-        return ['name', 'email', 'empresa_id'];
+        return ['nombre'];
     }
 
     // Searchable fields, if you dont want search feature, remove it
     public function searchable()
     {
-        return ['name', 'email', 'empresa_id'];
+        return ['nombre'];
     }
 
     // Write every fields in your db which you want to have a input
@@ -40,38 +39,17 @@ class UserComponent implements CRUDComponent
     // "password", "number", "email", "select", "date", "datetime", "time"
     public function inputs()
     {
-        $options = $this->options(); // Obtenemos las opciones del método options()
-        $optionsWithDefault = [
-            'empresa' => ['Selecciona una opción'] + $options['empresa'],
-        ];
         return [
-            'name' => 'text',
-            'email' => 'email',
-            'password' => 'password',
-            'empresa_id' => [
-                'select' => $optionsWithDefault['empresa'], // Usamos las opciones con el primer ítem
-            ],
+            'nombre' => 'text',
+
         ];
     }
-    public function options()
-    {
-        // Obtener todas las categorías disponibles
-        $empresas = Empresa::pluck('nombre', 'id')->toArray();
-    
-    
-        return [
-            'empresa' => $empresas,
-        ];
-    }
+
     // Validation in update and create actions
     // It uses Laravel validation system
     public function validationRules()
     {
-        return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
-        ];
+        return [];
     }
 
     // Where files will store for inputs
@@ -79,6 +57,4 @@ class UserComponent implements CRUDComponent
     {
         return [];
     }
-    
 }
-    

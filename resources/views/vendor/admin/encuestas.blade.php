@@ -8,21 +8,30 @@ use App\Models\Respuesta;
 use App\Models\Personal; 
 use App\Models\Encuesta;
 use App\Models\Empresa;
-
+use App\Models\Formulario;
 use App\Models\Vinculo;
 use App\Models\Envio;
 use App\Models\Evaluado;
+use App\Models\Detalle_empresa;
+
 
 $preguntas = Pregunta::all();
 $respuestas = Respuesta::all()->take(5); 
-
+$formularios = Formulario::all()->keyBy('id');
 $usuarios = Personal::all();
 $encuestas = Encuesta::with('evaluados.personal')->get();
 $vinculos = Vinculo::all();
 $evals = Evaluado::all();
 $envios = Envio::all();
+$empresas = Empresa::where('estado',1)->get();
+$userempresa = auth()->user()->empresa_id;
+$emp = Empresa::where('id', auth()->user()->empresa_id)->first();
+
+
 
 ?>
+
+
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
 <style>
     .list-group-item.over {
@@ -44,7 +53,15 @@ $envios = Envio::all();
         color: white;
         text-decoration: none;
     }
+    .nombre-empresa {
+        color: #2a3f9d; /* Color verde azulado */
+        font-weight: bold;
 
+        margin-bottom: 0.5em;
+        border-bottom: 2px solid #264653; /* Añade una línea debajo del texto */
+        padding-bottom: 0.3em;
+        display: inline-block; /* Para que la línea no ocupe el 100% */
+    }
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
@@ -79,16 +96,17 @@ $envios = Envio::all();
 
 
 <ul class="nav nav-tabs">
-    <li class="nav-item"><a class="nav-link active" id="listarEncuestaLink">Listado de Encuestas</a></li> <!-- Nuevo elemento de menú -->
+    <li class="nav-item"><a class="nav-link active" id="listarEncuestaLink">Listado de Procesos </a></li> <!-- Nuevo elemento de menú -->
+    @if ($userempresa == null)
     <li class="nav-item"><a class="nav-link" id="crearEncuestaLink">Crear Encuesta</a></li>
-    <li class="nav-item"><a class="nav-link" id="enviarEncuestaLink">Enviados</a></li>
+    @endif
 </ul>
 
 @if(session('error'))
     <div class="alert alert-danger">
         {{ session('error') }}
     </div>
-@endif
+
 
 @if($errors->any())
     <div class="alert alert-danger">
@@ -99,6 +117,9 @@ $envios = Envio::all();
         </ul>
     </div>
 @endif
+@endif
+
+@if ($userempresa  == null) 
 
 <div id="crearEncuestaBlock" class="mt-4" style="display: none;">
     <div class="card">
@@ -115,11 +136,18 @@ $envios = Envio::all();
                 <div class='form-group'>
                     <div class="row">
                         <div class="col-md-6">
-                            <label for='input-proceso' class='col-sm-2 control-label'> {{ __('Proceso') }}</label>
+                            <label for='input-proceso' class='control-label'> {{ __('Proceso') }}</label>
                             <input type='text' name='proceso' id='input-proceso' class="form-control @error('proceso') is-invalid @enderror" placeholder='' autocomplete='on'>
                             @error('proceso') <div class='invalid-feedback'>{{ $message }}</div> @enderror
                         </div>
+                           <!-- Fecha Input -->
+                        <div class="col-md-6">
+                            <label for='input-fecha' class='control-label'> {{ __('Fecha') }}</label>
+                            <input type='date' name='fecha' id='input-fecha' class="form-control @error('fecha') is-invalid @enderror" autocomplete='on' value="{{ $encuesta->fecha ?? ''}}">
+                            @error('fecha') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+                        </div>
                     </div>
+                  
                 </div>
     
                 <div class='form-group'>
@@ -127,19 +155,22 @@ $envios = Envio::all();
                         <div class="col-md-6">
                             <label for='input-empresa' class='control-label'> {{ __('Empresa') }}</label>
                             <select name='empresa'  id='input-empresa' class="form-control @error('empresa') is-invalid @enderror">
-                                @foreach(getCrudConfig('Personal')->inputs()['empresa']['select'] as $key => $value)
-                                    <option value='{{ $key }}' {{ isset($encuesta) && $encuesta->empresa == $key ? 'selected' : '' }}>{{ $value }}</option>
+                                @foreach($empresas as $key => $value)
+                                    <option value='{{ $value->id }}'>{{ $value }}</option>
                                 @endforeach
                             </select>
                             @error('empresa') <div class='invalid-feedback'>{{ $message }}</div> @enderror
                         </div>
-                
-                        <!-- Fecha Input -->
                         <div class="col-md-6">
-                            <label for='input-fecha' class='control-label'> {{ __('Fecha') }}</label>
-                            <input type='date' name='fecha' id='input-fecha' class="form-control @error('fecha') is-invalid @enderror" autocomplete='on' value="{{ $encuesta->fecha ?? ''}}">
-                            @error('fecha') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+                            <label for='input-formulario' class='control-label'> {{ __('Formulario') }}</label>
+                            <select name='formulario'  id='input-formulario' class="form-control @error('formulario') is-invalid @enderror">
+                                @foreach($formularios as $key => $value)
+                                    <option value='{{ $key }}' {{ isset($encuesta) && $encuesta->formulario == $key ? 'selected' : '' }}>{{ $value }}</option>
+                                @endforeach
+                            </select>
+                            @error('formulario') <div class='invalid-feedback'>{{ $message }}</div> @enderror
                         </div>
+                       
                     </div>
                 </div>
             
@@ -179,7 +210,6 @@ $envios = Envio::all();
                 </div>
 
                 <div id="lista-evaluados" class="mt-3">
-                    <h4>Evaluados seleccionados</h4>
                     <ul class="list-group" id="lista-evaluados-ul">
                         <li class="list-group-item list-group-item-info d-flex justify-content-between align-items-center">
                             <span class="col-1">#</span>
@@ -206,54 +236,7 @@ $envios = Envio::all();
                 </div>
         
   
-                <!-- Selección de Preguntas -->
-                <div class='form-group'>
-                    <label for='input-preguntas' class='form-label'>{{ __('Preguntas') }}</label>
-                    <div class="d-flex" style="align-items: stretch;">
-
-                        <!-- Select de preguntas con altura fija -->
-                        <select name='preguntas' id='input-preguntas' class="form-control flex-grow-1" style="height: 38px;">
-                            @foreach($preguntas as $pregunta)
-                                <option value='{{ $pregunta->id }}' data-categoria='{{ $pregunta->Categoria }}' data-estado='{{ $pregunta->estado ? "true" : "false" }}'>{{ $pregunta->texto }}</option>
-                            @endforeach
-                        </select>
-                        
-                        <!-- Botones con altura fija para coincidir con el select -->
-                        <button class="btn btn-outline-secondary ml-2" type="button" onclick="añadirPregunta()" style="height: 38px;">Añadir</button>
-                        <button class="btn btn-outline-primary ml-2" type="button" onclick="añadirTodasLasPreguntas()" style="height: 38px; width: 180px">Añadir Todas</button>
-                        
-                    </div>
-                </div>
-
-
-
-                <div id="lista-preguntas" class="mt-3">
-                    <h4>Preguntas seleccionadas</h4>
-                    <ul class="list-group" id="lista-preguntas-ul">
-                        <li class="list-group-item list-group-item-info d-flex justify-content-between align-items-center">
-                            <span class="col-1">#</span>
-                            <span class="col-3">Texto de la Pregunta</span>
-                            <span class="col-3">Estado</span>
-                            <span class="col-3">Categoria</span>
-                            <span>Acciones</span>
-                        </li>
-                        @isset($preguntasEncuesta)
-                        @foreach($preguntasEncuesta as $index => $pregunta)
-                        <li class="list-group-item d-flex justify-content-between align-items-center"  draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragend="handleDragEnd(event)">
-                                <span class="col-1">{{ $index + 1 }}</span> <!-- Índice incremental -->
-
-                                <span class="col-3"> {{ $pregunta->texto }} </span> 
-                                <span class="col-3">  @if($pregunta->estado)(Para marcar)@else
-                                    (Abierta)@endif</span> 
-                                <span class="col-3"> {{ $pregunta->Categoria }} </span> 
-
-                                <input type="hidden" name="preguntasSeleccionadas[]" value="{{ $pregunta->id }}">
-                                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-pregunta" data-pregunta-id="{{ $pregunta->id }}"> <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
-                            </li>
-                        @endforeach
-                        @endisset
-                    </ul>
-                </div>            
+  
             </div>
 
             <div class="card-footer">
@@ -264,54 +247,37 @@ $envios = Envio::all();
     </div>
 </div>
 
-<div id="enviarEncuestaBlock" class="mt-4" style="display: none;">
-    <h2>Enviados</h2>
-    <div class="accordion" id="accordionEncuestas">
-        @foreach($encuestas as $index => $encuesta)
-        <div class="card">
-            <div class="card-header" id="heading{{ $index }}">
-                <h2 class="mb-0">
-                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse{{ $index }}" aria-expanded="true" aria-controls="collapse{{ $index }}">
-                        {{ $encuesta->nombre }}
-                    </button>
-                </h2>
+@endif 
+
+<!-- Modal para Vínculos -->
+
+<div class="modal fade" id="vinculosModal" tabindex="-1" role="dialog" aria-labelledby="vinculosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vinculosModalLabel">Vínculos del Evaluado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-
-            <div id="collapse{{ $index }}" class="collapse" aria-labelledby="heading{{ $index }}" data-parent="#accordionEncuestas">
-                <div class="card-body">
-                    
-                    @foreach($evals as $eval)
-                    @if($eval->encuesta_id == $encuesta->id)
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $eval->evaluador }}</h5>
-                            @php
-                                $send=Envio::where('persona', $eval->evaluador_id)->where('encuesta', $encuesta->id)->first();
-                            @endphp
-                            @isset($send)
-                            <p class="card-text">Estado:{{$send->estado}} </p>
-                          
-                            @if($send->estado == 'Respondido')
-                            <button type="button" class="btn btn-primary ver-respuestas" data-toggle="modal" data-target="#modal{{$index}}" data-encuesta-id="{{ $eval->encuesta_id }}" data-persona-id="{{ $eval->evaluador_id }}">Ver</button>
-
-                            @endif
-                            @endisset
-                        </div>
-                    </div>
-                    @endif
-                    @endforeach
-                    
-                </div>
+            <div class="modal-body" id="modalBody">
+               
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
-        @endforeach
     </div>
 </div>
+
+
+
+
 
 <!-- Modal -->
 @foreach($encuestas as $index => $encuesta)
 <!-- Modal -->
-<div style="z-index: 9999; margin-left: 9px" class="modal fade" id="modal" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+<div style="z-index: 9999; margin-left: 1px" class="modal fade" id="modal" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -332,9 +298,7 @@ $envios = Envio::all();
 </div>
 
 @endforeach
-
-
-
+@if ($userempresa  == null) 
 <div id="listarEncuestaBlock" class="mt-4">
     <div id="accordion">
         @php
@@ -410,7 +374,6 @@ $envios = Envio::all();
                                                 </button>
                                                 
                                                 @else
-                                                <a href="{{ route('encuestas.edit', $encuesta->id) }}" class="btn btn-primary btn-sm btn-rounded"><i class="icon-pencil"></i></a>
                                                 <button title="Enviar encuesta" class="btn btn-warning btn-sm abrirModalEnvio btn-rounded" data-id="{{ $encuesta->id }}"><i class="fas fa-paper-plane"></i></button>
                                                 @endif
                                                 <button class="btn btn-danger btn-sm abrirModalEliminacion btn-rounded" data-id="{{ $encuesta->id }}"><i class="fas fa-trash-alt"></i></button>
@@ -466,7 +429,117 @@ $envios = Envio::all();
         @endforeach
     </div>
 </div>
+@else
+<div id="listarEncuestaBlock" class="mt-4">
+    <div id="accordion">
+        @php
+        // Filtramos las encuestas por la empresa del usuario.
+        $encuestasDeEmpresa = $encuestas->where('empresa', $userempresa);
+        $encuestasPorProceso = $encuestasDeEmpresa->groupBy('proceso');
+        @endphp
+<h4 class="nombre-empresa">{{ $emp->nombre }}</h4>
+@foreach($encuestasPorProceso as $proceso => $encuestasDelProceso)
+        <div class="card">
+  
+            <div class="card-header" id="headingProceso{{ str_replace(' ', '', $proceso) }}">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseProceso{{ str_replace(' ', '', $proceso) }}" aria-expanded="true" aria-controls="collapseProceso{{ str_replace(' ', '', $proceso) }}">
+                        {{ $proceso }}
+                    </button>
+                </h5>
+            </div>
 
+            <div id="collapseProceso{{ str_replace(' ', '', $proceso) }}" class="collapse" aria-labelledby="headingProceso{{ str_replace(' ', '', $proceso) }}" data-parent="#accordion">
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Evaluado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($encuestasDelProceso as $encuesta)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $encuesta->nombre }}</td>
+                                <td>
+                                    @php
+                                    // Crear una colección a partir de los evaluados para filtrar y mostrar nombres únicos
+                                    $nombresUnicos = $encuesta->evaluados->map(function($evaluado) {
+                                        return $evaluado->personal->nombre;
+                                    })->unique();
+                                    @endphp
+
+                                    @foreach($nombresUnicos as $nombre)
+                                    {{ $nombre }}<br>
+                                    @endforeach
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($encuesta->fecha)->format('d/m/Y') }}</td>
+                                <td>
+                                    @php
+                                    $envios = Envio::where('encuesta', $encuesta->id)->get();
+                                    @endphp
+                                    @if($envios->isNotEmpty())
+                                    <a title="PDF" href="{{ route('encuestas.pdf', ['encuesta' => $encuesta->id]) }}" class="btn pdf-export-btn btn-rounded" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                    </a>
+                                    <button title="Ver Envíos" class="btn btn-info btn-sm btn-rounded" data-toggle="modal" data-target="#enviosModal{{$encuesta->id}}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    @else
+                                    @endif
+                                </td>
+                            </tr>
+                                <!-- Modal para mostrar los envíos de la encuesta -->
+                                <div class="modal fade" id="enviosModal{{$encuesta->id}}" tabindex="-1" role="dialog" aria-labelledby="enviosModalLabel{{$encuesta->id}}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="enviosModalLabel{{$encuesta->id}}">Detalles de los Envíos para {{ $encuesta->nombre }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <!-- Cuerpo del modal con detalles de los envíos -->
+                                                @foreach($evals as $eval)
+                                                    @if($eval->encuesta_id == $encuesta->id)
+                                                    <div class="card mb-3">
+                                                        <div class="card-body">
+                                                            <h5 class="card-title">{{ $eval->evaluador }}</h5>
+                                                            @php
+                                                                $send = Envio::where('persona', $eval->evaluador_id)->where('encuesta', $encuesta->id)->first();
+                                                            @endphp
+                                                            @isset($send)
+                                                                <p class="card-text">Estado: {{$send->estado}}</p>
+                                                                
+                                                            @endisset
+                                                        </div>
+                                                    </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+
+@endif 
 <!-- Modal de Confirmación para Enviar Encuesta -->
 <div class="modal fade" id="confirmacionEnvioModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionEnvioModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -507,6 +580,7 @@ $envios = Envio::all();
         </div>
     </div>
 </div>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -518,6 +592,33 @@ $envios = Envio::all();
 <!-- Incluir JS de Select2 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
+// JavaScript para capturar el clic en el botón Vínculos y abrir el modal
+$(document).ready(function() {
+    $('#lista-evaluados').on('.abrirVinculosModal').click(function() {
+        var selectEvaluados = document.getElementById('input-evaluados').value;
+        console.log(selectEvaluados);
+        $('#vinculosModal').modal('show');
+        var selectEmpresa = document.getElementById('input-empresa').value;
+        console.log(selectEmpresa);
+
+        $.ajax({
+            url: '/obtener-evaluados/' + selectEmpresa + '/' + selectEvaluados, // Asegúrate de que esta es la URL correcta
+            type: 'GET',
+            success: function(data) {
+                console.log(data); // Verificar lo que se recibe
+
+                $('#modalBody').html(data); // Asegúrate de que este es el contenedor correcto
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+});
+
+
+
+
     $(document).ready(function() {
         // Al hacer clic en el botón que debería abrir el modal de confirmación de eliminación
         $('.abrirModalEliminacion').click(function() {
@@ -533,7 +634,17 @@ $envios = Envio::all();
         });
     });
     </script>
+    <!-- Agrega este script en tu vista Blade -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $('#input-empresa').change(function() {
+   
+});
+
+
+    </script>
     
+
 <script>
     $(document).ready(function() {
         // Al hacer clic en el botón que debería abrir el modal de confirmación
@@ -552,43 +663,59 @@ $envios = Envio::all();
     </script>
     
 
-<script>
-    $(document).ready(function() {
-        // Delegación de eventos para manejar clicks en botones de eliminar que se añaden dinámicamente
-        $('#lista-evaluados').on('click', '.quitar-evaluado', function() {
-            $(this).closest('li').remove();  // Elimina el <li> del evaluado
-            actualizarIndicesEvaluados();   // Actualiza los índices después de eliminar
-        });
-        $('#input-preguntas').select2({
-            placeholder: "Seleccione una opción",
-            allowClear: true,
-            width: '100%',
+    <script>
+        $(document).ready(function() {
+            // Función para cargar evaluados basados en la empresa seleccionada
+            function cargarEvaluados(empresaId) {
+                $.get('/usuarios-por-empresa/' + empresaId, function(data) {
+                    $('#input-evaluados').empty();
+                    $.each(data, function(index, usuario) {
+                        $('#input-evaluados').append($('<option>', { 
+                            value: usuario.id,
+                            text : usuario.nombre 
+                        }));
+                    });
+                    // Vaciar la lista de evaluados ya seleccionados
+                    $('#lista-evaluados-ul').empty();
+                    agregarCabezalEvaluados(); // Asegúrate de que el cabezal se muestre si es necesario
+                });
+            }
     
-
-        });
-        $('#input-empresa').select2({
-            placeholder: "Seleccione una opción",
-            allowClear: true,
-            width: '100%',
+            // Al cambiar el valor en el select de empresa
+            $('#input-empresa').change(function() {
+                var empresaId = $(this).val();
+                cargarEvaluados(empresaId);
+            });
     
-
-        });
-        $('#input-evaluados').select2({
-            placeholder: "Seleccione una opción",
-            allowClear: true,
-            width: '100%',
+            // Cargar inicialmente los evaluados para la empresa preseleccionada
+            var empresaInicial = $('#input-empresa').val();
+            if (empresaInicial) {
+                cargarEvaluados(empresaInicial);
+            }
     
-
+            // Configuración de Select2
+            $('#input-empresa').select2({
+                placeholder: "Seleccione una opción",
+                allowClear: true,
+                width: '100%'
+            });
+    
+            $('#input-evaluados').select2({
+                placeholder: "Seleccione una opción",
+                allowClear: true,
+                width: '100%'
+            });
+    
+            $('#input-formulario').select2({
+                placeholder: "Seleccione una opción",
+                allowClear: true,
+                width: '100%'
+            });
+    
+            $('.select2-container--default .select2-selection--single').css({'height': '100%'});
         });
-
-        
-
-        $('.select2-container--default .select2-selection--single').css({'height': '100%'});
-
-
-    });
-
-</script>
+    </script>
+    
 
 
 <script>
@@ -610,90 +737,19 @@ $envios = Envio::all();
             var cabezal = document.createElement('div');
             cabezal.className = 'list-group-item list-group-item-info d-flex justify-content-between align-items-center';
             cabezal.innerHTML = `
-            <span class="col-1">#</span>
-
+                <span class="col-1">#</span>
                 <span class="col-3">Evaluado</span>
+                <span class="col-3">Formulario</span>
+                
+
                 <span>Acciones</span>
             `;
             listaEvaluados.querySelector('.list-group').prepend(cabezal);
         }
     }
 
-   
 
-    function agregarCabezal() {
-        var listaPreguntas = document.getElementById('lista-preguntas');
-        if (!listaPreguntas.querySelector('.list-group-item-info')) {
-            var cabezal = document.createElement('div');
-            cabezal.className = 'list-group-item list-group-item-info d-flex justify-content-between align-items-center';
-            cabezal.innerHTML = `
-                <span class="col-1">#</span>
-                <span class="col-3">Texto de la Pregunta</span>
-                <span class="col-3">Estado</span>
-                <span class="col-3">Categoria</span>
-                <span>Acciones</span>
-            `;
-            listaPreguntas.querySelector('.list-group').prepend(cabezal);
-        }
-    }
 
-   
-
-    function crearElementoPregunta(preguntaId, preguntaTexto, estado, categoria) {
-        // Obtener el número total de filas en la lista
-        var totalFilas = document.querySelectorAll('#lista-preguntas .list-group-item').length;
-        var indice = totalFilas; // Calcular el índice sumando 1 al número total de filas
-        if (indice === 0){
-            indice = 1 ;
-        } 
-        // Verificar si la pregunta ya ha sido añadida
-        var yaSeleccionada = false;
-        document.querySelectorAll('#lista-preguntas input[type="hidden"]').forEach(function(input) {
-            if (input.value === preguntaId) {
-                yaSeleccionada = true;
-            }
-        });
-
-        if (!yaSeleccionada) {
-            var estadoTexto = estado === "true" ? "(Para marcar)" : "(Abierta)";
-            var entrada = document.createElement('div');
-            entrada.className = 'list-group-item d-flex justify-content-between align-items-center';
-            entrada.innerHTML = `
-                <span class="col-1">${indice}</span>
-                <span class="col-3">${preguntaTexto}</span>
-                <span class="col-3">${estadoTexto}</span>
-                <span class="col-3">${categoria}</span> <!-- Incluir la categoría aquí -->
-                <input type="hidden" name="preguntasSeleccionadas[]" value="${preguntaId}">
-                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-pregunta" data-pregunta-id="${preguntaId}"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>
-            `;
-
-            // Evento para eliminar la pregunta
-            entrada.querySelector('.quitar-pregunta').addEventListener('click', function() {
-                entrada.remove();
-                // Actualizar los índices después de eliminar la pregunta
-                actualizarIndicesPreguntas();
-            });
-
-            document.getElementById('lista-preguntas').querySelector('.list-group').appendChild(entrada);
-        }
-    }
-
-    function actualizarIndicesPreguntas() {
-        // Obtener todas las filas de la lista de preguntas
-        var listItems = document.querySelectorAll('#lista-preguntas .list-group-item');
-        // Iterar sobre las filas y actualizar los índices
-        listItems.forEach(function(item, index) {
-            // Obtener el índice actual sumando 1 al índice base
-            var indice = index ;
-            // Obtener el span que muestra el índice
-            var indiceSpan = item.querySelector('.col-1');
-            // Actualizar el texto del índice
-            if( indiceSpan.textContent != '#'){
-                indiceSpan.textContent = indice;
-
-            }
-        });
-    }
 
     function actualizarIndicesEvaluados() {
         // Obtener todas las filas de la lista de preguntas
@@ -713,52 +769,44 @@ $envios = Envio::all();
     }
 
     function añadirEvaluado() {
-        var selectEvaluados = document.getElementById('input-evaluados');
-        var evaluadorId = selectEvaluados.value;
-        var evaluadorNombre = selectEvaluados.options[selectEvaluados.selectedIndex].text;
+    var selectEvaluados = document.getElementById('input-evaluados');
+    var formularioSelect = document.getElementById('input-formulario');
+    var evaluadorId = selectEvaluados.value;
+    var evaluadorNombre = selectEvaluados.options[selectEvaluados.selectedIndex].text;
+    var formularioId = formularioSelect.value;
+    var formularioTexto = formularioSelect.options[formularioSelect.selectedIndex].text;
 
-        // Combinar el nombre del evaluador y la relación para formar una cadena única
-        var combinacionEvaluador = evaluadorNombre ;
-        var totalFilas = document.querySelectorAll('#lista-evaluados .list-group-item').length;
-        var indice = totalFilas; // Calcular el índice sumando 1 al número total de filas
-        if (indice === 0){
-            indice = 1 ;
-        } 
-        // Verificar si el evaluador ya ha sido añadido
-        var evaluadorYaAgregado = false;
-        document.querySelectorAll('#lista-evaluados input[type="hidden"]').forEach(function(input) {
-            if (input.value === evaluadorId) {
-                evaluadorYaAgregado = true;
-            }
-        });
-
-        if (!evaluadorYaAgregado) {
-            agregarCabezalEvaluados();
-            var li = document.createElement('div');
-            li.className = 'list-group-item d-flex justify-content-between align-items-center';
-            li.draggable = true;
-            li.innerHTML = `
-                <span class="col-1">${indice}</span>
-
-                <span class="col-3">${evaluadorNombre}</span>
-        
-                <input type="hidden" name="evaluadosSeleccionados[]" value="${evaluadorId}">
-        
-                <button style="border-radius: 15%; width: 67px;"  class="btn btn-danger btn-sm quitar-evaluado" data-evaluado-id="${ evaluadorId }">  <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
-            `;
-
-            li.querySelector('.quitar-evaluado').addEventListener('click', function() {
-                li.remove();
-                actualizarIndicesEvaluados();
-            });
-            // Añadir a la lista
-            document.getElementById('lista-evaluados').querySelector('.list-group').appendChild(li);
-            // Agregar cabezal si no está presente
-        
-        } else {
-            alert("Este evaluado ya ha sido seleccionado.");
+    var evaluadorYaAgregado = false;
+    document.querySelectorAll('#lista-evaluados input[type="hidden"]').forEach(function(input) {
+        if (input.value === evaluadorId) {
+            evaluadorYaAgregado = true;
         }
+    });
+
+    if (!evaluadorYaAgregado) {
+        agregarCabezalEvaluados(); // Asegura que el cabezal esté presente
+        var totalFilas = document.querySelectorAll('#lista-evaluados .list-group-item').length + 1;
+        var li = document.createElement('div');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+            <span class="col-1">${totalFilas}</span>
+            <span class="col-3">${evaluadorNombre}</span>
+            <span class="col-3">${formularioTexto}</span>
+            <span >
+                <button class="btn btn-danger btn-sm quitar-evaluado" data-evaluado-id="${evaluadorId}"><i class="fas fa-trash-alt"></i></button>
+                <button class="btn btn-info btn-sm abrirVinculosModal" type="button" data-evaluado-id="${evaluadorId}">Vínculos</button>
+            </span>
+            <input type="hidden" name="evaluadosSeleccionados[]" value="${evaluadorId}">
+            <input type="hidden" name="formulariosSeleccionados[]" value="${formularioId}">
+        `;
+        document.getElementById('lista-evaluados').querySelector('.list-group').appendChild(li);
+    } else {
+        alert("Este evaluado ya ha sido seleccionado.");
     }
+}
+
+// Similar modification is needed for añadirTodosLosEvaluados()
+
     document.addEventListener('DOMContentLoaded', function() {
     // Adjuntar un manejador de eventos al contenedor de la lista para manejar los clics en los botones de quitar
     document.getElementById('lista-evaluados').addEventListener('click', function(event) {
@@ -771,15 +819,175 @@ $envios = Envio::all();
 
     // Tu función existente añadirTodosLosEvaluados aquí
 });
+function quitarEvaluador(element) {
+        var evaluadoId = $(element).data('evaluado-id');
+        console.log("Eliminando evaluado con ID: ", evaluadoId);
+        // Subir hasta el ancestro correcto que sea un <li>
+        $(element).closest('div.list-group-item').remove();
+    }
+    function toggleDropdown(collapseId) {
+        var x = document.getElementById(collapseId);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }var indicesPorPersona = {};
+
+    function agregarVinculo(personaId) {
+    var selectEvaluados = document.getElementById('input-evaluadores-' + personaId);
+    var evaluadorId = selectEvaluados.value;
+    var evaluadorNombre = selectEvaluados.options[selectEvaluados.selectedIndex].text;
+    var tipoVinculo = document.getElementById('tipoVinculo-' + personaId);
+    var vinculoId = tipoVinculo.value;
+    var vinculoNombre = tipoVinculo.options[tipoVinculo.selectedIndex].text;
+
+    // Incrementa el índice para la persona actual
+    var listaEvaluadores = document.getElementById('lista-evaluadores-ul-' + personaId);
+    var totalEvaluadores = listaEvaluadores.querySelectorAll('.list-group-item').length; // Cuenta todos los ítems, incluyendo el cabezal
+
+    var li = document.createElement('div');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+    li.draggable = true;
+    li.innerHTML = `
+        <span class="col-1">${totalEvaluadores}</span>
+        <span class="col-3">${evaluadorNombre}</span>
+        <span class="col-3">${vinculoNombre}</span>
+        <input type="hidden" name="evaluadoresSeleccionados[]" value="${evaluadorId}">
+        <input type="hidden" name="evaluadoresVinculos[]" value="${vinculoId}">
+        <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluador" data-evaluado-id="${evaluadorId}" onclick="quitarEvaluador(this)">
+            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+        </button>
+    `;
+    listaEvaluadores.appendChild(li);
+
+    // Actualizar el selector para eliminar la opción que fue añadida
+    selectEvaluados.remove(selectEvaluados.selectedIndex);
+}
+
+function quitarEvaluador(element) {
+    var evaluadoId = $(element).data('evaluado-id');
+    console.log("Eliminando evaluado con ID: ", evaluadoId);
+    $(element).closest('div.list-group-item').remove();
+    actualizarIndices(personaId); // Llama a la función para actualizar índices tras eliminar un elemento
+}
+
+function actualizarIndices(personaId) {
+    var listaEvaluadores = document.getElementById('lista-evaluadores-ul-' + personaId);
+    var items = listaEvaluadores.querySelectorAll('.list-group-item');
+    items.forEach((item, index) => {
+        if (index > 0) { // Ignora el cabezal
+            item.querySelector('.col-1').textContent = index;
+        }
+    });
+}
+
+function guardarVinculos(index) {
+    const evaluadoresSeleccionados = [];
+    const evaluadoresVinculos = [];
+    const listaEvaluadores = document.querySelectorAll(`#lista-evaluadores-ul-${index} input[name="evaluadoresSeleccionados[]"]`);
+
+    listaEvaluadores.forEach(input => {
+        evaluadoresSeleccionados.push(input.value);
+    });
+
+    const listaVinculos = document.querySelectorAll(`#lista-evaluadores-ul-${index} input[name="evaluadoresVinculos[]"]`);
+
+    listaVinculos.forEach(input => {
+        evaluadoresVinculos.push(input.value);
+    });
+
+    const empresaId = document.querySelector('input[name="empresa_id"]').value;
+
+    const dataToSend = {
+        evaluadores: evaluadoresSeleccionados,
+        empresa_id: empresaId,
+        personal_id: index,
+        vinculos: evaluadoresVinculos
+    };
+
+    console.log(dataToSend); // Depuración para ver los datos que se enviarán
+
+    fetch('{{ route("agregar-vinculo") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify(dataToSend)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Respuesta del servidor:', data); // Más depuración
+        alert('Vínculos guardados correctamente.');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al guardar los vínculos: ' + error.message);
+    });
+}
+
+function recuperarUltimosVinculos() {
+    const empresaId = document.querySelector('input[name="empresa_id"]').value;
+
+    fetch(`/recuperar-ultimos-vinculos?empresa_id=${empresaId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        data.forEach(vinculo => {
+            const evaluadorId = vinculo.evaluador_id;
+            const vinculoId = vinculo.vinculo_id;
+            const evaluadorNombre = vinculo.evaluador.nombre;
+            const vinculoNombre = vinculo.vinculo.nombre;
+            const personaId = vinculo.evaluado_id;
+            const listaEvaluadores = document.getElementById(`lista-evaluadores-ul-${personaId}`);
+            const selectEvaluados = document.getElementById(`input-evaluadores-${personaId}`);
+
+            // Crear el elemento de la lista
+            const li = document.createElement('div');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.draggable = true;
+            li.innerHTML = `
+                <span class="col-1">${personaId}</span>
+                <span class="col-3">${evaluadorNombre}</span>
+                <span class="col-3">${vinculoNombre}</span>
+                <input type="hidden" name="evaluadoresSeleccionados[]" value="${evaluadorId}">
+                <input type="hidden" name="evaluadoresVinculos[]" value="${vinculoId}">
+                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluador" data-evaluado-id="${evaluadorId}" onclick="quitarEvaluador(this)">  <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+            `;
+            listaEvaluadores.appendChild(li);
+
+            // Eliminar la opción del selector si ya está en la lista
+            for (let i = 0; i < selectEvaluados.options.length; i++) {
+                if (selectEvaluados.options[i].value == evaluadorId) {
+                    selectEvaluados.remove(i);
+                    break;
+                }
+            }
+        });
+        alert('Últimos vínculos recuperados y agregados a las listas.');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al recuperar los últimos vínculos: ' + error.message);
+    });
+}
 
 function añadirTodosLosEvaluados() {
     var selectEvaluados = document.getElementById('input-evaluados');
     var evaluados = selectEvaluados.options;
+    var formularioSelect = document.getElementById('input-formulario'); // Referencia al select de formulario
 
     for (var i = 0; i < evaluados.length; i++) {
         var evaluadorId = evaluados[i].value;
         var evaluadoNombre = evaluados[i].text;
-
+        var formularioId = formularioSelect.value;
+        var formularioTexto = formularioSelect.options[formularioSelect.selectedIndex].text;
         // Verificar si el evaluador ya ha sido añadido
         var evaluadorYaAgregado = false;
         document.querySelectorAll('#lista-evaluados input[type="hidden"]').forEach(function(input) {
@@ -798,7 +1006,10 @@ function añadirTodosLosEvaluados() {
             li.innerHTML = `
                 <span class="col-1">${indice}</span>
                 <span class="col-3">${evaluadoNombre}</span>
+                <span class="col-3">${formularioTexto}</span>  <!-- Muestra el nombre del formulario -->
                 <input type="hidden" name="evaluadosSeleccionados[]" value="${evaluadorId}">
+                <input type="hidden" name="formulariosSeleccionados[]" value="${formularioId}">  <!-- Guarda el ID del formulario -->
+
                 <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluado" data-evaluado-id="${evaluadorId}">
                     <i class="fas fa-trash-alt" aria-hidden="true"></i>
                 </button>
@@ -815,37 +1026,6 @@ function añadirTodosLosEvaluados() {
 
 
 
-    function añadirTodasLasPreguntas() {
-                    // Agregar cabezal si no está presente
-        agregarCabezal();
-        var selectPreguntas = document.getElementById('input-preguntas');
-        for (var i = 0; i < selectPreguntas.options.length; i++) {
-            var preguntaId = selectPreguntas.options[i].value;
-            var preguntaTexto = selectPreguntas.options[i].text;
-            var estado = selectPreguntas.options[i].getAttribute('data-estado');
-            var categoria = selectPreguntas.options[i].getAttribute('data-categoria'); // Obtener la categoría
-            crearElementoPregunta(preguntaId, preguntaTexto, estado, categoria); // Pasar la categoría como argumento
-        }
-
-    }
-    function añadirPregunta() {
-        var selectPreguntas = document.getElementById('input-preguntas');
-        var preguntaId = selectPreguntas.value;
-        var preguntaTexto = selectPreguntas.options[selectPreguntas.selectedIndex].text;
-        var preguntasYaSeleccionadas = document.querySelectorAll('#lista-preguntas input[type="hidden"]');
-        for (var i = 0; i < preguntasYaSeleccionadas.length; i++) {
-            if (preguntasYaSeleccionadas[i].value === preguntaId) {
-                alert("Esta pregunta ya ha sido seleccionada.");
-                return; // Detener la ejecución si la pregunta ya está en la lista
-            }
-        }
-        var estado = selectPreguntas.options[selectPreguntas.selectedIndex].getAttribute('data-estado');
-        var categoria = selectPreguntas.options[selectPreguntas.selectedIndex].getAttribute('data-categoria'); // Obtener la categoría
-
-    crearElementoPregunta(preguntaId, preguntaTexto, estado, categoria); // Pasar la categoría como argumento
-    agregarCabezal();
-
-    }
 
 </script>
 <script>
@@ -943,7 +1123,7 @@ function añadirTodosLosEvaluados() {
         $('#input-empresa').change(function() {
         var empresaId = $(this).val();
         $.get('/usuarios-por-empresa/' + empresaId, function(data) {
-            console.log(data); // Agrega esta línea para depurar
+            console.log(empresaId); // Agrega esta línea para depurar
             $('#input-evaluados').empty();
             
             // Añadir los usuarios al select de evaluado

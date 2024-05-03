@@ -15,16 +15,14 @@ class Create extends Component
     public $correo;
     public $telefono;
     public $cargo;
-    public $empresa;
-    public $estado = false;
+    public $estado;
     
     protected $rules = [
         'dni' => 'required|string|max:20',
         'nombre' => 'required|string|max:255',
         'correo' => 'required|email|max:255',
         'telefono' => 'required|max:15',
-        'cargo' => 'required|integer|exists:cargos,id',
-        'empresa' => 'required|integer|exists:empresas,id',        
+        'cargo' => 'required',        
     ];
 
     public function updated($input)
@@ -45,7 +43,6 @@ class Create extends Component
             'correo' => $this->correo,
             'telefono' => $this->telefono,
             'cargo' => $this->cargo,
-            'empresa' => $this->empresa,
             'estado' => $this->estado,
             'user_id' => auth()->id(),
         ]);

@@ -12,14 +12,16 @@ use App\Models\Categoria;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EncuestaMailable;
+use App\Models\Detalle_empresa;
 use App\Models\Personal; // Asegúrate de que el namespace sea correcto para tu modelo.
 use App\Models\Envio; // Asegúrate de que el namespace sea correcto para tu modelo.
 use Illuminate\Support\Str; // Aquí se agrega la importación correcta
 use Barryvdh\DomPDF\Facade\PDF;
 use App\Models\Persona_respuesta;
 use App\Models\Empresa;
-use App\Models\Encuesta_pregunta;
+
 use App\Models\Evaluado;
+use App\Models\Formulario;
 use App\Models\Respuesta;
 use App\Models\Vinculo;
 use Illuminate\Support\Facades\Redirect;
@@ -33,11 +35,11 @@ class EncuestaController extends Controller
         $empresaId = $request->input('empresa');
         $fecha = $request->input('fecha');
         $proceso = $request->input('proceso');
-        // Preguntas seleccionadas vienen como un array de IDs desde el formulario
-        $preguntasSeleccionadas = $request->input('preguntasSeleccionadas', []);
+
     
         // Evaluadores seleccionados y sus vínculos vienen como array de IDs y Vínculos desde el formulario
         $evaluadosSeleccionados = $request->input('evaluadosSeleccionados', []);
+        $formulariosSeleccionados = $_POST['formulariosSeleccionados'];
 
    
         DB::beginTransaction();
@@ -45,66 +47,17 @@ class EncuestaController extends Controller
         try {
             $encuestaId = $request->input('encuesta_id');
             
-            if ($encuestaId) {
-                foreach ($evaluadosSeleccionados as $key => $evsel) {
-
-                $persona = Personal::find($evsel);
-                $encuesta = Encuesta::findOrFail($encuestaId);
-                $encuesta->update([
-                    'nombre' => 'Evaluación a ' . $persona->nombre ,
-                    'empresa' => $empresaId,
-                    'fecha' => $fecha,
-                ]);
-    
-                // Eliminamos las preguntas existentes asociadas con la encuesta
-                Encuesta_pregunta::where('encuesta_id', $encuesta->id)->delete();
-
-                // Insertamos las nuevas preguntas seleccionadas
-                foreach ($preguntasSeleccionadas as $preguntaId) {
-                    $detalles = Detalle_pregunta::where('pregunta', $preguntaId)->get();
-                    foreach ($detalles as $detalle) {
-                    Encuesta_pregunta::create([
-                        'encuesta_id' => $encuesta->id,
-                        'detalle_id' => $detalle->id,
-                    ]);
-                 }
-                }
-               
-    
-                // Eliminamos los evaluadores existentes
-                $evaluados  = Evaluado::where('empresa_id', $empresaId)->where('evaluado_id',$evsel)->get();
-    
-                // Añadimos los nuevos evaluadores seleccionados
-                foreach ($evaluados as $evs) {
-                    Evaluado::updateOrCreate([
-                        [
-                            'id' => $evs->id,      // clave(s) por las que buscar
-                        ],
-                        'evaluado_id' => $evsel,
-                        'evaluador_id' => $persona->id,
-                        'encuesta_id' => $encuesta->id,
-                    ]);
-                }
-            }
-            } else {
                 foreach ($evaluadosSeleccionados as $key => $evsel) {
                     $persona = Personal::find($evsel);
+                    $formularioId = $formulariosSeleccionados[$key]; 
                     $encuesta = Encuesta::create([
                         'nombre' => 'Evaluación a ' . $persona->nombre ,
                         'empresa' => $empresaId,
                         'fecha' => $fecha,
-                        'proceso' => $proceso
+                        'proceso' => $proceso,
+                        'formulario_id' => $formularioId
                     ]);
-                    // Para cada pregunta seleccionada, creamos una entrada en la tabla 'encuesta_preguntas'
-                    foreach ($preguntasSeleccionadas as $preguntaId) {
-                        $detalles = Detalle_pregunta::where('pregunta', $preguntaId)->get();
-                        foreach ($detalles as $detalle) {
-                        Encuesta_pregunta::create([
-                            'encuesta_id' => $encuesta->id,
-                            'detalle_id' => $detalle->id,
-                        ]);
-                     }
-                    }
+                   
                     $evaluados  = Evaluado::where('empresa_id', $empresaId)->where('evaluado_id',$evsel)->where('encuesta_id', null)->get();
                     // Añadimos los nuevos evaluadores seleccionados
                     foreach ($evaluados as $evs) {
@@ -121,7 +74,7 @@ class EncuestaController extends Controller
                     
                 }
 
-            }
+            
 
 
     
@@ -144,11 +97,11 @@ class EncuestaController extends Controller
     if ($evaluado) {
         $per = Personal::where('id', $evaluado->evaluado_id)->first(); // Encuentra el Personal asociado
     }
-        $encuesta_preguntas = Encuesta_pregunta::where('encuesta_id', $id)->get();
+        $formularios = Formulario::where('id', $encuesta->formulario_id)->get();
         $preguntasEncuesta = [];
 
-        foreach ($encuesta_preguntas as $encuesta_pregunta) {
-            $detalles = Detalle_pregunta::where('id', $encuesta_pregunta->detalle_id)->first();
+        foreach ($formularios as $form) {
+            $detalles = Detalle_pregunta::where('id', $form->detalle_id)->first();
             $pregunta = Pregunta::find($detalles->pregunta);
             if ($pregunta && !in_array($pregunta, $preguntasEncuesta)) {
                 $preguntasEncuesta[] = $pregunta;
@@ -171,7 +124,6 @@ public function destroy($id)
         $encuesta = Encuesta::findOrFail($id);
         
         // Elimina las relaciones. Asegúrate de ajustar estos métodos a tus necesidades.
-        Encuesta_pregunta::where('encuesta_id', $encuesta->id)->delete();
         Evaluado::where('encuesta_id', $encuesta->id)->delete();
         Envio::where('encuesta', $encuesta->id)->delete();
         Persona_respuesta::where('encuesta_id', $encuesta->id)->delete();
@@ -196,34 +148,34 @@ public function destroy($id)
     {
         try {
             $encuesta = Encuesta::where('id',$id)->first();
-        $evaluados = Evaluado::where('encuesta_id',$id)->get();
-        foreach($evaluados as $evaluado) {
-            $uuid = Str::uuid()->toString();
-            // Guarda la relación en la base de datos
-            $envio = Envio::create([
-                'persona' => $evaluado->evaluador_id, 
-                'encuesta' => $id,
-                'estado' => false,
-                'uuid' => $uuid,
-            ]);
-            $per = Personal::where('id', $evaluado->evaluador_id)->first();
-            // Verifica si el correo del destinatario está presente
-            if (empty($per->correo)) {
-                return redirect()->back()->with('error', 'No se ha especificado un correo electrónico válido.');
+            $evaluados = Evaluado::where('encuesta_id',$id)->get();
+            foreach($evaluados as $evaluado) {
+                $uuid = Str::uuid()->toString();
+                // Guarda la relación en la base de datos
+                $envio = Envio::create([
+                    'persona' => $evaluado->evaluador_id, 
+                    'encuesta' => $id,
+                    'estado' => false,
+                    'uuid' => $uuid,
+                ]);
+                $per = Personal::where('id', $evaluado->evaluador_id)->first();
+                // Verifica si el correo del destinatario está presente
+                if (empty($per->correo)) {
+                    return redirect()->back()->with('error', 'No se ha especificado un correo electrónico válido.');
+                }
+
+
+                if (!$envio) {
+                    return redirect()->back()->with('error', 'No se pudo guardar el envío de la encuesta.');
+                }
+
+                // Genera el enlace a la encuesta con el UUID
+                $link = route('encuestas.responder', ['uuid' => $uuid]); // Asegúrate de que la ruta y sus parámetros sean correctos.
+
+                // Envía el correo electrónico con el enlace
+                Mail::to($per->correo)->send(new EncuestaMailable($link, $encuesta->Empresa));
+
             }
-
-
-            if (!$envio) {
-                return redirect()->back()->with('error', 'No se pudo guardar el envío de la encuesta.');
-            }
-
-            // Genera el enlace a la encuesta con el UUID
-            $link = route('encuestas.responder', ['uuid' => $uuid]); // Asegúrate de que la ruta y sus parámetros sean correctos.
-
-            // Envía el correo electrónico con el enlace
-            Mail::to($per->correo)->send(new EncuestaMailable($link, $encuesta->Empresa));
-
-        }
      
 
         return Redirect::route('encuestas')->with('success', 'Encuesta enviada correctamente.');
@@ -261,7 +213,7 @@ public function destroy($id)
         return redirect()->back()->with('error', 'No hay envíos completados para esta encuesta.');
     }
 
-        $encuesta_pre = Encuesta_pregunta::where('encuesta_id', $encuestaId)
+        $encuesta_pre = Formulario::where('id', $encuesta->formulario_id)
         ->first(); // Usamos first() en lugar de get() para obtener solo un objeto en lugar de una colección
         
         if ($encuesta_pre) {
@@ -301,7 +253,13 @@ public function destroy($id)
                 ->groupBy('preguntas.texto', 'vinculos.nombre')
                 ->get();
        
-        $categorias = Categoria::all();
+        $categorias = Categoria::select('categorias.*')
+                ->distinct()
+                ->join('preguntas', 'preguntas.categoria', '=', 'categorias.id')
+                ->join('detalle_preguntas', 'preguntas.id', '=', 'detalle_preguntas.pregunta')
+                ->join('persona_respuestas', 'detalle_preguntas.id', '=', 'persona_respuestas.detalle')
+                ->where('persona_respuestas.encuesta_id', $encuestaId)
+                ->get();
 
         $respuestas = Respuesta::where('estado', true)->where('score', '!=', 0)->get();
 
@@ -372,22 +330,27 @@ public function destroy($id)
     }
     public function verRespuestas($persona_id, $encuesta_id)
     {
-        // Obtener las respuestas de la persona correspondiente al ID proporcionado
-        $respuestas = Persona_Respuesta::where('persona', $persona_id)->where('encuesta_id', $encuesta_id)->get();
+        // Obtener las respuestas únicas de la persona correspondiente al ID proporcionado
+        $respuestas = Persona_Respuesta::where('persona', $persona_id)
+                                        ->where('encuesta_id', $encuesta_id)
+                                        ->get();
         
         $detallesp = [];
         
         foreach ($respuestas as $key => $rpt) {
-            // Obtener las preguntas de la encuesta correspondiente al ID proporcionado y al detalle de respuesta
-            $e_preguntas = Encuesta_Pregunta::where('encuesta_id', $encuesta_id)->where('detalle_id', $rpt->detalle)->get();
+            // Obtener la pregunta única de la encuesta correspondiente al ID proporcionado y al detalle de respuesta
+            // Asegurarse de que el detalle_id sea distinto para evitar duplicados
+            $e_preguntas = Formulario::where('detalle_id', $rpt->detalle)
+                                      ->distinct()
+                                      ->get(['detalle_id']);
             
             foreach ($e_preguntas as $key => $ep) {
                 // Obtener los detalles de la pregunta
                 $detalle = Detalle_Pregunta::where('id', $ep->detalle_id)->first();
                 
-                if ($detalle) {
-                    // Agregar el detalle de pregunta al array
-                    $detallesp[] = $detalle;
+                if ($detalle && !array_key_exists($detalle->id, $detallesp)) {
+                    // Agregar el detalle de pregunta al array, asegurándose de que no esté ya incluido
+                    $detallesp[$detalle->id] = $detalle;
                 }
             }
         }
@@ -396,5 +359,21 @@ public function destroy($id)
         return view('partials.partial_respuestas', compact('respuestas', 'detallesp'))->render();
     }
     
+    public function obtenerEvaluados($empresaId, $perid) {
+        
+    $vinculados = Evaluado::where('empresa_id', $empresaId)->where('encuesta_id', null)->get();
+
+    $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
+                            ->where('empresa_id', $empresaId)
+                            ->whereNotNull('encuesta_id')
+                            ->orderBy('encuesta_id', 'desc')
+                            ->get();
+    $vinculos = Vinculo::all();
+
+    $detalle = Detalle_empresa::where('empresa_id', $empresaId)->get(); 
+    $personalIds = $detalle->pluck('personal_id'); 
+    $personals = Personal::whereIn('id', $personalIds)->get(); 
+        return view('partials.partial_vinculos', compact('vinculados', 'ultimosVin', 'vinculos', 'personals','empresaId', 'perid'))->render();
+    }
     
 }

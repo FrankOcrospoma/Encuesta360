@@ -114,5 +114,21 @@
     "Email": "Email",
     "Password": "Password",
     "User": "User",
-    "Users": "Users"
+    "Users": "Users",
+    "Ruc": "Ruc",
+    "Direccion": "Direccion",
+    "Representante": "Representante",
+    "Estado": "Estado",
+    "Empresa": "Empresa",
+    "Empresas": "Empresas",
+    "Detalle_id": "Detalle_id",
+    "Formulario": "Formulario",
+    "Formularios": "Formularios",
+    "Empresa_id": "Empresa_id",
+    "Dni": "Dni",
+    "Correo": "Correo",
+    "Telefono": "Telefono",
+    "Cargo": "Cargo",
+    "Personal": "Personal",
+    "Personals": "Personals"
 }

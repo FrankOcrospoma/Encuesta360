@@ -17,8 +17,8 @@ $preguntas = Pregunta::select('preguntas.*')
     ->join('detalle_preguntas as dp', 'dp.pregunta', '=', 'preguntas.id')
     ->whereIn('dp.id', function($query) use ($encuesta) {
         $query->select('detalle_id')
-              ->from('encuesta_preguntas')
-              ->where('encuesta_id', $encuesta->id); 
+              ->from('formularios')
+              ->where('id', $encuesta->formulario_id); 
     })
     ->orderBy('preguntas.categoria')  
     ->get();

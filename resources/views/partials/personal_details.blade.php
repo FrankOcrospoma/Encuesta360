@@ -3,6 +3,7 @@
 
 <?php
 use App\Models\Evaluado;
+
 $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
                         ->where('empresa_id', $empresa->id)
                         ->whereNotNull('encuesta_id')
@@ -17,207 +18,207 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
     <br>
     @if(getCrudConfig('Personal')->create && hasPermission(getRouteName().'.personal.create', 1, 1))
     <div class="col-md-4 d-flex justify-content-between align-items-center">
-    <button id="btnCrearPersonal" onclick="abrirModalcrear()" class="btn btn-success">Crear {{ __('Personal')}}</button>
-    <button  id="btnVinculos" onclick="mostrarVinculos()" class="btn btn-primary mt-3">Vínculos</button>
-    @if(getCrudConfig('Personal')->searchable())
-    <div class="col-md-4">
-        <div class="input-group">
-            <input type="text" class="form-control" @if(config('easy_panel.lazy_mode')) wire:model.lazy="search" @else wire:model="search" @endif placeholder="{{ __('Search') }}" value="{{ request('search') }}">
-            <div class="input-group-append">
-                <button class="btn btn-default">
-                    <a wire:target="search" wire:loading.remove><i class="fa fa-search"></i></a>
-                    <a wire:loading wire:target="search"><i class="fas fa-spinner fa-spin" ></i></a>
-                </button>
-            </div>
-        </div>
-    </div>
-    @endif
-</div>
-
-
-<br>
-<form action="{{ route('importar.personas') }}" method="POST" enctype="multipart/form-data">
-    @csrf
-    <input type="hidden" name="empresa_id" value="{{ $empresa->id }}">
-
-    <div class="input-group">
-        <div class="custom-file">
-            <input type="file" name="file" class="custom-file-input" id="inputGroupFile" required>
-            <label class="custom-file-label" for="inputGroupFile">Elegir archivo</label>
-        </div>
-        <div class="input-group-append">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-file-earmark-spreadsheet"></i> Importar Personas</button>
-        </div>
-    </div>
-</form>
-
-
-@if(session('success'))
-<div class="alert alert-success">
-    {{ session('success') }}
-</div>
-@endif
-
-@endif
-
-<br>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>DNI</th>
-                <th>Nombre</th>
-                <th>Cargo</th>
-                <th>Email</th>
-                <th>Telefono</th>
-                <th>Estado</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($personal as $persona)
-            <tr >
-                <td class="">{{ $persona->dni }}</td>
-                <td class="">{{ $persona->nombre }}</td>
-                <td class="">{{ $persona->cargo }}</td>
-                <td class="">{{ $persona->correo }}</td>
-                <td class="">{{ $persona->telefono }}</td>
-                <td class="">
-                    <label class="switch2">
-                        <input type="checkbox" data-id="{{ $persona->id }}" {{ $persona->estado ? 'checked' : '' }} class="switch2">
-                        <span class="slider round"></span>
-                    </label>
-                </td>
-                <style>
-                    /* El contenedor del switch2 - hazlo como quieras */
-                    .switch2 {
-                    position: relative;
-                    display: inline-block;
-                    width: 60px;
-                    height: 34px;
-                    }
-
-                    /* Esconde el input */
-                    .switch2 input { 
-                    opacity: 0;
-                    width: 0;
-                    height: 0;
-                    }
-
-                    /* El deslizador */
-                    .slider {
-                    position: absolute;
-                    cursor: pointer;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: #ff4f70;
-                    -webkit-transition: .4s;
-                    transition: .4s;
-                    }
-
-                    .slider:before {
-                    position: absolute;
-                    content: "";
-                    height: 26px;
-                    width: 26px;
-                    left: 4px;
-                    bottom: 4px;
-                    background-color: white;
-                    -webkit-transition: .4s;
-                    transition: .4s;
-                    }
-
-                    input:checked + .slider {
-                    background-color: #22ca80;
-                    }
-
-                    input:focus + .slider {
-                    box-shadow: 0 0 1px #22ca80;
-                    }
-
-                    input:checked + .slider:before {
-                    -webkit-transform: translateX(26px);
-                    -ms-transform: translateX(26px);
-                    transform: translateX(26px);
-                    }
-
-                    /* Forma redonda */
-                    .slider.round {
-                    border-radius: 34px;
-                    }
-
-                    .slider.round:before {
-                    border-radius: 50%;
-                    }
-
-                </style>
-                @if(getCrudConfig('Personal')->delete or getCrudConfig('Personal')->update)
-                    <td>
-
-                        <a class="btn text-primary mt-1" onclick="editarPersonal({{ $persona->id }})">
-                            <i class="icon-pencil"></i>
-                        </a>
-                        
-
-                        <button class="btn text-danger mt-1" onclick="confirmDelete('{{ $persona->id }}', '{{ $empresa->id }}')">
-                            <i class="icon-trash"></i>
-                        </button>
-                        
-                        
-                        <!-- Modal de Confirmación -->
-                        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-sm" role="document" style=" width: 30%; display: flex; align-items: center; justify-content: center; height: 100%;">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalLabel">Confirmar Eliminación</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        ¿Estás seguro de que quieres eliminar a esta persona?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                        <button type="button" class="btn btn-danger" id="deleteConfirmButton">Eliminar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        
-                    </td>
-                @endif
-            </tr>
-             
-            @endforeach
-        </tbody>
-    </table>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @else
-    <p>No hay personal registrado para esta empresa.</p>
-    <div class="col-md-4 right-0">
         <button id="btnCrearPersonal" onclick="abrirModalcrear()" class="btn btn-success">Crear {{ __('Personal')}}</button>
+        <button  id="btnVinculos" onclick="mostrarVinculos()" class="btn btn-primary mt-3">Vínculos</button>
+        @if(getCrudConfig('Personal')->searchable())
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" @if(config('easy_panel.lazy_mode')) wire:model.lazy="search" @else wire:model="search" @endif placeholder="{{ __('Search') }}" value="{{ request('search') }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-default">
+                            <a wire:target="search" wire:loading.remove><i class="fa fa-search"></i></a>
+                            <a wire:loading wire:target="search"><i class="fas fa-spinner fa-spin" ></i></a>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
+
     <br>
+    
     <form action="{{ route('importar.personas') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="empresa_id" value="{{ $empresa->id }}">
-    
+
         <div class="input-group">
             <div class="custom-file">
                 <input type="file" name="file" class="custom-file-input" id="inputGroupFile" required>
                 <label class="custom-file-label" for="inputGroupFile">Elegir archivo</label>
             </div>
             <div class="input-group-append">
-                <button type="submit" class="btn btn-primary">    <i class="bi bi-file-earmark-spreadsheet"></i> Importar Personas
-                </button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-file-earmark-spreadsheet"></i> Importar Personas</button>
             </div>
         </div>
     </form>
-    
-@endif
+
+
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @endif
+
+    <br>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>DNI</th>
+                    <th>Nombre</th>
+                    <th>Cargo</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Estado</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($personal as $persona)
+                <tr >
+                    <td class="">{{ $persona->dni }}</td>
+                    <td class="">{{ $persona->nombre }}</td>
+                    <td class="">{{ $persona->cargo }}</td>
+                    <td class="">{{ $persona->correo }}</td>
+                    <td class="">{{ $persona->telefono }}</td>
+                    <td class="">
+                        <label class="switch2">
+                            <input type="checkbox" data-id="{{ $persona->id }}" {{ $persona->estado ? 'checked' : '' }} class="switch2">
+                            <span class="slider round"></span>
+                        </label>
+                    </td>
+                    <style>
+                        /* El contenedor del switch2 - hazlo como quieras */
+                        .switch2 {
+                        position: relative;
+                        display: inline-block;
+                        width: 60px;
+                        height: 34px;
+                        }
+
+                        /* Esconde el input */
+                        .switch2 input { 
+                        opacity: 0;
+                        width: 0;
+                        height: 0;
+                        }
+
+                        /* El deslizador */
+                        .slider {
+                        position: absolute;
+                        cursor: pointer;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: #ff4f70;
+                        -webkit-transition: .4s;
+                        transition: .4s;
+                        }
+
+                        .slider:before {
+                        position: absolute;
+                        content: "";
+                        height: 26px;
+                        width: 26px;
+                        left: 4px;
+                        bottom: 4px;
+                        background-color: white;
+                        -webkit-transition: .4s;
+                        transition: .4s;
+                        }
+
+                        input:checked + .slider {
+                        background-color: #22ca80;
+                        }
+
+                        input:focus + .slider {
+                        box-shadow: 0 0 1px #22ca80;
+                        }
+
+                        input:checked + .slider:before {
+                        -webkit-transform: translateX(26px);
+                        -ms-transform: translateX(26px);
+                        transform: translateX(26px);
+                        }
+
+                        /* Forma redonda */
+                        .slider.round {
+                        border-radius: 34px;
+                        }
+
+                        .slider.round:before {
+                        border-radius: 50%;
+                        }
+
+                    </style>
+                    @if(getCrudConfig('Personal')->delete or getCrudConfig('Personal')->update)
+                        <td>
+
+                            <a class="btn text-primary mt-1" onclick="editarPersonal({{ $persona->id }})">
+                                <i class="icon-pencil"></i>
+                            </a>
+                            
+
+                            <button class="btn text-danger mt-1" onclick="confirmDelete('{{ $persona->id }}', '{{ $empresa->id }}')">
+                                <i class="icon-trash"></i>
+                            </button>
+                            
+                            
+                            <!-- Modal de Confirmación -->
+                            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-sm" role="document" style=" width: 30%; display: flex; align-items: center; justify-content: center; height: 100%;">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalLabel">Confirmar Eliminación</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Estás seguro de que quieres eliminar a esta persona?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-danger" id="deleteConfirmButton">Eliminar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                        </td>
+                    @endif
+                </tr>
+                
+                @endforeach
+            </tbody>
+        </table>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        @else
+        <p>No hay personal registrado para esta empresa.</p>
+        <div class="col-md-4 right-0">
+            <button id="btnCrearPersonal" onclick="abrirModalcrear()" class="btn btn-success">Crear {{ __('Personal')}}</button>
+        </div>
+        <br>
+        <form action="{{ route('importar.personas') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="empresa_id" value="{{ $empresa->id }}">
+        
+            <div class="input-group">
+                <div class="custom-file">
+                    <input type="file" name="file" class="custom-file-input" id="inputGroupFile" required>
+                    <label class="custom-file-label" for="inputGroupFile">Elegir archivo</label>
+                </div>
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">    <i class="bi bi-file-earmark-spreadsheet"></i> Importar Personas
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+    @endif
 </div>
 
 <div id="vinculosSection" style="display: none;">
@@ -227,7 +228,7 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
     <div class="col-md-4">
         <button class="btn btn-info" onclick="recuperarUltimosVinculos()">Recuperar Últimos Vínculos</button>
     </div>
-@endif
+    @endif
     <br>
     
     <div class="accordion" id="accordionVinculos">
@@ -333,10 +334,14 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
                 
 
                 <!-- Empresa Input -->
+                @php
+                use App\Models\Empresa; 
+                    $empresas = Empresa::all();
+                @endphp
                 <div class='form-group'>
                     <label for='input-empresa' class='col-sm-2 control-label'>{{ __('Empresa') }} <span style="color: red" class="required" >*</span></label>
                     <select disabled id='input-empresa' name='empresa' class="form-control @error('empresa') is-invalid @enderror">
-                        @foreach(getCrudConfig('Personal')->inputs()['empresa']['select'] as $key => $value)
+                        @foreach($empresas as $key => $value)
                             <option value='{{ $key }}' {{ $empresa->id == $key ? 'selected' : '' }}>{{ $value }}</option>
                         @endforeach
                     </select>

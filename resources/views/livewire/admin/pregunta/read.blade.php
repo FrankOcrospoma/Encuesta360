@@ -40,7 +40,7 @@
                         <tr>
                             <th scope="col" style='cursor: pointer' wire:click="sort('texto')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'texto') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'texto') fa-sort-amount-up ml-2 @endif'></i> {{ __('Texto') }} </th>
                             <th scope="col" style='cursor: pointer' wire:click="sort('Categoria')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'Categoria') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'Categoria') fa-sort-amount-up ml-2 @endif'></i> {{ __('Categoria') }} </th>
-                            <th scope="col" style='cursor: pointer' wire:click="sort('estado')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'estado') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'estado') fa-sort-amount-up ml-2 @endif'></i> {{ __('Estado') }} </th>
+                            <th scope="col" style='cursor: pointer' wire:click="sort('estado')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'estado') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'estado') fa-sort-amount-up ml-2 @endif'></i> {{ __('Modalidad') }} </th>
                             
                             @if(getCrudConfig('Pregunta')->delete or getCrudConfig('Pregunta')->update)
                                 <th scope="col">{{ __('Action') }}</th>

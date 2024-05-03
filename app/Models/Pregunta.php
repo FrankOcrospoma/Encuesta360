@@ -22,6 +22,10 @@ public function categoria()
 {
     return $this->belongsTo(Categoria::class, 'categoria');
 }
+public function detallesPregunta()
+{
+    return $this->hasMany(Detalle_pregunta::class, 'pregunta', 'id');
+}
 protected $attributes = [
     'estado' => false,
 ];

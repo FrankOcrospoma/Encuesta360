@@ -240,31 +240,27 @@
     }
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Lógica para el switch omitida para brevedad
+document.addEventListener('DOMContentLoaded', function () {
     window.togglePersonalModal = function(open, empresaId) {
-    const modal = document.getElementById('personalModal');
-    if (open) {
-        fetch(`/empresa/personal/${empresaId}`)
-            .then(response => response.text())
-            .then(html => {
-                modal.querySelector('.modal-body').innerHTML = html;
-                modal.style.display = 'flex';
-            })
-
-                        .catch(error => console.error('Error cargando el personal:', error));
-                } else {
-                    modal.style.display = 'none';
-                }
-            };
-
-        // Cerrar el modal si se hace clic fuera de él
-        document.getElementById('personalModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                togglePersonalModal(false);
+        const modal = document.getElementById('personalModal');
+        if (modal) {
+            if (open) {
+                fetch(`/empresa/personal/${empresaId}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        modal.querySelector('.modal-body').innerHTML = html;
+                        modal.style.display = 'flex';
+                    })
+                    .catch(error => console.error('Error cargando el personal:', error));
+            } else {
+                modal.style.display = 'none';
             }
-        });
-    });
+        } else {
+            console.error('El modal con ID "personalModal" no se encontró en el DOM.');
+        }
+    };
+});
+
 </script>
 
 <script>
@@ -322,48 +318,65 @@
 </script>
 
 <script>
-    function enviarDatos(empresaId) {
-        let formData = new FormData();
-        formData.append('dni', document.getElementById('input-dni').value);
-        formData.append('nombre', document.getElementById('input-nombre').value);
-        formData.append('correo', document.getElementById('input-correo').value);
-        formData.append('telefono', document.getElementById('input-telefono').value);
-        formData.append('cargo', document.getElementById('input-cargo').value);
-        formData.append('empresa', empresaId); // Utiliza el id de la empresa pasado como argumento
-        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+function enviarDatos(empresaId) {
+    let formData = new FormData();
+    formData.append('dni', document.getElementById('input-dni').value);
+    formData.append('nombre', document.getElementById('input-nombre').value);
+    formData.append('correo', document.getElementById('input-correo').value);
+    formData.append('telefono', document.getElementById('input-telefono').value);
+    formData.append('cargo', document.getElementById('input-cargo').value);
+    formData.append('empresa', empresaId);
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
-        // Añadir el ID del personal si está presente
-        let personalId = document.getElementById('input-personal-id').value;
-        if (personalId) {
-            formData.append('personal_id', personalId);
-        }
-
-        fetch('{{ route("personals.create") }}', {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Respuesta de red fallida');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Aquí puedes agregar lógica adicional para manejar la respuesta,
-            // como actualizar la interfaz de usuario o mostrar un mensaje de éxito/error.
-            console.log(data);
-            togglePersonalModal(true, empresaId); 
-            cerrarModalcrear(); 
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('El Dni ya esta registrado.');
-        });
+    let personalId = document.getElementById('input-personal-id').value;
+    if (personalId) {
+        formData.append('personal_id', personalId);
     }
 
+    fetch('{{ route("personals.create") }}', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            agregarPersonalATabla(data.personal);
+            cerrarModalcrear();
+        } else {
+            throw new Error(data.message || "Error al crear el personal.");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    });
+}
 
+function agregarPersonalATabla(personal) {
+    const tabla = document.getElementById("tablaPersonal");
+    if (tabla) { // Asegúrate de que el elemento exista
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${personal.dni}</td>
+            <td>${personal.nombre}</td>
+            <td>${personal.correo}</td>
+            <td>${personal.telefono}</td>
+            <td>${personal.cargo}</td>
+            <td>
+                <button class="btn text-primary mt-1" onclick="editarPersonal(${personal.id})">
+                    <i class="icon-pencil"></i>
+                </button>
+                <button class="btn text-danger mt-1" onclick="confirmDelete(${personal.id}, this)">
+                    <i class="icon-trash"></i>
+                </button>
+            </td>
+        `;
+        tabla.appendChild(fila);
+    } else {
+        console.error('No se encontró la tabla de personal en el DOM.');
+    }
+}
 
-    
 </script>
 <script>
     function confirmDelete(personaId, empresaId) {

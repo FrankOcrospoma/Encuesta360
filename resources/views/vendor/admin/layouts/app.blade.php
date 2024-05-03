@@ -12,9 +12,12 @@
 
     {{--Scripts which must load before full loading--}}
     @style('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css')
-
-    @script("https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js")
-    @script("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js")
+    @script('https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+    @script('https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+    @script('https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.2/dist/alpine.min.js')
+    @script('https://cdn.jsdelivr.net/npm/chart.js')
+    @script("/assets/admin/js/ckeditor.min.js")
+    
     {{--Styles--}}
     @livewireStyles
     @style("/assets/admin/css/style.min.css")
@@ -153,6 +156,7 @@
 @script("/assets/admin/js/feather.min.js")
 @script("/assets/admin/js/sidebarmenu.min.js")
 @script("/assets/admin/js/custom.min.js")
+
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @livewireScripts

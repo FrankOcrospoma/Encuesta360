@@ -7,13 +7,13 @@
     @if(getCrudConfig('Envio')->delete or getCrudConfig('Envio')->update)
         <td>
 
-            @if(getCrudConfig('Envio')->update && hasPermission(getRouteName().'.envio.update', 1, 1, $envio))
+            @if(getCrudConfig('Envio')->update && hasPermission(getRouteName().'.envio.update', 1, 1))
                 <a href="@route(getRouteName().'.envio.update', $envio->id)" class="btn text-primary mt-1">
                     <i class="icon-pencil"></i>
                 </a>
             @endif
 
-            @if(getCrudConfig('Envio')->delete && hasPermission(getRouteName().'.envio.delete', 1, 1, $envio))
+            @if(getCrudConfig('Envio')->delete && hasPermission(getRouteName().'.envio.delete', 1, 1))
                 <button @click.prevent="modalIsOpen = true" class="btn text-danger mt-1">
                     <i class="icon-trash"></i>
                 </button>

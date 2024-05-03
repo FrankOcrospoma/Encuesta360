@@ -73,9 +73,9 @@ class PersonasEmpresaController extends Controller
     
     public function usuariosPorEmpresa($empresaId)
     {
-        $usuarios = Evaluado::select('personals.id','personals.dni', 'personals.nombre', 'personals.correo')  // Selecciona todos los campos de personal
-        ->join('personals', 'personals.id', '=', 'evaluados.evaluado_id')
-        ->where('evaluados.empresa_id', $empresaId)
+        $usuarios = Detalle_empresa::select('personals.id','personals.dni', 'personals.nombre', 'personals.correo')  // Selecciona todos los campos de personal
+        ->join('personals', 'personals.id', '=', 'detalle_empresas.personal_id')
+        ->where('detalle_empresas.empresa_id', $empresaId)
         ->groupBy('personals.id','personals.dni', 'personals.nombre', 'personals.correo')  // Asegúrate de agrupar por el ID de personal para evitar duplicados
         ->get();
 

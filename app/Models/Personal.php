@@ -17,7 +17,8 @@ class Personal extends Model
         'correo',
         'telefono',
         'cargo',
-        'estado'
+        'estado',
+      
     ];
     public function __toString()
     {
@@ -29,5 +30,9 @@ class Personal extends Model
         // y 'id' es la clave primaria de 'personal'
         return $this->hasMany(Envio::class, 'persona', 'id');
     }
+    public function detallesEmpresa()
+{
+    return $this->hasMany(Detalle_empresa::class, 'persona_id', 'id');
+}
 
 }

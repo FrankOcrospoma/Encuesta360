@@ -10,57 +10,43 @@ class Update extends Component
 {
     use WithFileUploads;
 
-    public $personal;
-
-    public $dni;
-    public $nombre;
-    public $correo;
-    public $telefono;
-    public $cargo;
-    public $empresa;
-    public $estado;
+    public $personal, $dni, $nombre, $correo, $telefono, $cargo, $estado;
     
     protected $rules = [
         'dni' => 'required|string|max:20',
         'nombre' => 'required|string|max:255',
         'correo' => 'required|email|max:255',
         'telefono' => 'required|max:15',
-        'cargo' => 'required|integer|exists:cargos,id',
-        'empresa' => 'required|integer|exists:empresas,id',        
+        'cargo' => 'required',        
     ];
 
-    public function mount(Personal $Personal){
-        $this->personal = $Personal;
-        $this->dni = $this->personal->dni;
-        $this->nombre = $this->personal->nombre;
-        $this->correo = $this->personal->correo;
-        $this->telefono = $this->personal->telefono;
-        $this->cargo = $this->personal->cargo;
-        $this->empresa = $this->personal->empresa;
-        $this->estado = $this->personal->estado;        
-    }
-
-    public function updated($input)
-    {
-        $this->validateOnly($input);
+    public function mount(Personal $personal){
+        $this->personal = $personal;
+        $this->dni = $personal->dni;
+        $this->nombre = $personal->nombre;
+        $this->correo = $personal->correo;
+        $this->telefono = $personal->telefono;
+        $this->cargo = $personal->cargo;
+        $this->estado = $personal->estado;        
     }
 
     public function update()
     {
-        if($this->getRules())
-            $this->validate();
+        $this->validate();  // Make sure to validate user input
 
-        $this->dispatchBrowserEvent('show-message', ['type' => 'success', 'message' => __('UpdatedMessage', ['name' => __('Personal') ]) ]);
-        
         $this->personal->update([
             'dni' => $this->dni,
             'nombre' => $this->nombre,
             'correo' => $this->correo,
             'telefono' => $this->telefono,
             'cargo' => $this->cargo,
-            'empresa' => $this->empresa,
             'estado' => $this->estado,
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id(),  // Assuming you want to track which user made the change
+        ]);
+
+        $this->dispatchBrowserEvent('show-message', [
+            'type' => 'success',
+            'message' => __('UpdatedMessage', ['name' => __('Personal') ])
         ]);
     }
 

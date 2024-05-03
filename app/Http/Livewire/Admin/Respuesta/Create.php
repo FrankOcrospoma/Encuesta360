@@ -14,7 +14,7 @@ class Create extends Component
 
     public $texto;
     public $score;
-    public $estado;
+    public $estado = 1;
     
     protected $rules = [
         'texto' => 'required|string|max:255',

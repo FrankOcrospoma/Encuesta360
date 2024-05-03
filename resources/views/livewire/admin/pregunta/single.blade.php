@@ -1,18 +1,24 @@
 <tr x-data="{ modalIsOpen : false }">
     <td class="">{{ $pregunta->texto }}</td>
     <td class="">{{ $pregunta->Categoria }}</td>
-    <td class="">{{ $pregunta->estado }}</td>
-    
+    <td class="">
+        @if($pregunta->estado == 1)
+        Para Marcar
+
+        @else
+            Abierta
+        @endif
+    </td>    
     @if(getCrudConfig('Pregunta')->delete or getCrudConfig('Pregunta')->update)
         <td>
 
-            @if(getCrudConfig('Pregunta')->update && hasPermission(getRouteName().'.pregunta.update', 1, 1, $pregunta))
+            @if(getCrudConfig('Pregunta')->update && hasPermission(getRouteName().'.pregunta.update', 1, 1))
                 <a href="@route(getRouteName().'.pregunta.update', $pregunta->id)" class="btn text-primary mt-1">
                     <i class="icon-pencil"></i>
                 </a>
             @endif
 
-            @if(getCrudConfig('Pregunta')->delete && hasPermission(getRouteName().'.pregunta.delete', 1, 1, $pregunta))
+            @if(getCrudConfig('Pregunta')->delete && hasPermission(getRouteName().'.pregunta.delete', 1, 1))
                 <button @click.prevent="modalIsOpen = true" class="btn text-danger mt-1">
                     <i class="icon-trash"></i>
                 </button>

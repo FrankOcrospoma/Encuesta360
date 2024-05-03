@@ -23,7 +23,7 @@ class Detalle_pregunta extends Model
     // Definición de la relación con Respuesta
     public function Respuesta()
     {
-        return $this->belongsTo(Respuesta::class, 'respuesta', 'id');
+        return $this->hasMany(Respuesta::class, 'id', 'respuesta');
     }
 
 }

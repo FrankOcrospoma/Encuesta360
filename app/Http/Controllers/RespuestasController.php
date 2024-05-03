@@ -8,7 +8,6 @@ use App\Models\Envio;
 use App\Models\Respuesta; 
 
 use App\Models\Detalle_Pregunta;
-use App\Models\Encuesta_pregunta;
 use Illuminate\Support\Facades\DB; // Importar Facade para las transacciones
 
 class RespuestasController extends Controller
@@ -56,16 +55,12 @@ class RespuestasController extends Controller
                         'pregunta' => $preguntaId,
                         'respuesta' => $nuevaRespuesta->id,
                     ]);
-                                    // Crear un nuevo registro en encuesta_preguntas
 
     
                     if ($detalle) {
                         $detalle->respuesta = $nuevaRespuesta->id;
                         $detalle->save();
-                        Encuesta_pregunta::create([
-                            'encuesta_id' =>  $envio->encuesta,
-                            'detalle_id' => $detalle->id,
-                        ]);
+
                         // También registrar esta respuesta en persona_respuestas
                         Persona_Respuesta::create([
                             'persona' => $personaId,

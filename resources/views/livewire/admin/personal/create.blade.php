@@ -13,56 +13,36 @@
     <form class="form-horizontal" wire:submit.prevent="create" enctype="multipart/form-data">
 
         <div class="card-body">
-            <!-- Empresa Input -->
+                        <!-- Dni Input -->
             <div class='form-group'>
-                <label for='input-empresa' class='col-sm-2 control-label'>{{ __('Empresa') }} <span style="color: red" class="required">*</span></label>
-                <select id='input-empresa' wire:model.lazy='empresa' class="form-control  @error('empresa') is-invalid @enderror">
-                    @foreach(getCrudConfig('Personal')->inputs()['empresa']['select'] as $key => $value)
-                    <option value='{{ $key }}'>{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('empresa') <div class='invalid-feedback'>{{ $message }}</div> @enderror
-            </div>
-            <!-- Dni Input -->
-            <div class='form-group'>
-                <label for='input-dni' class='col-sm-2 control-label'> {{ __('Dni') }} <span style="color: red" class="required">*</span></label>
-                <div class="input-group mb-3">
-                    <input type='text' id='input-dni' wire:model.lazy='dni' class="form-control  @error('dni') is-invalid @enderror" placeholder='' autocomplete='on'>
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onclick="consultaDNI()">Buscar</button>
-                    </div>
-                </div>
+                <label for='input-dni' class='col-sm-2 control-label '> {{ __('Dni') }}</label>
+                <input type='text' id='input-dni' wire:model.lazy='dni' class="form-control  @error('dni') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('dni') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
             <!-- Nombre Input -->
             <div class='form-group'>
-                <label for='input-nombre' class='col-sm-2 control-label '> {{ __('Nombre') }} <span style="color: red" class="required">*</span></label>
-                <input type='text' id='input-nombre' wire:model.defer='nombre' class="form-control  @error('nombre') is-invalid @enderror" placeholder='' autocomplete='on'>
+                <label for='input-nombre' class='col-sm-2 control-label '> {{ __('Nombre') }}</label>
+                <input type='text' id='input-nombre' wire:model.lazy='nombre' class="form-control  @error('nombre') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('nombre') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
             <!-- Correo Input -->
             <div class='form-group'>
-                <label for='input-correo' class='col-sm-2 control-label '> {{ __('Correo') }} <span style="color: red" class="required">*</span></label>
+                <label for='input-correo' class='col-sm-2 control-label '> {{ __('Correo') }}</label>
                 <input type='email' id='input-correo' wire:model.lazy='correo' class="form-control  @error('correo') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('correo') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
-            <!-- Teléfono Input -->
+            <!-- Telefono Input -->
             <div class='form-group'>
-            <label for='input-telefono' class='col-sm-2 control-label '> {{ __('Teléfono') }} <span style="color: red" class="required">*</span></label>
-            <input type='number' id='input-telefono' wire:model.lazy='telefono' class="form-control  @error('telefono') is-invalid @enderror" placeholder='' autocomplete='on'>
-            @error('telefono') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+                <label for='input-telefono' class='col-sm-2 control-label '> {{ __('Telefono') }}</label>
+                <input type='number' id='input-telefono' wire:model.lazy='telefono' class="form-control  @error('telefono') is-invalid @enderror" placeholder='' autocomplete='on'>
+                @error('telefono') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
             <!-- Cargo Input -->
-                <div class='form-group'>
-                <label for='input-cargo' class='col-sm-2 control-label '> {{ __('Cargo') }} <span style="color: red" class="required">*</span></label>
-                <select id='input-cargo' wire:model.lazy='cargo' class="form-control  @error('cargo') is-invalid @enderror">
-                    @foreach(getCrudConfig('Personal')->inputs()['cargo']['select'] as $key => $value)
-                    <option value='{{ $key }}'>{{ $value }}</option>
-                    @endforeach
-                </select>
+            <div class='form-group'>
+                <label for='input-cargo' class='col-sm-2 control-label '> {{ __('Cargo') }}</label>
+                <input type='text' id='input-cargo' wire:model.lazy='cargo' class="form-control  @error('cargo') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('cargo') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
-            
             <!-- Estado Input -->
             <div class='form-group'>
                 <div class='form-check mt-4 mb-3'>
@@ -71,6 +51,7 @@
                 </div>
                 @error('estado') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
+
         </div>
 
         <div class="card-footer">
@@ -79,25 +60,3 @@
         </div>
     </form>
 </div>
-<script>
-    function consultaDNI() {
-        var dni = $("#input-dni").val();
-        var url = "https://facturae-garzasoft.com/facturacion/buscaCliente/BuscaCliente2.php";
-        if (location.protocol !== "https:") {
-            url = "http://facturae-garzasoft.com/facturacion/buscaCliente/BuscaCliente2.php";
-        }
-        $.ajax({
-            type: 'GET',
-            url: url,
-            data: "dni=" + dni + "&fe=N&token=qusEj_w7aHEpX",
-            success: function(data) {
-                data = JSON.parse(data);
-                var nombreCompleto = data.apepat + " " + data.apemat + " " + data.nombres;
-                @this.set('nombre', nombreCompleto);
-            },
-            error: function(xhr, status, error) {
-                console.error("Error al obtener datos: ", error);
-            }
-        });
-    }
-</script>

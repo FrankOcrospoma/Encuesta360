@@ -25,13 +25,13 @@ class PersonalComponent implements CRUDComponent
     // which kind of data should be showed in list page
     public function fields()
     {
-        return ['dni', 'nombre', 'correo', 'telefono','cargo', 'Empresa','estado'];
+        return ['dni', 'nombre', 'correo', 'telefono','cargo','estado'];
     }
     
     // Searchable fields, if you dont want search feature, remove it
     public function searchable()
     {
-        return ['dni', 'nombre','correo', 'telefono', 'cargo', 'empresa.nombre','estado'];
+        return ['dni', 'nombre','correo', 'telefono', 'cargo', 'estado'];
     }
 
     // Write every fields in your db which you want to have a input
@@ -39,7 +39,7 @@ class PersonalComponent implements CRUDComponent
     // "password", "number", "email", "select", "date", "datetime", "time"
     public function inputs()
     {
-        $options = $this->options();
+
     
         return [
             'dni' => 'text',
@@ -47,9 +47,6 @@ class PersonalComponent implements CRUDComponent
             'correo' => 'email', // Campo de tipo correo electrónico
             'telefono' => 'number',
             'cargo' => 'text',
-            'empresa' => [
-                'select' => $options['empresas'],
-            ],
             'estado' => 'checkbox'
         ];
     }
@@ -64,7 +61,7 @@ class PersonalComponent implements CRUDComponent
             'correo' => 'required|email|max:255',
             'telefono' => 'required|max:15',
             'cargo' => 'required',
-            'empresa' => 'required|integer|exists:empresas,id',
+    
         ];
     }
     // Where files will store for inputs
@@ -73,18 +70,5 @@ class PersonalComponent implements CRUDComponent
         return [];
     }
 
-    public function options()
-    {
-        $empresas = Empresa::pluck('nombre', 'id')->toArray();
-    
-        // Agregar la opción por defecto en los arreglos de cargos y empresas
-    
-        $empresas = ['' => 'Selecciona una opción'] + $empresas;
-    
-        return [
-       
-            'empresas' => $empresas,
-        ];
-    }
     
 }

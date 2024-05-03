@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\Admin\Personal;
 
+use App\Models\Detalle_empresa;
+use App\Models\Empresa;
 use App\Models\Personal;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
@@ -36,35 +38,39 @@ class Read extends Component
 
     public function render()
     {
-        $data = Personal::query();
-
+        $detalle = Detalle_empresa::where('empresa_id', auth()->user()->empresa_id)->get(); 
+        $personalIds = $detalle->pluck('personal_id'); 
+        $query = Personal::whereIn('id', $personalIds);
+    
         $instance = getCrudConfig('personal');
-        if($instance->searchable()){
-            $array = (array) $instance->searchable();
-            $data->where(function (Builder $query) use ($array){
-                foreach ($array as $item) {
-                    if(!\Str::contains($item, '.')) {
-                        $query->orWhere($item, 'like', '%' . $this->search . '%');
+        if ($instance->searchable()) {
+            $searchableFields = (array) $instance->searchable();
+            $query->where(function (Builder $query) use ($searchableFields) {
+                foreach ($searchableFields as $field) {
+                    if (!\Str::contains($field, '.')) {
+                        $query->orWhere($field, 'like', '%' . $this->search . '%');
                     } else {
-                        $array = explode('.', $item);
-                        $query->orWhereHas($array[0], function (Builder $query) use ($array) {
-                            $query->where($array[1], 'like', '%' . $this->search . '%');
+                        $fieldParts = explode('.', $field);
+                        $query->orWhereHas($fieldParts[0], function (Builder $subQuery) use ($fieldParts) {
+                            $subQuery->where($fieldParts[1], 'like', '%' . $this->search . '%');
                         });
                     }
                 }
             });
         }
-
-        if($this->sortColumn) {
-            $data->orderBy($this->sortColumn, $this->sortType);
+    
+        if ($this->sortColumn) {
+            $query->orderBy($this->sortColumn, $this->sortType);
         } else {
-            $data->latest('id');
+            $query->latest('id');
         }
-
-        $data = $data->paginate(config('easy_panel.pagination_count', 15));
-
+    
+        $data = $query->paginate(config('easy_panel.pagination_count', 15));
+    
         return view('livewire.admin.personal.read', [
             'personals' => $data
-        ])->layout('admin::layouts.app', ['title' => __(\Str::plural('Personal')) ]);
+        ])->layout('admin::layouts.app', ['title' => __(\Str::plural('Personal'))]);
     }
+    
+    
 }

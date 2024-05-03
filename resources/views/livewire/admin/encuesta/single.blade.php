@@ -6,13 +6,13 @@
     @if(getCrudConfig('Encuesta')->delete or getCrudConfig('Encuesta')->update)
         <td>
 
-            @if(getCrudConfig('Encuesta')->update && hasPermission(getRouteName().'.encuesta.update', 1, 1, $encuesta))
+            @if(getCrudConfig('Encuesta')->update && hasPermission(getRouteName().'.encuesta.update', 1, 1))
                 <a href="@route(getRouteName().'.encuesta.update', $encuesta->id)" class="btn text-primary mt-1">
                     <i class="icon-pencil"></i>
                 </a>
             @endif
 
-            @if(getCrudConfig('Encuesta')->delete && hasPermission(getRouteName().'.encuesta.delete', 1, 1, $encuesta))
+            @if(getCrudConfig('Encuesta')->delete && hasPermission(getRouteName().'.encuesta.delete', 1, 1))
                 <button @click.prevent="modalIsOpen = true" class="btn text-danger mt-1">
                     <i class="icon-trash"></i>
                 </button>

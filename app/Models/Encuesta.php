@@ -9,7 +9,7 @@ class Encuesta extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['nombre', 'empresa', 'fecha', 'proceso'];
+    protected $fillable = ['nombre', 'empresa', 'fecha', 'proceso', 'formulario_id'];
     protected $dates = ['fecha'];
     public function __toString()
     {
@@ -24,14 +24,15 @@ public function evaluados()
 {
     return $this->hasMany(Evaluado::class);
 }
+public function formularios()
+{
+    return $this->hasMany(Formulario::class);
+}
 public function preguntas()
 {
-    return $this->belongsToMany(Pregunta::class, 'encuesta_preguntas', 'encuesta_id', 'detalle_id');
+    return $this->belongsToMany(Pregunta::class, 'formularios', 'detalle_id');
 }
-public function encuesta_preguntas()
-{
-    return $this->hasMany(Encuesta_pregunta::class);
-}
+
 // Aquí agregamos la relación con Envios
 public function envios()
 {

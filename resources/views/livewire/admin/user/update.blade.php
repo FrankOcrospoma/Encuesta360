@@ -14,7 +14,35 @@
 
         <div class="card-body">
 
-            
+                        <!-- Name Input -->
+            <div class='form-group'>
+                <label for='input-name' class='col-sm-2 control-label '> {{ __('Name') }}</label>
+                <input type='text' id='input-name' wire:model.lazy='name' class="form-control  @error('name') is-invalid @enderror" placeholder='' autocomplete='on'>
+                @error('name') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+            </div>
+            <!-- Email Input -->
+            <div class='form-group'>
+                <label for='input-email' class='col-sm-2 control-label '> {{ __('Email') }}</label>
+                <input type='email' id='input-email' wire:model.lazy='email' class="form-control  @error('email') is-invalid @enderror" placeholder='' autocomplete='on'>
+                @error('email') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+            </div>
+            <!-- Password Input -->
+            <div class='form-group'>
+                <label for='inputpassword' class='col-sm-2 control-label '> {{ __('Password') }}</label>
+                <input type='password' id='input-password' wire:model.lazy='password' class="form-control  @error('password') is-invalid @enderror" placeholder=''>
+                @error('password') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+            </div>
+            <!-- Empresa_id Input -->
+            <div class='form-group'>
+                <label for='input-empresa_id' class='col-sm-2 control-label '> {{ __('Empresa_id') }}</label>
+                <select id='input-empresa_id' wire:model.lazy='empresa_id' class="form-control  @error('empresa_id') is-invalid @enderror">
+                    @foreach(getCrudConfig('User')->inputs()['empresa_id']['select'] as $key => $value)
+                        <option value='{{ $key }}'>{{ $value }}</option>
+                    @endforeach
+                </select>
+                @error('empresa_id') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+            </div>
+
 
         </div>
 

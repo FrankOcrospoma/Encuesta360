@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Admin\Personal;
 
+use App\Models\Empresa;
 use App\Models\Personal;
 use Livewire\Component;
 
@@ -23,7 +24,11 @@ class Single extends Component
 
     public function render()
     {
-        return view('livewire.admin.personal.single')
+        $empresa = Empresa::findOrFail(auth()->user()->empresa_id); 
+
+        return view('livewire.admin.personal.single',
+            [ 'empresa' => $empresa ]        
+        )
             ->layout('admin::layouts.app');
     }
 }

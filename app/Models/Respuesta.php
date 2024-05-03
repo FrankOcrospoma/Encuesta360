@@ -18,5 +18,8 @@ class Respuesta extends Model
 {
     return $this->belongsToMany(Pregunta::class, 'detalle_preguntas', 'respuesta_id', 'pregunta_id');
 }
-
+public function detallesPregunta()
+{
+    return $this->hasMany(Detalle_pregunta::class, 'respuesta', 'id');
+}
 }
