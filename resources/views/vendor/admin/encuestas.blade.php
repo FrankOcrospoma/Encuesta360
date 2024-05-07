@@ -34,6 +34,33 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
 
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
 <style>
+   .card {
+    transition: box-shadow .3s ease-in-out;
+    border: none;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.card-header:hover {
+    background-color: #e2e6ea;
+}
+
+.collapse.show {
+    transition: height 0.3s ease; /* Aumenta el tiempo a 0.75 segundos */
+}
+
+.collapse {
+    transition: height 0.3s ease;
+}
+
+
     .search-container {
         max-width: 300px; /* Limitar el ancho del campo de búsqueda */
     }
@@ -363,17 +390,18 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
         $empresa = Empresa::find($empresaId);
         $encuestasPorProceso = $encuestasDeEmpresa->groupBy('proceso');
         @endphp
-        <div class="card">
-            <div class="card-header" id="headingEmpresa{{ $empresaId }}">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseEmpresa{{ $empresaId }}" aria-expanded="true" aria-controls="collapseEmpresa{{ $empresaId }}">
-                        {{ $empresa->nombre ?? 'Empresa no encontrada' }}
-                    </button>
-                </h5>
-            </div>
 
-            <div id="collapseEmpresa{{ $empresaId }}" class="collapse" aria-labelledby="headingEmpresa{{ $empresaId }}" data-parent="#accordion">
-                <div class="card-body">
+<div class="card card-empresa">
+    <div class="card-header" id="headingEmpresa{{ $empresaId }}">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEmpresa{{ $empresaId }}" aria-expanded="false" aria-controls="collapseEmpresa{{ $empresaId }}">
+                    {{ $empresa->nombre ?? 'Empresa no encontrada' }}
+                </button>
+            </h5>
+        </div>
+
+        <div id="collapseEmpresa{{ $empresaId }}" class="collapse" aria-labelledby="headingEmpresa{{ $empresaId }}" data-parent="#accordion">
+            <div class="card-body">
                     @foreach($encuestasPorProceso as $proceso => $encuestasDelProceso)
                     <div class="card">
                         <div class="card-header" id="headingProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}">
@@ -531,6 +559,9 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
         </div>
         @endforeach
     </div>
+
+
+    
 </div>
 @else
 <div id="listarEncuestaBlock" class="mt-4">
@@ -540,8 +571,8 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
         $encuestasDeEmpresa = $encuestas->where('empresa', $userempresa);
         $encuestasPorProceso = $encuestasDeEmpresa->groupBy('proceso');
         @endphp
-<h4 class="nombre-empresa">{{ $emp->nombre }}</h4>
-@foreach($encuestasPorProceso as $proceso => $encuestasDelProceso)
+        <h4 class="nombre-empresa">{{ $emp->nombre }}</h4>
+        @foreach($encuestasPorProceso as $proceso => $encuestasDelProceso)
         <div class="card">
   
             <div class="card-header" id="headingProceso{{ str_replace(' ', '', $proceso) }}">
@@ -733,24 +764,55 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
     </div>
 </div>
 <script>
-    function filterCompanies() {
-        var input = document.getElementById("searchInput");
-        var filter = input.value.toUpperCase();
-        var accordion = document.getElementById("accordion");
-        var cards = accordion.getElementsByClassName("card");
-    
-        for (var i = 0; i < cards.length; i++) {
-            var title = cards[i].querySelector(".card-header button");
-            if (title) {
-                var txtValue = title.textContent || title.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    cards[i].style.display = "";
-                } else {
-                    cards[i].style.display = "none";
-                }
-            }       
+$(document).ready(function() {
+    $('.collapse').on('show.bs.collapse', function() {
+        $(this).css({
+            'transition': 'height 0.5s ease' // Aumenta el tiempo a 0.75 segundos
+        });
+    });
+
+    $('.collapse').on('hide.bs.collapse', function() {
+        $(this).css({
+            'transition': 'height 0.5s ease' // Aumenta el tiempo a 0.75 segundos
+        });
+    });
+});
+
+function filterCompanies() {
+    var input = document.getElementById("searchInput");
+    var filter = input.value.toUpperCase();
+    var accordion = document.getElementById("accordion");
+    var cards = accordion.getElementsByClassName("card-empresa");
+
+    for (var i = 0; i < cards.length; i++) {
+        var title = cards[i].querySelector(".card-header button");
+        if (title) {
+            var txtValue = title.textContent || title.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                cards[i].style.display = "";
+            } else {
+                cards[i].style.display = "none";
+            }
         }
     }
+}
+
+
+function resetAccordion() {
+    var filteredCards = document.querySelectorAll('.card.filtered');
+    filteredCards.forEach(function(card, index) {
+        var headingId = "heading" + index;
+        var collapseId = "collapse" + index;
+
+        var cardHeader = card.querySelector('.card-header');
+        var collapseDiv = card.querySelector('.collapse');
+
+        cardHeader.id = headingId;
+        cardHeader.querySelector('button').dataset.target = "#" + collapseId;
+        collapseDiv.id = collapseId;
+        collapseDiv.setAttribute('aria-labelledby', headingId);
+    });
+}
 
 $(document).ready(function() {
     // Interceptar el envío del formulario y enviarlo mediante AJAX
@@ -1504,3 +1566,5 @@ function añadirTodosLosEvaluados() {
 
 
 @endcomponent
+
+

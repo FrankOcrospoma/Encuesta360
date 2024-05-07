@@ -554,7 +554,11 @@ function guardarVinculos(index) {
 
 function recuperarUltimosVinculos() {
     const empresaId = document.querySelector('input[name="empresa_id"]').value;
+    const btnRecuperar = document.getElementById('btnRecuperarVinculos');
 
+    // Deshabilitar el botón y cambiar el texto (opcional)
+    btnRecuperar.disabled = true;
+    btnRecuperar.textContent = 'Recuperando...';
     fetch(`/recuperar-ultimos-vinculos?empresa_id=${empresaId}`, {
         method: 'GET',
         headers: {
@@ -573,17 +577,22 @@ function recuperarUltimosVinculos() {
             const listaEvaluadores = document.getElementById(`lista-evaluadores-ul-${personaId}`);
             const selectEvaluados = document.getElementById(`input-evaluadores-${personaId}`);
 
+            // Recalcular el índice en función de los elementos ya presentes
+            const existingItems = listaEvaluadores.querySelectorAll('.list-group-item').length;
+
             // Crear el elemento de la lista
             const li = document.createElement('div');
             li.className = 'list-group-item d-flex justify-content-between align-items-center';
             li.draggable = true;
             li.innerHTML = `
-                <span class="col-1">${personaId}</span>
+                <span class="col-1">${existingItems }</span>
                 <span class="col-3">${evaluadorNombre}</span>
                 <span class="col-3">${vinculoNombre}</span>
                 <input type="hidden" name="evaluadoresSeleccionados[]" value="${evaluadorId}">
                 <input type="hidden" name="evaluadoresVinculos[]" value="${vinculoId}">
-                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluador" data-evaluado-id="${evaluadorId}" onclick="quitarEvaluador(this)">  <i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+                <button style="border-radius: 15%; width: 67px;" class="btn btn-danger btn-sm quitar-evaluador" data-evaluado-id="${evaluadorId}" onclick="quitarEvaluador(this)">
+                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                </button>
             `;
             listaEvaluadores.appendChild(li);
 

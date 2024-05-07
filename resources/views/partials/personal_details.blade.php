@@ -226,7 +226,7 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
 
     @if (!$ultimosVin->isEmpty())
     <div class="col-md-4">
-        <button class="btn btn-info" onclick="recuperarUltimosVinculos()">Recuperar Últimos Vínculos</button>
+        <button id="btnRecuperarVinculos" class="btn btn-info" onclick="recuperarUltimosVinculos()">Recuperar Últimos Vínculos</button>
     </div>
     @endif
     <br>

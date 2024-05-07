@@ -8,6 +8,7 @@ use App\Models\Personal;
 use App\Models\Empresa; 
 use Illuminate\Support\Facades\Log;
 use App\Imports\PersonasImport;
+use App\Models\Encuesta;
 use App\Models\Evaluado;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -112,17 +113,32 @@ class PersonasEmpresaController extends Controller
     }
 
     public function recuperarUltimosVinculos(Request $request)
-{
-    $empresaId = $request->empresa_id;
-    $ultimosVinculos = Evaluado::with(['evaluador', 'vinculo'])
-                                ->where('empresa_id', $empresaId)
-                                ->whereNotNull('encuesta_id')
-                                ->orderBy('encuesta_id', 'desc')
-                                ->get();
-
-    return response()->json($ultimosVinculos);
-}
-
+    {
+        $empresaId = $request->empresa_id;
+    
+        // Identificar el nombre del último proceso basado en la fecha más reciente
+        $ultimoProceso = Encuesta::where('empresa', $empresaId)
+                                 ->latest('fecha')
+                                 ->first();
+    
+        if (!$ultimoProceso) {
+            return response()->json([]);  // Devuelve un arreglo vacío si no hay procesos
+        }
+    
+        // Obtener todas las encuestas que están en ese último proceso
+        $ultimasEncuestas = Encuesta::where('empresa', $empresaId)
+                                    ->where('proceso', $ultimoProceso->proceso)
+                                    ->get()
+                                    ->pluck('id');  // Recolectar todos los ids de encuesta del último proceso
+    
+        // Obtener los vínculos de todos los evaluados que están en las últimas encuestas del último proceso
+        $ultimosVinculos = Evaluado::with(['evaluador', 'vinculo', 'personal'])
+                                   ->whereIn('encuesta_id', $ultimasEncuestas)
+                                   ->get();
+    
+        return response()->json($ultimosVinculos);
+    }
+    
 
 }
 
