@@ -17,6 +17,7 @@ class Create extends Component
     public $email;
     public $password;
     public $empresa_id;
+    public $selectedRole = null; // Mantén un registro del rol seleccionado
     
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -45,27 +46,47 @@ class Create extends Component
             $user = User::create([
                 'name' => $this->name,
                 'email' => $this->email,
-                'password' => Hash::make($this->password), // Aquí encriptas la contraseña
+                'password' => Hash::make($this->password),
                 'empresa_id' => $this->empresa_id,
-                'user_id' => auth()->id(), // Esto parece incorrecto, usualmente user_id no es necesario aquí si estás creando un usuario nuevo
             ]);
+             
+
         
-            // Ahora insertamos en la tabla panel_admins
-            Panel_admin::create([
-                'user_id' => $user->id, // Usamos el ID del usuario recién creado
-                'is_superuser' => false, // O el valor que necesites
-                // 'created_at' y 'updated_at' se establecerán automáticamente si estás usando timestamps
-            ]);
+            // Insertar en la tabla role_user si el rol de Admin Empresa es seleccionado
+            if ($this->empresa_id) {
+                            // Ahora insertamos en la tabla panel_admins
+                Panel_admin::create([
+                    'user_id' => $user->id, // Usamos el ID del usuario recién creado
+                    'is_superuser' => false, // O el valor que necesites
+                    // 'created_at' y 'updated_at' se establecerán automáticamente si estás usando timestamps
+                ]);
     
+                DB::table('role_user')->insert([
+                    'user_id' => $user->id,
+                    'role_id' => 7 
+                ]);
+            }else {
+                                // Ahora insertamos en la tabla panel_admins
+                Panel_admin::create([
+                    'user_id' => $user->id, // Usamos el ID del usuario recién creado
+                    'is_superuser' => true, // O el valor que necesites
+                    // 'created_at' y 'updated_at' se establecerán automáticamente si estás usando timestamps
+                ]);
+    
+                DB::table('role_user')->insert([
+                    'user_id' => $user->id,
+                    'role_id' => 1
+                ]);
+            }
+        
             DB::commit(); // Confirma las operaciones si todo está bien
             $this->reset();
         } catch (\Exception $e) {
             DB::rollback(); // Revierte las operaciones en caso de error
-            // Manejo del error
-            // Por ejemplo: $this->dispatchBrowserEvent('show-message', ['type' => 'error', 'message' => 'Error creating user']);
+            // Aquí podrías manejar el error más específicamente
+            $this->dispatchBrowserEvent('show-message', ['type' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
-    
     
 
     public function render()

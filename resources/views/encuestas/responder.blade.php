@@ -171,10 +171,11 @@ $respuestas = Respuesta::all();
                                 <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
                                         @php
-                                        $detalles = Detalle_Pregunta::join('formularios', 'formularios.detalle_id', '=', 'detalle_preguntas.id')
+                                        $detalles = Detalle_Pregunta::join('formularios', 'formularios.detalle_id', '=', 'detalle_preguntas.id')->join('respuestas', 'respuestas.id', '=', 'detalle_preguntas.respuesta')
                                             ->where('detalle_preguntas.pregunta', $pregunta->id)
                                             ->where('formularios.id', $formulario->id)
-                                            ->select('detalle_preguntas.*')  // Selecciona todos los campos de detalle_preguntas
+                                            ->select('detalle_preguntas.*')
+                                            ->orderBy('respuestas.score')  // Selecciona todos los campos de detalle_preguntas
                                             ->get();
                                         // Obtener la respuesta guardada si existe
                                         $respuestaGuardada = Persona_Respuesta::where('persona', $envio->persona)
@@ -214,7 +215,7 @@ $respuestas = Respuesta::all();
                             </div>
                             <?php $index++; ?>
                         @endforeach
-                        
+                        <h2 class='categoria-titulo'>Preguntas Abiertas</h2>
                         {{-- Mostrar preguntas abiertas --}}
                         @foreach ($preguntas->where('estado', false) as $pregunta)
                 
@@ -245,10 +246,8 @@ $respuestas = Respuesta::all();
                                 </h2>
                                 <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
-
                                         <label for="respuestaAbierta<?php echo $pregunta->id; ?>">Tu respuesta:</label>
-                                        <textarea class="form-control" name="respuestaAbierta[{{ $pregunta->id }}]" id="respuestaAbierta{{ $pregunta->id }}" rows="4" required>{{ $respuestatexto->texto ?? '' }}
-                                        </textarea>
+                                        <textarea class="form-control" name="respuestaAbierta[{{ $pregunta->id }}]" id="respuestaAbierta{{ $pregunta->id }}" rows="4" required>{{ $respuestatexto->texto ?? '' }} </textarea>
                                     </div>
                                 </div>
                             </div>
@@ -257,8 +256,8 @@ $respuestas = Respuesta::all();
                     </div>
                     
                     <div class="text-center mt-4">
-                        <button type="button" onclick="guardarBorrador()" class="btn btn-secondary">Guardar Borrador</button>
-                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-send"></i> Enviar Respuestas</button>
+                        <button type="button" onclick="guardarBorrador()" class="btn btn-secondary">GUARDAR Y COMPLETAR MÁS TARDE</button>
+                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-send"></i> ENVIAR RESPUESTAS</button>
                     </div>
                 </form>
             </div>

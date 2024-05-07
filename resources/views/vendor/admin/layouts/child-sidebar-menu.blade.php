@@ -14,24 +14,27 @@
 
 @if ( auth()->user() && auth()->user()->empresa_id == null)
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Busca todos los enlaces dentro de la navegación de la barra lateral
-        const sidebarLinks = document.querySelectorAll('#sidebarnav a');
-    
-        sidebarLinks.forEach(link => {
-            // Verifica si el enlace contiene el texto "Personals"
-            if (link.textContent.trim() === 'Personals') {
-                // Sube en la jerarquía del DOM hasta el elemento 'li' y lo oculta
-                let listItem = link.parentElement;
-                while (listItem && listItem.tagName !== 'LI') {
-                    listItem = listItem.parentElement;
-                }
-                if (listItem) {
-                    listItem.style.display = 'none';
-                }
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarLinks = document.querySelectorAll('#sidebarnav a');
+
+    sidebarLinks.forEach(link => {
+        if (link.textContent.trim() === 'Categorias') {
+            link.innerHTML = '<i class="fa fa-bars"></i> Competencias';  // Nota el uso de innerHTML aquí
+        }
+
+        if (link.textContent.trim() === 'Personals') {
+            let listItem = link.parentElement;
+            while (listItem && listItem.tagName !== 'LI') {
+                listItem = listItem.parentElement;
             }
-        });
+            if (listItem) {
+                listItem.style.display = 'none';
+            }
+        }
     });
+});
+
+
     </script>
     
 @endif

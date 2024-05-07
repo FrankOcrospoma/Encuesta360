@@ -37,23 +37,24 @@
                 </li>
                 @endif --}}
 
-                {{-- @if(hasPermission(getRouteName().'.translation', true))
+                @if(hasPermission(getRouteName().'.translation', true))
                 <li class="sidebar-item @isActive(getRouteName().'.translation', 'selected')">
                     <a class="sidebar-link @isActive(getRouteName().'.translation', 'active') " href="@route(getRouteName().'.translation')" aria-expanded="false">
                         <i data-feather="globe" class="feather-icon"></i>
                         <span class="hide-menu">{{ __('Translation') }}</span>
                     </a>
                 </li>
-                @endif --}}
+                @endif
 
-                @if(hasPermission(getRouteName().'.role.lists', true))
+                {{-- @if(hasPermission(getRouteName().'.role.lists', true))
                 <li class="sidebar-item @isActive([getRouteName().'.role.lists', getRouteName().'.role.create', getRouteName().'.role.update'], 'selected')">
                     <a class="sidebar-link @isActive([getRouteName().'.role.lists', getRouteName().'.role.create', getRouteName().'.role.update'], 'active') " href="@route(getRouteName().'.role.lists')" aria-expanded="false">
                         <i data-feather="key" class="feather-icon"></i>
                         <span class="hide-menu">{{ __('Role Manager') }}</span>
                     </a>
                 </li>
-                @endif
+                @endif --}}
+{{-- 
 
                 @if(hasPermission(getRouteName().'.admins.lists', true))
                 <li class="sidebar-item @isActive([getRouteName().'.admins.lists', getRouteName().'.admins.update'], 'selected')">
@@ -62,7 +63,7 @@
                         <span class="hide-menu">{{ __('Admin Manager') }}</span>
                     </a>
                 </li>
-                @endif
+                @endif --}}
 
                 @include('admin::layouts.child-sidebar-menu')
 
