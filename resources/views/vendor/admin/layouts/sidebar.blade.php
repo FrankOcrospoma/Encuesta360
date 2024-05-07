@@ -18,6 +18,7 @@
                         <span class="hide-menu">{{ __('Home') }}</span>
                     </a>
                 </li>
+                
                 <li class="sidebar-item @isActive(getRouteName().'.encuestas', 'selected')">
                     <a class="sidebar-link @isActive(getRouteName().'.encuestas', 'active') " href="/encuestas" aria-expanded="false">
                         <i data-feather="bar-chart-2" class="feather-icon"></i>
@@ -26,7 +27,7 @@
                 </li>
 
 
-
+{{-- 
                 @if(hasPermission(getRouteName().'.crud.lists', true))
                 <li class="sidebar-item @isActive([getRouteName().'.crud.lists', getRouteName().'.crud.create'], 'selected')">
                     <a class="sidebar-link @isActive([getRouteName().'.crud.lists', getRouteName().'.crud.create'], 'active') " href="@route(getRouteName().'.crud.lists')" aria-expanded="false">
@@ -34,16 +35,16 @@
                         <span class="hide-menu">{{ __('CRUD Manager') }}</span>
                     </a>
                 </li>
-                @endif
+                @endif --}}
 
-                @if(hasPermission(getRouteName().'.translation', true))
+                {{-- @if(hasPermission(getRouteName().'.translation', true))
                 <li class="sidebar-item @isActive(getRouteName().'.translation', 'selected')">
                     <a class="sidebar-link @isActive(getRouteName().'.translation', 'active') " href="@route(getRouteName().'.translation')" aria-expanded="false">
                         <i data-feather="globe" class="feather-icon"></i>
                         <span class="hide-menu">{{ __('Translation') }}</span>
                     </a>
                 </li>
-                @endif
+                @endif --}}
 
                 @if(hasPermission(getRouteName().'.role.lists', true))
                 <li class="sidebar-item @isActive([getRouteName().'.role.lists', getRouteName().'.role.create', getRouteName().'.role.update'], 'selected')">
@@ -80,3 +81,12 @@
     </div>
     <!-- End Sidebar scroll-->
 </aside>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+<!-- Incluir CSS de Select2 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+
+<!-- Incluir JS de Select2 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>

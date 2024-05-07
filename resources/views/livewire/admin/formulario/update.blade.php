@@ -219,3 +219,19 @@
 
 
 </script>
+<script>
+    $(document).ready(function() {
+
+
+
+    // Configuración de Select2
+    $('#input-preguntas').select2({
+        placeholder: "Seleccione una opción",
+        allowClear: true,
+        width: '100%'
+    });
+
+
+    $('.select2-container--default .select2-selection--single').css({'height': '100%'});
+});
+</script>

@@ -19,11 +19,17 @@ class RespuestasController extends Controller
         try {
             $uuid = $request->input('uuid');
             $envio = Envio::where('uuid', $uuid)->firstOrFail();
+            $accion = $request->input('accion', 'definitivo');  // Recoger la acción del formulario
     
             $personaId = $envio->persona;
             $respuestas = $request->input('detalle', []);
             $respuestasAbiertas = $request->input('respuestaAbierta', []);
             $totalScore = 0;
+            // dd($respuestasAbiertas);
+            // Eliminar respuestas anteriores para evitar duplicados
+            Persona_Respuesta::where('persona', $personaId)
+                             ->where('encuesta_id', $envio->encuesta)
+                             ->delete();
     
             // Primero procesar respuestas predefinidas
             foreach ($respuestas as $preguntaId => $detallePreguntaId) {
@@ -51,16 +57,15 @@ class RespuestasController extends Controller
                         'estado' => false,
                     ]);
     
-                    $detalle =  Detalle_Pregunta::create([
+                    $detalle = Detalle_Pregunta::create([
                         'pregunta' => $preguntaId,
                         'respuesta' => $nuevaRespuesta->id,
                     ]);
-
     
                     if ($detalle) {
                         $detalle->respuesta = $nuevaRespuesta->id;
                         $detalle->save();
-
+    
                         // También registrar esta respuesta en persona_respuestas
                         Persona_Respuesta::create([
                             'persona' => $personaId,
@@ -75,17 +80,20 @@ class RespuestasController extends Controller
     
             // Actualizar estado de envío
             $countRespuestas = count($respuestas);
-
+    
             // Calcular el promedio de los scores
             $promedio = $countRespuestas > 0 ? $totalScore / $countRespuestas : 0;
-
+    
             // Convertir el promedio a formato decimal
             $promedioDecimal =(float) number_format($promedio, 2, '.', '');
-
-
-            // Actualizar el campo rango del envío con el promedio decimal
-            $envio->estado = true; // Establecer el estado en true
-            $envio->rango = $promedioDecimal; // Establecer el nuevo promedio como el valor de rango
+    
+            if ($accion === 'borrador') {
+                $envio->estado = 'B';
+            } else {
+                // Código para finalizar y calcular promedios
+                $envio->estado = 'F';
+                $envio->rango = $promedioDecimal;
+            }
             $envio->save(); // Guardar los cambios en la base de datos
     
             DB::commit();
@@ -95,7 +103,6 @@ class RespuestasController extends Controller
             return redirect()->back()->with('error', 'Hubo un error al guardar las respuestas: ' . $e->getMessage());
         }
     }
-    
     
     
 }

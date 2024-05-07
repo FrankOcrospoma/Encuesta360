@@ -18,11 +18,9 @@ class PersonasEmpresaController extends Controller
     {
         try {
             $personalId = $request->input('personal_id');
-            $dni = $request->input('dni');
-    
     
             $datos = [
-                'dni' => $dni,
+                'dni' => $request->input('dni'),
                 'nombre' => $request->input('nombre'),
                 'correo' => $request->input('correo'),
                 'telefono' => $request->input('telefono'),
@@ -33,6 +31,7 @@ class PersonasEmpresaController extends Controller
                 // Actualizar
                 $personal = Personal::findOrFail($personalId);
                 $personal->update($datos);
+                $message = 'El personal ha sido actualizado con éxito.';
             } else {
                 // Crear nuevo registro
                 $personal = Personal::create($datos);
@@ -41,13 +40,14 @@ class PersonasEmpresaController extends Controller
                     'personal_id' => $personal->id,
                     'empresa_id' => $request->input('empresa'),
                 ]);
+                $message = 'El personal ha sido creado con éxito.';
             }
     
-            return response()->json(['data' => $personal]);
+            return response()->json(['success' => true, 'message' => $message, 'data' => $personal]);
     
         } catch (\Exception $e) {
             Log::error('Error al guardar el personal: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al procesar la solicitud.'], 500);
+            return response()->json(['success' => false, 'error' => 'Hubo un error al procesar la solicitud.'], 500);
         }
     }
     

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Evaluado;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -15,6 +16,7 @@ class EncuestaMailable extends Mailable
 
     public $urlEncuesta; // Propiedad existente para la URL de la encuesta
     public $encuesta; // Nueva propiedad para la información adicional de la encuesta
+    public $evaluador; // Nueva propiedad para la información adicional de la encuesta
 
     /**
      * Create a new message instance.
@@ -22,10 +24,11 @@ class EncuestaMailable extends Mailable
      * @param string $urlEncuesta La URL de la encuesta.
      * @param mixed $encuesta Información adicional sobre la encuesta.
      */
-    public function __construct($urlEncuesta, $encuesta)
+    public function __construct($urlEncuesta, $encuesta, $evaluador)
     {
         $this->urlEncuesta = $urlEncuesta; // Asignar la URL de la encuesta
         $this->encuesta = $encuesta; // Asignar la información adicional de la encuesta
+        $this->evaluador = $evaluador; // Asignar la información adicional de la encuesta
     }
 
     /**
@@ -37,6 +40,8 @@ class EncuestaMailable extends Mailable
                     ->with([
                         'urlEncuesta' => $this->urlEncuesta, // Pasar la URL a la vista
                         'encuesta' => $this->encuesta, // Pasar la información adicional de la encuesta a la vista
+                        'evaluador' => $this->evaluador, // Pasar la información adicional de la encuesta a la vista
+
                     ]);
     }
 

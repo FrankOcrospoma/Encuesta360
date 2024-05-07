@@ -24,6 +24,7 @@ class Single extends Component
 
     public function render()
     {
+        
         $empresa = Empresa::findOrFail(auth()->user()->empresa_id); 
 
         return view('livewire.admin.personal.single',

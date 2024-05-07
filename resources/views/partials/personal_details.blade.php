@@ -255,7 +255,7 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
                                     // Obtener IDs de personas ya vinculadas
                                     $vinculadosIds = $vinculados->where('evaluado_id', $persona->id)->pluck('evaluador_id')->toArray();
                                 @endphp
-                               <select class="form-control" id="input-evaluadores-{{ $persona->id }}">
+                               <select class="form-control input-evaluadores" id="input-evaluadores-{{ $persona->id }}">
 
 
                                     @foreach ($personal as $otraPersona)
@@ -397,3 +397,28 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
 
  
 </div>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+
+<script>
+    $(document).ready(function() {
+    
+            $('[id^="input-evaluadores-"]').each(function() {
+                $(this).select2({
+                    placeholder: "Seleccione una opción",
+                    allowClear: true,
+                    width: '100%'
+                });
+            });
+        $('.select2-container--default .select2-selection--single').css({'height': '100%'});
+    });
+
+    $('[id^="tipoVinculo-"]').each(function() {
+        $(this).select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>

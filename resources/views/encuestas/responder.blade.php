@@ -4,7 +4,10 @@ use App\Models\Pregunta;
 use App\Models\Respuesta;
 use App\Models\Encuesta;
 use App\Models\Envio;
-use App\Models\Detalle_Pregunta; 
+use App\Models\Formulario;
+use App\Models\Detalle_Pregunta;
+use App\Models\Persona_Respuesta;
+
 $uuid = request()->segment(3); 
 $envio = Envio::where('uuid', $uuid)->first();
 
@@ -24,7 +27,7 @@ $preguntas = Pregunta::select('preguntas.*')
     ->get();
 
 
-
+$formulario = Formulario::where('id', $encuesta->formulario_id)->first(); 
 $respuestas = Respuesta::all();
 
 ?>
@@ -35,9 +38,11 @@ $respuestas = Respuesta::all();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario Avanzado</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        
         :root {
             --color-primary: #1e4381; /* Azul oscuro */
             --color-secondary: #1e4381; /* Azul claro */
@@ -48,6 +53,22 @@ $respuestas = Respuesta::all();
         body {
             background-color: var(--color-light);
         }
+        .bi-star-fill {
+    color: #ccc; /* Cambiar el color a gris claro */
+}
+
+        .form-check-label {
+    display: flex;
+    align-items: center;
+}
+.bi-star-fill.amarillo {
+    color: #ffc107; /* Amarillo */
+}
+
+
+.form-check-label i {
+    margin-left: 5px; /* Espaciado entre texto y estrellas */
+}
 
     .categoria-titulo {
         font-size: 1.5rem; /* Tamaño de fuente */
@@ -128,7 +149,8 @@ $respuestas = Respuesta::all();
                 <form method="POST" action="{{ route('guardar.respuestas') }}" class="needs-validation" id="formularioEncuesta">
                     @csrf
                     <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
-                    
+                    <input type="hidden" name="accion" value="definitivo" id="accionFormulario">  <!-- Input para la acción -->
+
                     <div class="accordion" id="accordionExample">
                         <?php $index = 1; ?>
                         <?php $currentCategoria = null; ?>
@@ -148,16 +170,45 @@ $respuestas = Respuesta::all();
                                 </h2>
                                 <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
-                                        <?php
-                                        $detalles = Detalle_Pregunta::where('pregunta', $pregunta->id)->get();
-                                        foreach ($detalles as $detalle):
-                                            $respuesta = Respuesta::find($detalle->respuesta);
-                                            ?>
-                                            <div class="form-check">
-                                                <input type="radio" name="detalle[<?php echo $pregunta->id; ?>]" value="<?php echo $detalle->id; ?>" class="form-check-input" id="detalle<?php echo $detalle->id; ?>" required>
-                                                <label class="form-check-label" for="detalle<?php echo $detalle->id; ?>"><?php echo $respuesta->texto; ?></label>
-                                            </div>
-                                        <?php endforeach; ?>
+                                        @php
+                                        $detalles = Detalle_Pregunta::join('formularios', 'formularios.detalle_id', '=', 'detalle_preguntas.id')
+                                            ->where('detalle_preguntas.pregunta', $pregunta->id)
+                                            ->where('formularios.id', $formulario->id)
+                                            ->select('detalle_preguntas.*')  // Selecciona todos los campos de detalle_preguntas
+                                            ->get();
+                                        // Obtener la respuesta guardada si existe
+                                        $respuestaGuardada = Persona_Respuesta::where('persona', $envio->persona)
+                                       ->where('encuesta_id', $envio->encuesta)
+                                       ->whereIn('detalle', function($query) use ($pregunta) {
+                                           $query->select('id')->from('detalle_preguntas')->where('pregunta', $pregunta->id);
+                                       })->first();
+
+                                        @endphp
+                                        @foreach ($detalles as $detalle)
+                                        @php
+                                        $respuesta = Respuesta::find($detalle->respuesta);
+                                        $score = $respuesta->score; // Suponemos que cada respuesta tiene un 'score' asociado
+                                        @endphp
+                                        <div class="form-check">
+                                            <input type="radio" name="detalle[{{ $pregunta->id }}]" value="{{ $detalle->id }}"
+                                                class="form-check-input" id="detalle{{ $detalle->id }}"
+                                                required {{ $respuestaGuardada && $respuestaGuardada->detalle == $detalle->id ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="detalle{{ $detalle->id }}">
+                                                    {{ $respuesta->texto }}
+                                                    <span id="stars{{ $detalle->id }}">
+                                                        @for ($i = 0; $i < $score; $i++)
+                                                            <i class="bi bi-star-fill"></i> <!-- Estrellas llenas ahora en gris -->
+                                                        @endfor
+                                                        @for ($i = $score; $i < 5; $i++)
+                                                            <i class="bi bi-star" style="color: #ccc;"></i> <!-- Estrellas vacías -->
+                                                        @endfor
+                                                    </span>
+                                                </label>
+                                                
+                                        </div>
+                                        @endforeach
+
+                                  
                                     </div>
                                 </div>
                             </div>
@@ -166,12 +217,26 @@ $respuestas = Respuesta::all();
                         
                         {{-- Mostrar preguntas abiertas --}}
                         @foreach ($preguntas->where('estado', false) as $pregunta)
-                            <?php
-                            if ($currentCategoria != $pregunta->categoria) {
-                                $currentCategoria = $pregunta->categoria;
-                                echo "<h2 class='mt-4'>{$currentCategoria}</h2>"; // Imprimir el título de la categoría
-                            }
-                            ?>
+                
+                            @php
+                            // Obtener la respuesta guardada si existe
+                            $respuestaGuardada = Persona_Respuesta::where('persona', $envio->persona)
+                                        ->where('encuesta_id', $envio->encuesta)
+                                        ->whereIn('detalle', function($query) use ($pregunta) {
+                                            $query->select('id')->from('detalle_preguntas')->where('pregunta', $pregunta->id);
+                                        })->first();
+
+                            // Inicializa $respuestatexto como null para manejar casos donde no hay respuesta guardada
+                            $respuestatexto = null;
+
+                            // Verifica si se encontró una respuesta guardada antes de intentar acceder a la propiedad 'detalle'
+                            if ($respuestaGuardada) {
+                                $respuestatexto = Respuesta::join('detalle_preguntas', 'respuestas.id', '=', 'detalle_preguntas.respuesta')
+                                                            ->where('detalle_preguntas.id', $respuestaGuardada->detalle)
+                                                            ->select('respuestas.*')  // Selecciona todos los campos de detalle_preguntas
+                                                            ->first();
+}
+                            @endphp
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading<?php echo $index; ?>">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
@@ -180,8 +245,10 @@ $respuestas = Respuesta::all();
                                 </h2>
                                 <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
+
                                         <label for="respuestaAbierta<?php echo $pregunta->id; ?>">Tu respuesta:</label>
-                                        <textarea class="form-control" name="respuestaAbierta[<?php echo $pregunta->id; ?>]" id="respuestaAbierta<?php echo $pregunta->id; ?>" rows="4" required></textarea>
+                                        <textarea class="form-control" name="respuestaAbierta[{{ $pregunta->id }}]" id="respuestaAbierta{{ $pregunta->id }}" rows="4" required>{{ $respuestatexto->texto ?? '' }}
+                                        </textarea>
                                     </div>
                                 </div>
                             </div>
@@ -190,14 +257,16 @@ $respuestas = Respuesta::all();
                     </div>
                     
                     <div class="text-center mt-4">
+                        <button type="button" onclick="guardarBorrador()" class="btn btn-secondary">Guardar Borrador</button>
                         <button type="submit" class="btn btn-outline-primary"><i class="bi bi-send"></i> Enviar Respuestas</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    
-    <?php else: ?>
+
+    <?php endif; ?>
+    <?php if($envio->estado=='Finalizado'): ?>
         <div class="container text-center mt-5">
             <div class="row">
                 <div class="col">
@@ -211,36 +280,127 @@ $respuestas = Respuesta::all();
             </div>
         </div>
     <?php endif; ?>
+    <?php if($envio->estado=='Borrador'): ?>
+    <div class="container text-center mt-5">
+        <div class="row">
+            <div class="col">
+                <i class="bi bi-file-earmark" style="font-size: 4rem; color: #28a745;"></i>
+            </div>
+        </div>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <div class="row mt-3">
+            <div class="col">
+                <h3>¡Respuestas guardadas en borrador!</h3>
+
+                <button class="btn btn-primary" onclick="continuarEncuesta()">Continuar Encuesta</button>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
     <!-- Bootstrap Bundle with Popper -->
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
     <script>
-        document.getElementById('formularioEncuesta').addEventListener('submit', function(e) {
-            let todasRespondidas = true;
-            let preguntas = document.querySelectorAll('.accordion-item');
-        
-            preguntas.forEach(function(pregunta, index) {
-                if (pregunta.querySelector('textarea')) {
-                    // Para preguntas abiertas
-                    let respuestaAbierta = pregunta.querySelector('textarea').value.trim();
-                    if (!respuestaAbierta) {
-                        todasRespondidas = false;
-                    }
-                } else {
-                    // Para preguntas de opción múltiple
-                    let opciones = pregunta.querySelectorAll('input[type="radio"]');
-                    let algunaSeleccionada = Array.from(opciones).some(opcion => opcion.checked);
-                    if (!algunaSeleccionada) {
-                        todasRespondidas = false;
-                    }
-                }
-            });
-        
-            if (!todasRespondidas) {
-                e.preventDefault(); // Evita el envío del formulario
-                alert('Por favor, responda todas las preguntas de la encuesta.');
+function continuarEncuesta() {
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfTokenMeta) {
+        alert('Token CSRF no encontrado. Asegúrese de que el meta tag está presente en el HTML.');
+        return;
+    }
+    const csrfToken = csrfTokenMeta.getAttribute('content');
+    const uuid = '<?php echo $uuid; ?>'; // Asegúrate de que el UUID está disponible en JavaScript
+    console.log(uuid)
+    fetch('/continuar-encuesta/' + uuid, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken // Token CSRF para seguridad
+        },
+        body: JSON.stringify({ estado: 'Pendiente' })
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload(); // Recarga la página para reflejar los cambios
+        } else {
+            alert('No se pudo actualizar el estado de la encuesta. Intente nuevamente.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al enviar la solicitud:', error);
+        alert('Error al procesar la solicitud.');
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Función para actualizar el color de las estrellas basado en el estado de los radio buttons
+    function actualizarEstrellas() {
+        document.querySelectorAll('.form-check-input').forEach(input => {
+            const label = input.nextElementSibling;
+            const stars = label.querySelector('span');
+            if (input.checked) {
+                stars.querySelectorAll('.bi-star-fill').forEach(star => {
+                    star.classList.add('amarillo');
+                });
+            } else {
+                stars.querySelectorAll('.bi-star-fill').forEach(star => {
+                    star.classList.remove('amarillo');
+                });
             }
         });
+    }
+
+    // Escucha de eventos para cambios en los inputs
+    document.querySelectorAll('.form-check-input').forEach(input => {
+        input.addEventListener('change', function() {
+            // Eliminar amarillo de todas las estrellas
+            document.querySelectorAll('.bi-star-fill').forEach(star => {
+                star.classList.remove('amarillo');
+            });
+            // Aplicar amarillo a las estrellas del input seleccionado
+            const label = input.nextElementSibling;
+            const stars = label.querySelector('span');
+            stars.querySelectorAll('.bi-star-fill').forEach(star => {
+                star.classList.add('amarillo');
+            });
+        });
+    });
+
+    // Llamar a actualizarEstrellas al cargar la página para manejar los inputs preseleccionados
+    actualizarEstrellas();
+});
+
+function guardarBorrador() {
+    document.getElementById('accionFormulario').value = 'borrador';
+    document.getElementById('formularioEncuesta').submit();
+}
+
+document.getElementById('formularioEncuesta').addEventListener('submit', function(e) {
+    let todasRespondidas = true;
+    document.querySelectorAll('.accordion-item').forEach(function(pregunta, index) {
+        if (pregunta.querySelector('textarea')) {
+            let respuestaAbierta = pregunta.querySelector('textarea').value.trim();
+            if (!respuestaAbierta) {
+                todasRespondidas = false;
+            }
+        } else {
+            let opciones = pregunta.querySelectorAll('input[type="radio"]');
+            let algunaSeleccionada = Array.from(opciones).some(opcion => opcion.checked);
+            if (!algunaSeleccionada) {
+                todasRespondidas = false;
+            }
+        }
+    });
+
+    if (!todasRespondidas) {
+        e.preventDefault(); // Evita el envío del formulario
+        alert('Por favor, responda todas las preguntas de la encuesta.');
+    }
+});
+
+  
+
         </script>
         
 </body>

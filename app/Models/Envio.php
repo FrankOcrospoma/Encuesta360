@@ -22,8 +22,9 @@ class Envio extends Model
     public function getEstadoAttribute($value)
     {
         $estadoOptions = [
-           true => 'Respondido',
-           false=> 'Pendiente',
+           'F' => 'Finalizado',
+           'P'=> 'Pendiente',
+           'B' => 'Borrador'
        
         ];
 

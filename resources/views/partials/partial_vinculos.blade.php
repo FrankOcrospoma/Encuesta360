@@ -8,7 +8,7 @@
                     // Obtener IDs de personas ya vinculadas
                     $vinculadosIds = $vinculados->where('evaluado_id', $perid)->pluck('evaluador_id')->toArray();
                 @endphp
-               <select class="form-control" id="input-evaluadores-{{ $perid }}">
+                <select class="form-control input-evaluadores" id="input-evaluadores-{{ $perid }}">
 
 
                     @foreach ($personals as $otraPersona)
@@ -66,3 +66,23 @@
     <button id="btnGuardarVinculos" class="btn btn-success mt-3" onclick="guardarVinculos({{ $perid }})">Guardar Vínculos</button>
 
 </div>
+
+<script>
+    $(document).ready(function() {
+    $('[id^="input-evaluadores-"]').each(function() {
+        $(this).select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+    $('[id^="tipoVinculo-"]').each(function() {
+        $(this).select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+});
+
+</script>

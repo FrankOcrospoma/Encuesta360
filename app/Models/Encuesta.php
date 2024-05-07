@@ -38,4 +38,5 @@ public function envios()
 {
     return $this->hasMany(Envio::class, 'encuesta');
 }
+
 }

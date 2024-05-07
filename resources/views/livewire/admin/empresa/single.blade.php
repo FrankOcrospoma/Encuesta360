@@ -183,7 +183,14 @@
 </tr>
   
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 
+<!-- Incluir CSS de Select2 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+
+<!-- Incluir JS de Select2 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -340,10 +347,11 @@ function enviarDatos(empresaId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            agregarPersonalATabla(data.personal);
-            cerrarModalcrear();
+            alert(data.message); // Muestra un mensaje de éxito
+            togglePersonalModal(true, empresaId); // Recarga el contenido del listado de personal
+            cerrarModalcrear(); // Cierra el formulario
         } else {
-            throw new Error(data.message || "Error al crear el personal.");
+            throw new Error(data.error || "Error al crear el personal.");
         }
     })
     .catch(error => {
@@ -351,6 +359,7 @@ function enviarDatos(empresaId) {
         alert('Error: ' + error.message);
     });
 }
+
 
 function agregarPersonalATabla(personal) {
     const tabla = document.getElementById("tablaPersonal");
@@ -595,4 +604,18 @@ function recuperarUltimosVinculos() {
 }
 
 
+</script>
+
+<script>
+    $(document).ready(function() {
+    
+            $('[id^="input-evaluadores-"]').each(function() {
+                $(this).select2({
+                    placeholder: "Seleccione una opción",
+                    allowClear: true,
+                    width: '100%'
+                });
+            });
+        $('.select2-container--default .select2-selection--single').css({'height': '100%'});
+    });
 </script>

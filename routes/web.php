@@ -67,6 +67,8 @@ Route::post('/guardar-respuestas', [RespuestasController::class, 'store'])->name
 
 
 Route::get('/enviar-encuesta/{id}', [EncuestaController::class, 'enviarEncuesta'])->name('enviar.encuesta');
+Route::post('/enviar-todas-encuestas', [EncuestaController::class, 'enviarTodasEncuestas'])->name('enviar-todas-encuestas');
+
 Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder'])->name('encuestas.responder');
 
 Route::post('/personal/updateEstado/{id}', [ModelosController::class, 'updateEstadoPersona'])->name('personal.updateEstado');
@@ -89,3 +91,4 @@ Route::post('/formularios', [FormularioController::class, 'store'])->name('formu
 Route::get('/admin/formulario/update/{formulario}', [FormularioController::class, 'edit'])->name('formularios.edit');
 Route::put('/formularios/{formulario}', [FormularioController::class, 'update'])->name('formularios.update');
 Route::get('/obtener-evaluados/{empresaId}/{perid}',  [EncuestaController::class, 'obtenerEvaluados'])->name('obtener-evaluados');
+Route::post('/continuar-encuesta/{uuid}',  [EncuestaController::class, 'continuarEncuesta'])->name('continuar.encuesta');
