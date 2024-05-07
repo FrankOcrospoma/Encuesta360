@@ -331,8 +331,6 @@ function continuarEncuesta() {
         alert('Error al procesar la solicitud.');
     });
 }
-
-
 document.addEventListener('DOMContentLoaded', function () {
     // Función para actualizar el color de las estrellas basado en el estado de los radio buttons
     function actualizarEstrellas() {
@@ -352,17 +350,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Escucha de eventos para cambios en los inputs
-    document.querySelectorAll('.form-check-input').forEach(input => {
-        input.addEventListener('change', function() {
-            // Eliminar amarillo de todas las estrellas
-            document.querySelectorAll('.bi-star-fill').forEach(star => {
-                star.classList.remove('amarillo');
-            });
-            // Aplicar amarillo a las estrellas del input seleccionado
-            const label = input.nextElementSibling;
-            const stars = label.querySelector('span');
-            stars.querySelectorAll('.bi-star-fill').forEach(star => {
-                star.classList.add('amarillo');
+    document.querySelectorAll('.accordion-item').forEach(item => {
+        item.querySelectorAll('.form-check-input').forEach(input => {
+            input.addEventListener('change', function() {
+                // Primero, elimina la clase 'amarillo' de todas las estrellas dentro del mismo item de acordeón
+                item.querySelectorAll('.bi-star-fill').forEach(star => {
+                    star.classList.remove('amarillo');
+                });
+
+                // Luego, añade la clase 'amarillo' solo a las estrellas dentro del mismo label que el input seleccionado
+                const label = input.nextElementSibling;
+                const stars = label.querySelector('span');
+                stars.querySelectorAll('.bi-star-fill').forEach(star => {
+                    star.classList.add('amarillo');
+                });
             });
         });
     });
@@ -378,7 +379,7 @@ function guardarBorrador() {
 
 document.getElementById('formularioEncuesta').addEventListener('submit', function(e) {
     let todasRespondidas = true;
-    document.querySelectorAll('.accordion-item').forEach(function(pregunta, index) {
+    document.querySelectorAll('.accordion-item').forEach(function(pregunta) {
         if (pregunta.querySelector('textarea')) {
             let respuestaAbierta = pregunta.querySelector('textarea').value.trim();
             if (!respuestaAbierta) {
@@ -398,8 +399,6 @@ document.getElementById('formularioEncuesta').addEventListener('submit', functio
         alert('Por favor, responda todas las preguntas de la encuesta.');
     }
 });
-
-  
 
         </script>
         
