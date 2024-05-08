@@ -7,7 +7,8 @@ use App\Models\Detalle_empresa;
 use App\Models\Personal;
 use App\Models\Vinculo;
 
-
+use App\Models\Empresa; 
+$empresas = Empresa::all();
 $vinculados = Evaluado::where('empresa_id', $empresa->id)->where('encuesta_id', null)->get();
 
 $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
@@ -127,16 +128,13 @@ $personals = Personal::whereIn('id', $personalIds)->get();
                 <!-- ID del personal, necesario solo para actualizar -->
                 <input type="hidden" name="personal_id" id="input-personal-id">
 
-                @php
-                use App\Models\Empresa; 
-                    $empresas = Empresa::all();
-                @endphp
+        
                 <!-- Empresa Input -->
                 <div class='form-group'>
                     <label for='input-empresa' class='col-sm-2 control-label'>{{ __('Empresa') }} <span style="color: red" class="required" >*</span></label>
                     <select disabled id='input-empresa' name='empresa' class="form-control @error('empresa') is-invalid @enderror">
                         @foreach($empresas as $key => $value)
-                            <option value='{{ $key }}' {{ $empresa->id == $key ? 'selected' : '' }}>{{ $value }}</option>
+                            <option value='{{ $key }}' {{ $empresa->id == $value->id ? 'selected' : '' }}>{{ $value }}</option>
                         @endforeach
                     </select>
                     @error('empresa') <div class='invalid-feedback'>{{ $message }}</div> @enderror
