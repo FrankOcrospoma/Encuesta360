@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-05-2024 a las 13:10:56
+-- Tiempo de generación: 09-05-2024 a las 21:03:11
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -331,19 +331,23 @@ DELIMITER ;
 
 CREATE TABLE `categorias` (
   `id` int(11) NOT NULL,
-  `nombre` text NOT NULL
+  `nombre` text NOT NULL,
+  `descripcion` varchar(999) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `categorias`
 --
 
-INSERT INTO `categorias` (`id`, `nombre`) VALUES
-(1, 'Colaboración'),
-(2, 'Resolución de Problemas'),
-(3, 'Comunicación'),
-(4, 'Adaptabilidad'),
-(5, 'Servicio al cliente');
+INSERT INTO `categorias` (`id`, `nombre`, `descripcion`) VALUES
+(1, 'Colaboración', NULL),
+(2, 'Resolución de Problemas', NULL),
+(3, 'Comunicación', NULL),
+(4, 'Adaptabilidad', NULL),
+(5, 'Servicio al cliente', NULL),
+(7, 'Gestión del tiempo', 'Organizar tareas y cumplir con plazos.'),
+(8, 'Creatividad', 'Los desarrolladores utilizan estrategias creativas para diseñar tecnologías atractivas para los usuarios y satisfacer las necesidades de los clientes. La creatividad también ayuda a destacar en un mercado competitivo'),
+(9, 'Comunicación Interpersonal', 'Adaptar tu estilo de comunicación según la audiencia (por ejemplo, usar un lenguaje técnico con colegas y términos más sencillos con clientes).');
 
 -- --------------------------------------------------------
 
@@ -377,7 +381,7 @@ INSERT INTO `cruds` (`id`, `name`, `model`, `route`, `icon`, `active`, `built`, 
 (9, 'Pregunta', 'App\\Models\\Pregunta', 'pregunta', 'fa fa-question', 1, 1, 1, 1, '2024-03-22 11:41:04', '2024-04-27 08:52:51'),
 (11, 'Encuesta', 'App\\Models\\Encuesta', 'encuesta', 'fa fa-file', 0, 1, 1, 1, '2024-03-23 10:07:55', '2024-05-07 07:20:22'),
 (12, 'Envio', 'App\\Models\\Envio', 'envio', 'fa fa-paper-plane', 0, 1, 1, 1, '2024-03-26 09:51:02', '2024-05-07 13:26:42'),
-(13, 'Categoria', 'App\\Models\\Categoria', 'categoria', 'fa fa-bars', 1, 1, 1, 1, '2024-03-28 11:00:07', '2024-04-27 08:52:51'),
+(13, 'Categoria', 'App\\Models\\Categoria', 'categoria', 'fa fa-bars', 1, 1, 1, 1, '2024-03-28 11:00:07', '2024-05-09 15:43:55'),
 (14, 'Vinculo', 'App\\Models\\Vinculo', 'vinculo', 'fa fa-link', 1, 1, 1, 1, '2024-04-07 02:08:34', '2024-04-27 08:52:51'),
 (15, 'User', 'App\\Models\\User', 'users', 'fa fa-user', 1, 1, 1, 1, '2024-04-22 11:03:58', '2024-05-07 13:15:11');
 
@@ -420,7 +424,8 @@ INSERT INTO `detalle_empresas` (`personal_id`, `empresa_id`) VALUES
 (244, 23),
 (245, 24),
 (259, 12),
-(260, 14);
+(260, 14),
+(261, 23);
 
 -- --------------------------------------------------------
 
@@ -445,90 +450,105 @@ INSERT INTO `detalle_preguntas` (`id`, `pregunta`, `respuesta`) VALUES
 (14, 31, 4),
 (15, 31, 5),
 (154, 31, 96),
+(269, 31, 166),
 (16, 32, 1),
 (17, 32, 2),
 (18, 32, 3),
 (19, 32, 4),
 (20, 32, 5),
 (155, 32, 96),
+(270, 32, 166),
 (21, 33, 1),
 (22, 33, 2),
 (23, 33, 3),
 (24, 33, 4),
 (25, 33, 5),
 (156, 33, 96),
+(271, 33, 166),
 (26, 34, 1),
 (27, 34, 2),
 (28, 34, 3),
 (29, 34, 4),
 (30, 34, 5),
 (157, 34, 96),
+(272, 34, 166),
 (31, 35, 1),
 (32, 35, 2),
 (33, 35, 3),
 (34, 35, 4),
 (35, 35, 5),
 (158, 35, 96),
+(273, 35, 166),
 (36, 36, 1),
 (37, 36, 2),
 (38, 36, 3),
 (39, 36, 4),
 (40, 36, 5),
 (159, 36, 96),
+(274, 36, 166),
 (41, 37, 1),
 (42, 37, 2),
 (43, 37, 3),
 (44, 37, 4),
 (45, 37, 5),
 (160, 37, 96),
+(275, 37, 166),
 (46, 38, 1),
 (47, 38, 2),
 (48, 38, 3),
 (49, 38, 4),
 (50, 38, 5),
 (161, 38, 96),
+(276, 38, 166),
 (51, 39, 1),
 (52, 39, 2),
 (53, 39, 3),
 (54, 39, 4),
 (55, 39, 5),
 (162, 39, 96),
+(277, 39, 166),
 (56, 40, 1),
 (57, 40, 2),
 (58, 40, 3),
 (59, 40, 4),
 (60, 40, 5),
 (163, 40, 96),
+(278, 40, 166),
 (61, 41, 1),
 (62, 41, 2),
 (63, 41, 3),
 (64, 41, 4),
 (65, 41, 5),
 (164, 41, 96),
+(279, 41, 166),
 (66, 42, 1),
 (67, 42, 2),
 (68, 42, 3),
 (69, 42, 4),
 (70, 42, 5),
 (165, 42, 96),
+(280, 42, 166),
 (71, 43, 1),
 (72, 43, 2),
 (73, 43, 3),
 (74, 43, 4),
 (75, 43, 5),
 (166, 43, 96),
+(281, 43, 166),
 (76, 44, 1),
 (77, 44, 2),
 (78, 44, 3),
 (79, 44, 4),
 (80, 44, 5),
 (167, 44, 96),
+(282, 44, 166),
 (81, 45, 1),
 (82, 45, 2),
 (83, 45, 3),
 (84, 45, 4),
 (85, 45, 5),
 (168, 45, 96),
+(283, 45, 166),
 (91, 49, NULL),
 (101, 49, 47),
 (109, 49, 50),
@@ -557,6 +577,16 @@ INSERT INTO `detalle_preguntas` (`id`, `pregunta`, `respuesta`) VALUES
 (243, 49, 140),
 (246, 49, 143),
 (249, 49, 146),
+(252, 49, 149),
+(254, 49, 151),
+(257, 49, 154),
+(260, 49, 157),
+(263, 49, 160),
+(266, 49, 163),
+(390, 49, 167),
+(393, 49, 170),
+(396, 49, 173),
+(399, 49, 176),
 (92, 50, NULL),
 (102, 50, 48),
 (110, 50, 51),
@@ -602,6 +632,15 @@ INSERT INTO `detalle_preguntas` (`id`, `pregunta`, `respuesta`) VALUES
 (244, 50, 141),
 (247, 50, 144),
 (250, 50, 147),
+(255, 50, 152),
+(258, 50, 155),
+(261, 50, 158),
+(264, 50, 161),
+(267, 50, 164),
+(391, 50, 168),
+(394, 50, 171),
+(397, 50, 174),
+(400, 50, 177),
 (93, 51, NULL),
 (103, 51, 49),
 (111, 51, 52),
@@ -630,12 +669,128 @@ INSERT INTO `detalle_preguntas` (`id`, `pregunta`, `respuesta`) VALUES
 (245, 51, 142),
 (248, 51, 145),
 (251, 51, 148),
+(253, 51, 150),
+(256, 51, 153),
+(259, 51, 156),
+(262, 51, 159),
+(265, 51, 162),
+(268, 51, 165),
+(392, 51, 169),
+(395, 51, 172),
+(398, 51, 175),
+(401, 51, 178),
 (104, 52, 1),
 (105, 52, 2),
 (106, 52, 3),
 (107, 52, 4),
 (108, 52, 5),
-(169, 52, 96);
+(169, 52, 96),
+(284, 52, 166),
+(285, 53, 1),
+(286, 53, 2),
+(287, 53, 3),
+(288, 53, 4),
+(289, 53, 5),
+(290, 53, 96),
+(291, 53, 166),
+(292, 54, 1),
+(293, 54, 2),
+(294, 54, 3),
+(295, 54, 4),
+(296, 54, 5),
+(297, 54, 96),
+(298, 54, 166),
+(299, 55, 1),
+(300, 55, 2),
+(301, 55, 3),
+(302, 55, 4),
+(303, 55, 5),
+(304, 55, 96),
+(305, 55, 166),
+(306, 56, 1),
+(307, 56, 2),
+(308, 56, 3),
+(309, 56, 4),
+(310, 56, 5),
+(311, 56, 96),
+(312, 56, 166),
+(313, 57, 1),
+(314, 57, 2),
+(315, 57, 3),
+(316, 57, 4),
+(317, 57, 5),
+(318, 57, 96),
+(319, 57, 166),
+(320, 58, 1),
+(321, 58, 2),
+(322, 58, 3),
+(323, 58, 4),
+(324, 58, 5),
+(325, 58, 96),
+(326, 58, 166),
+(327, 59, 1),
+(328, 59, 2),
+(329, 59, 3),
+(330, 59, 4),
+(331, 59, 5),
+(332, 59, 96),
+(333, 59, 166),
+(334, 60, 1),
+(335, 60, 2),
+(336, 60, 3),
+(337, 60, 4),
+(338, 60, 5),
+(339, 60, 96),
+(340, 60, 166),
+(341, 61, 1),
+(342, 61, 2),
+(343, 61, 3),
+(344, 61, 4),
+(345, 61, 5),
+(346, 61, 96),
+(347, 61, 166),
+(348, 62, 1),
+(349, 62, 2),
+(350, 62, 3),
+(351, 62, 4),
+(352, 62, 5),
+(353, 62, 96),
+(354, 62, 166),
+(355, 63, 1),
+(356, 63, 2),
+(357, 63, 3),
+(358, 63, 4),
+(359, 63, 5),
+(360, 63, 96),
+(361, 63, 166),
+(362, 64, 1),
+(363, 64, 2),
+(364, 64, 3),
+(365, 64, 4),
+(366, 64, 5),
+(367, 64, 96),
+(368, 64, 166),
+(369, 65, 1),
+(370, 65, 2),
+(371, 65, 3),
+(372, 65, 4),
+(373, 65, 5),
+(374, 65, 96),
+(375, 65, 166),
+(376, 66, 1),
+(377, 66, 2),
+(378, 66, 3),
+(379, 66, 4),
+(380, 66, 5),
+(381, 66, 96),
+(382, 66, 166),
+(383, 67, 1),
+(384, 67, 2),
+(385, 67, 3),
+(386, 67, 4),
+(387, 67, 5),
+(388, 67, 96),
+(389, 67, 166);
 
 -- --------------------------------------------------------
 
@@ -708,7 +863,12 @@ INSERT INTO `encuestas` (`id`, `nombre`, `empresa`, `fecha`, `proceso`, `formula
 (423, 'Evaluación a OCROSPOMA UGAZ FRANK ANTHONY', 12, '2024-05-06', 'PROCESO pb01', 1),
 (424, 'Evaluación a Lorena Maria Sosa', 23, '2024-05-06', 'Segundo Proceso', 8),
 (425, 'Evaluación a Frank Ocrospoma', 23, '2024-05-06', 'Segundo Proceso', 8),
-(426, 'Evaluación a Jose Luis Garcia ', 23, '2024-05-06', 'Segundo Proceso', 8);
+(426, 'Evaluación a Jose Luis Garcia ', 23, '2024-05-06', 'Segundo Proceso', 8),
+(428, 'Evaluación a MORALES SERRATO PEDRO ESTEFAN', 23, '2024-05-08', 'Proceso para Pedro', 9),
+(429, 'Evaluación a OCROSPOMA UGAZ FRANK ANTHONY', 12, '2024-05-09', 'Proceso 09 de mayo', 10),
+(430, 'Evaluación a FERNANDEZ ALVA EDU', 12, '2024-05-09', 'Proceso 09 de mayo', 10),
+(431, 'Evaluación a AMPUERO PASCO GILBERTO MARTIN', 12, '2024-05-09', 'Proceso 09 de mayo', 10),
+(432, 'Evaluación a GUZMAN MORI CARLOS GUSTAVO', 12, '2024-05-09', 'Proceso 09 de mayo', 10);
 
 -- --------------------------------------------------------
 
@@ -831,7 +991,28 @@ INSERT INTO `envios` (`id`, `persona`, `encuesta`, `estado`, `uuid`, `rango`) VA
 (227, 239, 426, 'F', '11752ea2-9ab2-4a88-bac1-78bf2612370a', 2.38),
 (228, 240, 426, 'F', '3e0cee2a-ddbd-4c41-a90a-a791c9707785', 2.50),
 (229, 241, 426, 'F', '9bf936ba-d96f-40bd-9311-ea2cc1793dce', 3.50),
-(230, 242, 426, 'F', '1ea0dd28-944d-402f-a2ca-61a9cd1afeda', 3.31);
+(230, 242, 426, 'F', '1ea0dd28-944d-402f-a2ca-61a9cd1afeda', 3.31),
+(236, 239, 428, 'F', '1f069764-e6e5-4057-b9e1-74dcea9a1c46', 2.87),
+(237, 261, 428, 'F', '8441219f-f5d6-4cbc-afd4-7719872e8525', 2.93),
+(238, 240, 428, 'F', '80f9cbde-e085-4541-8f15-d66296a81339', 3.13),
+(239, 241, 428, 'F', '2a8c4738-b38d-416c-8da3-31da00c788de', 3.20),
+(240, 242, 428, 'F', 'e8c50746-8d52-43d2-a04c-6965a2efbaef', 3.20),
+(241, 42, 429, 'P', 'f120dfd0-bbce-4cf7-9413-00f566460b80', NULL),
+(242, 43, 429, 'P', '5ad34d1c-9cb5-4eb4-bc27-f44bdfd0d333', NULL),
+(243, 45, 429, 'P', '1ede8105-0ad7-4224-b0f1-748cdc3c8c92', NULL),
+(244, 46, 429, 'P', 'd7ef5ae5-d460-4531-b0f9-32da807aaafa', NULL),
+(245, 42, 430, 'P', '3c957238-4eb6-4ab7-9368-d39432b17eb5', NULL),
+(246, 43, 430, 'P', '81965ab4-fcee-46b0-94a8-1a1a54d7fecc', NULL),
+(247, 45, 430, 'P', 'b4d4ec7e-14ac-4f86-8264-6604873bf5a7', NULL),
+(248, 46, 430, 'P', 'b06da4fd-7c73-4c01-a3ab-4bed3b3fe7d0', NULL),
+(249, 46, 431, 'P', 'c70ed791-8bad-4eda-9a36-87d969e89f7a', NULL),
+(250, 42, 431, 'P', '0c8228ba-2199-480e-9efe-f1963713211b', NULL),
+(251, 43, 431, 'P', '8f343b32-30a0-42c2-a04a-af535416baf4', NULL),
+(252, 45, 431, 'P', '15fda242-e577-4307-ad6a-341473804173', NULL),
+(253, 47, 432, 'F', 'f4f6d280-90b3-4e11-901b-e4ec63deeb67', 3.47),
+(254, 42, 432, 'F', 'bcd87e91-0a4b-4cc6-b1d9-29d246d5b25c', 3.00),
+(255, 43, 432, 'F', 'affb7f75-b705-4acc-a2ec-bfc3d7d4b896', 3.13),
+(256, 45, 432, 'F', '2aeec58b-e868-43ad-9c7a-4745a3f1413f', 3.53);
 
 -- --------------------------------------------------------
 
@@ -950,7 +1131,28 @@ INSERT INTO `evaluados` (`id`, `evaluado_id`, `evaluador_id`, `encuesta_id`, `vi
 (479, 243, 243, 424, 1, 23),
 (480, 243, 239, 424, 2, 23),
 (481, 243, 240, 424, 4, 23),
-(482, 243, 241, 424, 3, 23);
+(482, 243, 241, 424, 3, 23),
+(488, 261, 239, 428, 2, 23),
+(489, 261, 261, 428, 1, 23),
+(490, 261, 240, 428, 3, 23),
+(491, 261, 241, 428, 8, 23),
+(492, 261, 242, 428, 4, 23),
+(493, 42, 42, 429, 1, 12),
+(494, 42, 43, 429, 2, 12),
+(495, 42, 45, 429, 4, 12),
+(496, 42, 46, 429, 8, 12),
+(497, 43, 42, 430, 2, 12),
+(498, 43, 43, 430, 1, 12),
+(499, 43, 45, 430, 3, 12),
+(500, 43, 46, 430, 8, 12),
+(501, 46, 46, 431, 1, 12),
+(502, 46, 42, 431, 2, 12),
+(503, 46, 43, 431, 8, 12),
+(504, 46, 45, 431, 4, 12),
+(505, 47, 47, 432, 1, 12),
+(506, 47, 42, 432, 2, 12),
+(507, 47, 43, 432, 3, 12),
+(508, 47, 45, 432, 8, 12);
 
 -- --------------------------------------------------------
 
@@ -1513,7 +1715,193 @@ INSERT INTO `formularios` (`id`, `detalle_id`, `nombre`) VALUES
 (8, 166, 'Formulario prueba'),
 (8, 167, 'Formulario prueba'),
 (8, 168, 'Formulario prueba'),
-(8, 169, 'Formulario prueba');
+(8, 169, 'Formulario prueba'),
+(9, 11, 'Formulario Yasumi 08 Mayo'),
+(9, 12, 'Formulario Yasumi 08 Mayo'),
+(9, 13, 'Formulario Yasumi 08 Mayo'),
+(9, 14, 'Formulario Yasumi 08 Mayo'),
+(9, 15, 'Formulario Yasumi 08 Mayo'),
+(9, 16, 'Formulario Yasumi 08 Mayo'),
+(9, 17, 'Formulario Yasumi 08 Mayo'),
+(9, 18, 'Formulario Yasumi 08 Mayo'),
+(9, 19, 'Formulario Yasumi 08 Mayo'),
+(9, 20, 'Formulario Yasumi 08 Mayo'),
+(9, 21, 'Formulario Yasumi 08 Mayo'),
+(9, 22, 'Formulario Yasumi 08 Mayo'),
+(9, 23, 'Formulario Yasumi 08 Mayo'),
+(9, 24, 'Formulario Yasumi 08 Mayo'),
+(9, 25, 'Formulario Yasumi 08 Mayo'),
+(9, 26, 'Formulario Yasumi 08 Mayo'),
+(9, 27, 'Formulario Yasumi 08 Mayo'),
+(9, 28, 'Formulario Yasumi 08 Mayo'),
+(9, 29, 'Formulario Yasumi 08 Mayo'),
+(9, 30, 'Formulario Yasumi 08 Mayo'),
+(9, 31, 'Formulario Yasumi 08 Mayo'),
+(9, 32, 'Formulario Yasumi 08 Mayo'),
+(9, 33, 'Formulario Yasumi 08 Mayo'),
+(9, 34, 'Formulario Yasumi 08 Mayo'),
+(9, 35, 'Formulario Yasumi 08 Mayo'),
+(9, 36, 'Formulario Yasumi 08 Mayo'),
+(9, 37, 'Formulario Yasumi 08 Mayo'),
+(9, 38, 'Formulario Yasumi 08 Mayo'),
+(9, 39, 'Formulario Yasumi 08 Mayo'),
+(9, 40, 'Formulario Yasumi 08 Mayo'),
+(9, 41, 'Formulario Yasumi 08 Mayo'),
+(9, 42, 'Formulario Yasumi 08 Mayo'),
+(9, 43, 'Formulario Yasumi 08 Mayo'),
+(9, 44, 'Formulario Yasumi 08 Mayo'),
+(9, 45, 'Formulario Yasumi 08 Mayo'),
+(9, 46, 'Formulario Yasumi 08 Mayo'),
+(9, 47, 'Formulario Yasumi 08 Mayo'),
+(9, 48, 'Formulario Yasumi 08 Mayo'),
+(9, 49, 'Formulario Yasumi 08 Mayo'),
+(9, 50, 'Formulario Yasumi 08 Mayo'),
+(9, 51, 'Formulario Yasumi 08 Mayo'),
+(9, 52, 'Formulario Yasumi 08 Mayo'),
+(9, 53, 'Formulario Yasumi 08 Mayo'),
+(9, 54, 'Formulario Yasumi 08 Mayo'),
+(9, 55, 'Formulario Yasumi 08 Mayo'),
+(9, 56, 'Formulario Yasumi 08 Mayo'),
+(9, 57, 'Formulario Yasumi 08 Mayo'),
+(9, 58, 'Formulario Yasumi 08 Mayo'),
+(9, 59, 'Formulario Yasumi 08 Mayo'),
+(9, 60, 'Formulario Yasumi 08 Mayo'),
+(9, 61, 'Formulario Yasumi 08 Mayo'),
+(9, 62, 'Formulario Yasumi 08 Mayo'),
+(9, 63, 'Formulario Yasumi 08 Mayo'),
+(9, 64, 'Formulario Yasumi 08 Mayo'),
+(9, 65, 'Formulario Yasumi 08 Mayo'),
+(9, 66, 'Formulario Yasumi 08 Mayo'),
+(9, 67, 'Formulario Yasumi 08 Mayo'),
+(9, 68, 'Formulario Yasumi 08 Mayo'),
+(9, 69, 'Formulario Yasumi 08 Mayo'),
+(9, 70, 'Formulario Yasumi 08 Mayo'),
+(9, 71, 'Formulario Yasumi 08 Mayo'),
+(9, 72, 'Formulario Yasumi 08 Mayo'),
+(9, 73, 'Formulario Yasumi 08 Mayo'),
+(9, 74, 'Formulario Yasumi 08 Mayo'),
+(9, 75, 'Formulario Yasumi 08 Mayo'),
+(9, 76, 'Formulario Yasumi 08 Mayo'),
+(9, 77, 'Formulario Yasumi 08 Mayo'),
+(9, 78, 'Formulario Yasumi 08 Mayo'),
+(9, 79, 'Formulario Yasumi 08 Mayo'),
+(9, 80, 'Formulario Yasumi 08 Mayo'),
+(9, 81, 'Formulario Yasumi 08 Mayo'),
+(9, 82, 'Formulario Yasumi 08 Mayo'),
+(9, 83, 'Formulario Yasumi 08 Mayo'),
+(9, 84, 'Formulario Yasumi 08 Mayo'),
+(9, 85, 'Formulario Yasumi 08 Mayo'),
+(9, 91, 'Formulario Yasumi 08 Mayo'),
+(9, 92, 'Formulario Yasumi 08 Mayo'),
+(9, 93, 'Formulario Yasumi 08 Mayo'),
+(9, 154, 'Formulario Yasumi 08 Mayo'),
+(9, 155, 'Formulario Yasumi 08 Mayo'),
+(9, 156, 'Formulario Yasumi 08 Mayo'),
+(9, 157, 'Formulario Yasumi 08 Mayo'),
+(9, 158, 'Formulario Yasumi 08 Mayo'),
+(9, 159, 'Formulario Yasumi 08 Mayo'),
+(9, 160, 'Formulario Yasumi 08 Mayo'),
+(9, 161, 'Formulario Yasumi 08 Mayo'),
+(9, 162, 'Formulario Yasumi 08 Mayo'),
+(9, 163, 'Formulario Yasumi 08 Mayo'),
+(9, 164, 'Formulario Yasumi 08 Mayo'),
+(9, 165, 'Formulario Yasumi 08 Mayo'),
+(9, 166, 'Formulario Yasumi 08 Mayo'),
+(9, 167, 'Formulario Yasumi 08 Mayo'),
+(9, 168, 'Formulario Yasumi 08 Mayo'),
+(10, 91, 'Formulario Garzasoft 2024'),
+(10, 92, 'Formulario Garzasoft 2024'),
+(10, 93, 'Formulario Garzasoft 2024'),
+(10, 285, 'Formulario Garzasoft 2024'),
+(10, 286, 'Formulario Garzasoft 2024'),
+(10, 287, 'Formulario Garzasoft 2024'),
+(10, 288, 'Formulario Garzasoft 2024'),
+(10, 290, 'Formulario Garzasoft 2024'),
+(10, 291, 'Formulario Garzasoft 2024'),
+(10, 292, 'Formulario Garzasoft 2024'),
+(10, 293, 'Formulario Garzasoft 2024'),
+(10, 294, 'Formulario Garzasoft 2024'),
+(10, 295, 'Formulario Garzasoft 2024'),
+(10, 297, 'Formulario Garzasoft 2024'),
+(10, 298, 'Formulario Garzasoft 2024'),
+(10, 299, 'Formulario Garzasoft 2024'),
+(10, 300, 'Formulario Garzasoft 2024'),
+(10, 301, 'Formulario Garzasoft 2024'),
+(10, 302, 'Formulario Garzasoft 2024'),
+(10, 304, 'Formulario Garzasoft 2024'),
+(10, 305, 'Formulario Garzasoft 2024'),
+(10, 306, 'Formulario Garzasoft 2024'),
+(10, 307, 'Formulario Garzasoft 2024'),
+(10, 308, 'Formulario Garzasoft 2024'),
+(10, 309, 'Formulario Garzasoft 2024'),
+(10, 311, 'Formulario Garzasoft 2024'),
+(10, 312, 'Formulario Garzasoft 2024'),
+(10, 313, 'Formulario Garzasoft 2024'),
+(10, 314, 'Formulario Garzasoft 2024'),
+(10, 315, 'Formulario Garzasoft 2024'),
+(10, 316, 'Formulario Garzasoft 2024'),
+(10, 318, 'Formulario Garzasoft 2024'),
+(10, 319, 'Formulario Garzasoft 2024'),
+(10, 320, 'Formulario Garzasoft 2024'),
+(10, 321, 'Formulario Garzasoft 2024'),
+(10, 322, 'Formulario Garzasoft 2024'),
+(10, 323, 'Formulario Garzasoft 2024'),
+(10, 325, 'Formulario Garzasoft 2024'),
+(10, 326, 'Formulario Garzasoft 2024'),
+(10, 327, 'Formulario Garzasoft 2024'),
+(10, 328, 'Formulario Garzasoft 2024'),
+(10, 329, 'Formulario Garzasoft 2024'),
+(10, 330, 'Formulario Garzasoft 2024'),
+(10, 332, 'Formulario Garzasoft 2024'),
+(10, 333, 'Formulario Garzasoft 2024'),
+(10, 334, 'Formulario Garzasoft 2024'),
+(10, 335, 'Formulario Garzasoft 2024'),
+(10, 336, 'Formulario Garzasoft 2024'),
+(10, 337, 'Formulario Garzasoft 2024'),
+(10, 339, 'Formulario Garzasoft 2024'),
+(10, 340, 'Formulario Garzasoft 2024'),
+(10, 341, 'Formulario Garzasoft 2024'),
+(10, 342, 'Formulario Garzasoft 2024'),
+(10, 343, 'Formulario Garzasoft 2024'),
+(10, 344, 'Formulario Garzasoft 2024'),
+(10, 346, 'Formulario Garzasoft 2024'),
+(10, 347, 'Formulario Garzasoft 2024'),
+(10, 348, 'Formulario Garzasoft 2024'),
+(10, 349, 'Formulario Garzasoft 2024'),
+(10, 350, 'Formulario Garzasoft 2024'),
+(10, 351, 'Formulario Garzasoft 2024'),
+(10, 353, 'Formulario Garzasoft 2024'),
+(10, 354, 'Formulario Garzasoft 2024'),
+(10, 355, 'Formulario Garzasoft 2024'),
+(10, 356, 'Formulario Garzasoft 2024'),
+(10, 357, 'Formulario Garzasoft 2024'),
+(10, 358, 'Formulario Garzasoft 2024'),
+(10, 360, 'Formulario Garzasoft 2024'),
+(10, 361, 'Formulario Garzasoft 2024'),
+(10, 362, 'Formulario Garzasoft 2024'),
+(10, 363, 'Formulario Garzasoft 2024'),
+(10, 364, 'Formulario Garzasoft 2024'),
+(10, 365, 'Formulario Garzasoft 2024'),
+(10, 367, 'Formulario Garzasoft 2024'),
+(10, 368, 'Formulario Garzasoft 2024'),
+(10, 369, 'Formulario Garzasoft 2024'),
+(10, 370, 'Formulario Garzasoft 2024'),
+(10, 371, 'Formulario Garzasoft 2024'),
+(10, 372, 'Formulario Garzasoft 2024'),
+(10, 374, 'Formulario Garzasoft 2024'),
+(10, 375, 'Formulario Garzasoft 2024'),
+(10, 376, 'Formulario Garzasoft 2024'),
+(10, 377, 'Formulario Garzasoft 2024'),
+(10, 378, 'Formulario Garzasoft 2024'),
+(10, 379, 'Formulario Garzasoft 2024'),
+(10, 381, 'Formulario Garzasoft 2024'),
+(10, 382, 'Formulario Garzasoft 2024'),
+(10, 383, 'Formulario Garzasoft 2024'),
+(10, 384, 'Formulario Garzasoft 2024'),
+(10, 385, 'Formulario Garzasoft 2024'),
+(10, 386, 'Formulario Garzasoft 2024'),
+(10, 388, 'Formulario Garzasoft 2024'),
+(10, 389, 'Formulario Garzasoft 2024');
 
 -- --------------------------------------------------------
 
@@ -1570,7 +1958,8 @@ INSERT INTO `panel_admins` (`id`, `user_id`, `is_superuser`, `created_at`, `upda
 (4, 6, 0, '2024-04-30 02:25:46', '2024-04-30 02:25:46'),
 (5, 7, 0, '2024-05-02 22:24:32', '2024-05-02 22:24:32'),
 (6, 8, 0, '2024-05-04 01:12:50', '2024-05-04 01:12:50'),
-(7, 9, 0, '2024-05-04 07:42:38', '2024-05-04 07:42:38');
+(7, 9, 0, '2024-05-04 07:42:38', '2024-05-04 07:42:38'),
+(14, 17, 0, '2024-05-08 12:52:23', '2024-05-08 12:52:23');
 
 -- --------------------------------------------------------
 
@@ -1628,7 +2017,8 @@ INSERT INTO `personals` (`id`, `dni`, `nombre`, `correo`, `telefono`, `cargo`, `
 (244, NULL, 'Veronica Lopez Gutierrez', 'frankocrospomaugaz@gmail.com', NULL, NULL, '1'),
 (245, NULL, 'UGAZ LACERNA MARIA ESTEFANIA', 'asdasd@gmail.com', NULL, NULL, '1'),
 (259, '43572166', 'PEREZ ROBLES LUIS MIGUEL', 'frankocrospomaugaz@gmail.com', '958745876', 'Desarrollador', '1'),
-(260, NULL, 'Manuel Barrero', 'frankocrospomaugaz@gmail.com', NULL, NULL, '1');
+(260, NULL, 'Manuel Barrero', 'frankocrospomaugaz@gmail.com', NULL, NULL, '1'),
+(261, '72403333', 'MORALES SERRATO PEDRO ESTEFAN', 'frankocrospomaugaz@gmail.com', NULL, NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -1851,7 +2241,169 @@ INSERT INTO `persona_respuestas` (`id`, `persona`, `detalle`, `encuesta_id`) VAL
 (1495, 243, 159, 424),
 (1496, 243, 249, 424),
 (1497, 243, 250, 424),
-(1498, 243, 251, 424);
+(1498, 243, 251, 424),
+(1516, 242, 14, 428),
+(1517, 242, 16, 428),
+(1518, 242, 23, 428),
+(1519, 242, 44, 428),
+(1520, 242, 50, 428),
+(1521, 242, 162, 428),
+(1522, 242, 60, 428),
+(1523, 242, 63, 428),
+(1524, 242, 69, 428),
+(1525, 242, 74, 428),
+(1526, 242, 77, 428),
+(1527, 242, 85, 428),
+(1528, 242, 157, 428),
+(1529, 242, 33, 428),
+(1530, 242, 40, 428),
+(1531, 242, 254, 428),
+(1532, 242, 255, 428),
+(1533, 242, 256, 428),
+(1534, 241, 13, 428),
+(1535, 241, 18, 428),
+(1536, 241, 24, 428),
+(1537, 241, 44, 428),
+(1538, 241, 49, 428),
+(1539, 241, 52, 428),
+(1540, 241, 58, 428),
+(1541, 241, 65, 428),
+(1542, 241, 70, 428),
+(1543, 241, 74, 428),
+(1544, 241, 78, 428),
+(1545, 241, 168, 428),
+(1546, 241, 28, 428),
+(1547, 241, 32, 428),
+(1548, 241, 38, 428),
+(1549, 241, 257, 428),
+(1550, 241, 258, 428),
+(1551, 241, 259, 428),
+(1552, 240, 154, 428),
+(1553, 240, 17, 428),
+(1554, 240, 23, 428),
+(1555, 240, 44, 428),
+(1556, 240, 49, 428),
+(1557, 240, 53, 428),
+(1558, 240, 59, 428),
+(1559, 240, 65, 428),
+(1560, 240, 67, 428),
+(1561, 240, 72, 428),
+(1562, 240, 79, 428),
+(1563, 240, 85, 428),
+(1564, 240, 27, 428),
+(1565, 240, 35, 428),
+(1566, 240, 37, 428),
+(1567, 240, 260, 428),
+(1568, 240, 261, 428),
+(1569, 240, 262, 428),
+(1570, 261, 12, 428),
+(1571, 261, 18, 428),
+(1572, 261, 24, 428),
+(1573, 261, 45, 428),
+(1574, 261, 49, 428),
+(1575, 261, 53, 428),
+(1576, 261, 58, 428),
+(1577, 261, 63, 428),
+(1578, 261, 68, 428),
+(1579, 261, 73, 428),
+(1580, 261, 80, 428),
+(1581, 261, 168, 428),
+(1582, 261, 157, 428),
+(1583, 261, 34, 428),
+(1584, 261, 37, 428),
+(1585, 261, 263, 428),
+(1586, 261, 264, 428),
+(1587, 261, 265, 428),
+(1588, 239, 12, 428),
+(1589, 239, 18, 428),
+(1590, 239, 24, 428),
+(1591, 239, 45, 428),
+(1592, 239, 47, 428),
+(1593, 239, 51, 428),
+(1594, 239, 56, 428),
+(1595, 239, 164, 428),
+(1596, 239, 70, 428),
+(1597, 239, 166, 428),
+(1598, 239, 80, 428),
+(1599, 239, 84, 428),
+(1600, 239, 28, 428),
+(1601, 239, 34, 428),
+(1602, 239, 39, 428),
+(1603, 239, 266, 428),
+(1604, 239, 267, 428),
+(1605, 239, 268, 428),
+(1606, 42, 327, 432),
+(1607, 42, 337, 432),
+(1608, 42, 343, 432),
+(1609, 42, 349, 432),
+(1610, 42, 358, 432),
+(1611, 42, 365, 432),
+(1612, 42, 370, 432),
+(1613, 42, 379, 432),
+(1614, 42, 386, 432),
+(1615, 42, 302, 432),
+(1616, 42, 287, 432),
+(1617, 42, 293, 432),
+(1618, 42, 309, 432),
+(1619, 42, 315, 432),
+(1620, 42, 320, 432),
+(1621, 42, 390, 432),
+(1622, 42, 391, 432),
+(1623, 42, 392, 432),
+(1624, 43, 327, 432),
+(1625, 43, 335, 432),
+(1626, 43, 344, 432),
+(1627, 43, 349, 432),
+(1628, 43, 358, 432),
+(1629, 43, 364, 432),
+(1630, 43, 375, 432),
+(1631, 43, 382, 432),
+(1632, 43, 384, 432),
+(1633, 43, 305, 432),
+(1634, 43, 286, 432),
+(1635, 43, 295, 432),
+(1636, 43, 307, 432),
+(1637, 43, 314, 432),
+(1638, 43, 323, 432),
+(1639, 43, 393, 432),
+(1640, 43, 394, 432),
+(1641, 43, 395, 432),
+(1642, 47, 329, 432),
+(1643, 47, 336, 432),
+(1644, 47, 347, 432),
+(1645, 47, 349, 432),
+(1646, 47, 358, 432),
+(1647, 47, 365, 432),
+(1648, 47, 375, 432),
+(1649, 47, 377, 432),
+(1650, 47, 389, 432),
+(1651, 47, 305, 432),
+(1652, 47, 286, 432),
+(1653, 47, 293, 432),
+(1654, 47, 308, 432),
+(1655, 47, 319, 432),
+(1656, 47, 321, 432),
+(1657, 47, 396, 432),
+(1658, 47, 397, 432),
+(1659, 47, 398, 432),
+(1660, 45, 328, 432),
+(1661, 45, 337, 432),
+(1662, 45, 342, 432),
+(1663, 45, 350, 432),
+(1664, 45, 357, 432),
+(1665, 45, 368, 432),
+(1666, 45, 375, 432),
+(1667, 45, 379, 432),
+(1668, 45, 384, 432),
+(1669, 45, 302, 432),
+(1670, 45, 288, 432),
+(1671, 45, 295, 432),
+(1672, 45, 312, 432),
+(1673, 45, 319, 432),
+(1674, 45, 320, 432),
+(1675, 45, 399, 432),
+(1676, 45, 400, 432),
+(1677, 45, 401, 432);
 
 -- --------------------------------------------------------
 
@@ -1886,10 +2438,25 @@ INSERT INTO `preguntas` (`id`, `texto`, `categoria`, `estado`) VALUES
 (43, 'Realiza una amplia gama de tareas y responde a los cambios de dirección y prioridades', 4, 1),
 (44, 'Trabaja eficazmente en entornos de trabajo dinámicos y cambiantes', 4, 1),
 (45, ' Adapta sus planes u horarios a situaciones cambiantes', 4, 1),
-(49, 'Cuáles crees que son sus principales fortalezas? (2 a 3 fortalezas)', NULL, 0),
-(50, 'Cuáles crees que son sus principales oportunidades de mejora? (2 a 3 oportunidades)', NULL, 0),
-(51, 'Si solo pudiese enfocarse en mejorar una conducta cuál debería ser', NULL, 0),
-(52, 'Realiza los trabajos con responsabilidad y puntualidad', 5, 1);
+(49, '¿Cuáles crees que son sus principales fortalezas? (2 a 3 fortalezas)', NULL, 0),
+(50, '¿Cuáles crees que son sus principales oportunidades de mejora? (2 a 3 oportunidades)', NULL, 0),
+(51, '¿Si solo pudiese enfocarse en mejorar una conducta cuál debería ser? ', NULL, 0),
+(52, 'Realiza los trabajos con responsabilidad y puntualidad', 5, 1),
+(53, '¿El empleado presenta nuevas ideas o soluciones creativas?', 8, 1),
+(54, '¿Trabaja bien con otros para desarrollar y expandir las ideas presentadas?', 8, 1),
+(55, '¿El empleado busca soluciones fuera de los métodos convencionales?', 8, 1),
+(56, '¿El empleado logra transmitir información de manera concisa y sin ambigüedades?', 9, 1),
+(57, '¿Se comunica de forma clara y eficaz con los demás?', 9, 1),
+(58, '¿Adapta su estilo de comunicación a los distintos públicos?', 9, 1),
+(59, '¿El empleado puede determinar las causas fundamentales de un problema?', 2, 1),
+(60, '¿El empleado resuelve problemas dentro de plazos razonables?', 2, 1),
+(61, '¿Analiza los resultados después de implementar una solución para aprender y mejorar?', 2, 1),
+(62, '¿Realiza una amplia gama de tareas y responde a los cambios de dirección y prioridades?', 4, 1),
+(63, '¿Adapta sus planes u horarios a situaciones cambiantes?', 4, 1),
+(64, '¿Utiliza los errores como oportunidades de aprendizaje?', 4, 1),
+(65, '¿El empleado cumple con las fechas límite acordadas?', 7, 1),
+(66, '¿Sabe identificar y priorizar las tareas más importantes?', 7, 1),
+(67, '¿Minimiza distracciones y se enfoca en las tareas clave?', 7, 1);
 
 -- --------------------------------------------------------
 
@@ -2012,7 +2579,37 @@ INSERT INTO `respuestas` (`id`, `texto`, `score`, `estado`) VALUES
 (145, 'prueba de prueba', NULL, 0),
 (146, 'yeaa', NULL, 0),
 (147, 'sigg', NULL, 0),
-(148, 'si hace', NULL, 0);
+(148, 'si hace', NULL, 0),
+(149, 'yas', NULL, 0),
+(150, '11', NULL, 0),
+(151, 'yas', NULL, 0),
+(152, 'proyecto', NULL, 0),
+(153, '11', NULL, 0),
+(154, 'adcw', NULL, 0),
+(155, 'asdfa', NULL, 0),
+(156, 'advc', NULL, 0),
+(157, 'ese csmr solo wevea', NULL, 0),
+(158, 'se la pasa jugando dota', NULL, 0),
+(159, 'wevear', NULL, 0),
+(160, 'yes', NULL, 0),
+(161, 'aja', NULL, 0),
+(162, 'lanzala', NULL, 0),
+(163, 'ddd', NULL, 0),
+(164, 'xddd', NULL, 0),
+(165, 'uwu', NULL, 0),
+(166, 'Excelente', 5, 1),
+(167, 'asca', NULL, 0),
+(168, 'asca', NULL, 0),
+(169, 'sac', NULL, 0),
+(170, 'dtgedd', NULL, 0),
+(171, 'edfvdfdf', NULL, 0),
+(172, 'vdfv', NULL, 0),
+(173, 'asdcfa', NULL, 0),
+(174, 'adc', NULL, 0),
+(175, 'asca', NULL, 0),
+(176, 'wefw', NULL, 0),
+(177, 'werfws', NULL, 0),
+(178, 'sfvs', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -2055,7 +2652,8 @@ INSERT INTO `role_user` (`role_id`, `user_id`) VALUES
 (1, 1),
 (7, 4),
 (7, 8),
-(7, 9);
+(7, 9),
+(7, 17);
 
 -- --------------------------------------------------------
 
@@ -2077,7 +2675,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('jHQDoF2F7RjnqMiliO7HDQry7xO5chV9uRWqpEV6', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0', 'YTo2OntzOjM6InVybCI7YTowOnt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo2OiJfdG9rZW4iO3M6NDA6Ind3WTEzbUJURG43elkwUHVjcldHenNpVVpQYkR0OW1RVzlrbE51OUwiO3M6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7czoyMToicGFzc3dvcmRfaGFzaF9zYW5jdHVtIjtzOjYwOiIkMnkkMTIkeEc4aFU3dUhsTHhzdFR3dTlOdDdidTBwL25jZzV5OTIuRVIweWg0dkNnQXBYVlJyOHVjWi4iO3M6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjQxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvZW1wcmVzYS9wZXJzb25hbC8yNCI7fX0=', 1715080240);
+('FpTGUFMZt5YxPZZdAW1wNK91Q8eTNkAfXzd2LE8M', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoidTNzelJGSjhmeExoN0VpQm50am5zOHVMM1Rvb2JYN3BqQ2hPQ29RMSI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjIxOiJwYXNzd29yZF9oYXNoX3NhbmN0dW0iO3M6NjA6IiQyeSQxMiR4RzhoVTd1SGxMeHN0VHd1OU50N2J1MHAvbmNnNXk5Mi5FUjB5aDR2Q2dBcFhWUnI4dWNaLiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9lbmN1ZXN0YXBkZi80MzIiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1715247212);
 
 -- --------------------------------------------------------
 
@@ -2107,13 +2705,14 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `empresa_id`, `email_verified_at`, `password`, `two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at`, `remember_token`, `current_team_id`, `profile_photo_path`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@gmail.com', NULL, NULL, '$2y$12$xG8hU7uHlLxstTwu9Nt7bu0p/ncg5y92.ER0yh4vCgApXVRr8ucZ.', NULL, NULL, NULL, 'fcFcm0IcOs0K7aSDmErfSReyCUGJ8jJLc7jSfwFQAsSy3peJMsQOg6oXHrku', NULL, NULL, '2024-03-20 07:10:54', '2024-03-20 07:10:54'),
+(1, 'admin', 'admin@gmail.com', NULL, NULL, '$2y$12$xG8hU7uHlLxstTwu9Nt7bu0p/ncg5y92.ER0yh4vCgApXVRr8ucZ.', NULL, NULL, NULL, 'upBnnJKdAgRJeiDzp877cCwKB2XK4cEKTlDCgjqHNWrUdO1zYEM6JXZod7VM', NULL, NULL, '2024-03-20 07:10:54', '2024-03-20 07:10:54'),
 (4, 'frank', 'frank@gmail.com', 12, NULL, '$2y$12$txiC1tONdS/gt7I21/UpJOWWhiW40PZor6rI9Yn7fg8OsuC0iGOkC', NULL, NULL, NULL, 'JMf0ODxVNJckqatM3aQxZwnTbCRtdaY9A5NaB9AGlvZC3JFPDqDLE3L4hRRG', NULL, NULL, '2024-04-28 14:24:35', '2024-04-28 14:24:35'),
 (5, 'prueba', 'prueba@gmail.com', NULL, NULL, '$2y$12$N2osfbmWpSWE9NNz9NI9h.dzE8UR0aK8N2frLARe.CGcHB6ij72dm', NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-28 14:35:04', '2024-04-28 14:35:04'),
 (6, 'alex', 'alex@gmail.com', NULL, NULL, '$2y$12$XoJOmuLFEDFUbmZZVeXW9OeDrZSP49nTZdXsB.I0szEzWnrQ6.8LO', NULL, NULL, NULL, 'NDzocEzmZXce798hBCVRMmk88xfKsLvofaXFO66ffzZbFloxdSLUbjwRfiwL', NULL, NULL, '2024-04-30 02:25:46', '2024-04-30 02:25:46'),
 (7, 'prueba2', 'prueba2@gmail.com', 23, NULL, '$2y$12$MsVIUircWhLV6KGHPXyd5Ob1J4fZ0Vo0/P3VQV1/PgDnqbu58G1Sa', NULL, NULL, NULL, NULL, NULL, NULL, '2024-05-02 22:24:32', '2024-05-02 22:41:57'),
 (8, 'martin', 'martin@gmail.com', 22, NULL, '$2y$12$PpMLnhBhFVh0RKMAvLERH.vGXxxgMJWkyBbSnLhtm6Rrl/fyQx9pu', NULL, NULL, NULL, NULL, NULL, NULL, '2024-05-04 01:12:50', '2024-05-04 01:12:50'),
-(9, 'Jose', 'jose@gmail.com', 22, NULL, '$2y$12$9./QgImVooY/mV7qdKlCxuF5MuVXMiT4OSymjJpjWk50YaATjgHE2', NULL, NULL, NULL, NULL, NULL, NULL, '2024-05-04 07:42:38', '2024-05-04 07:42:38');
+(9, 'Jose', 'jose@gmail.com', 22, NULL, '$2y$12$9./QgImVooY/mV7qdKlCxuF5MuVXMiT4OSymjJpjWk50YaATjgHE2', NULL, NULL, NULL, NULL, NULL, NULL, '2024-05-04 07:42:38', '2024-05-04 07:42:38'),
+(17, 'pedro', 'pedro@gmail.com', 23, NULL, '$2y$12$rqFU4vvHM9yezjumGUpk1exq7yf4BHb10rnAPjHSln9l0dF4kOLSG', NULL, NULL, NULL, NULL, NULL, NULL, '2024-05-08 12:52:23', '2024-05-08 12:52:23');
 
 -- --------------------------------------------------------
 
@@ -2321,7 +2920,7 @@ ALTER TABLE `vinculos`
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `cruds`
@@ -2333,7 +2932,7 @@ ALTER TABLE `cruds`
 -- AUTO_INCREMENT de la tabla `detalle_preguntas`
 --
 ALTER TABLE `detalle_preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=252;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=402;
 
 --
 -- AUTO_INCREMENT de la tabla `empresas`
@@ -2345,19 +2944,19 @@ ALTER TABLE `empresas`
 -- AUTO_INCREMENT de la tabla `encuestas`
 --
 ALTER TABLE `encuestas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=427;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=433;
 
 --
 -- AUTO_INCREMENT de la tabla `envios`
 --
 ALTER TABLE `envios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=231;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=257;
 
 --
 -- AUTO_INCREMENT de la tabla `evaluados`
 --
 ALTER TABLE `evaluados`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=483;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=509;
 
 --
 -- AUTO_INCREMENT de la tabla `failed_jobs`
@@ -2375,13 +2974,13 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT de la tabla `panel_admins`
 --
 ALTER TABLE `panel_admins`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `personals`
 --
 ALTER TABLE `personals`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=261;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=262;
 
 --
 -- AUTO_INCREMENT de la tabla `personal_access_tokens`
@@ -2393,19 +2992,19 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT de la tabla `persona_respuestas`
 --
 ALTER TABLE `persona_respuestas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1499;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1678;
 
 --
 -- AUTO_INCREMENT de la tabla `preguntas`
 --
 ALTER TABLE `preguntas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT de la tabla `respuestas`
 --
 ALTER TABLE `respuestas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=179;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -2417,7 +3016,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `vinculos`
