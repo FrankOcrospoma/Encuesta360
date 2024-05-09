@@ -72,6 +72,7 @@
         .purple {
             background-color: #D633FF;
         }
+        
 
         .header-section {
             text-align: center;
@@ -203,32 +204,31 @@
 
         .blue-line {
             background-color: #007BFF;
-            /* Un azul más vibrante */
         }
 
         .red-line {
             background-color: #FF5733;
-            /* Un rojo más intenso */
+        }
+        
+        .celeste-line {
+            background-color: #7ee1ff;
+        
         }
 
         .green-line {
             background-color: #28A745;
-            /* Un verde más saturado */
         }
 
         .yellow-line {
             background-color: yellow;
-            /* Ajusta el color amarillo según tus preferencias */
         }
 
         .orange-line {
             background-color: orange;
-            /* Ajusta el color amarillo según tus preferencias */
         }
 
         .purple-line {
             background-color: #D633FF;
-            /* Un púrpura más luminoso */
         }
 
 
@@ -270,7 +270,8 @@
         .green-line,
         .purple-line,
         .orange-line,
-        .yellow-line {
+        .yellow-line,
+        .celeste-line {
             height: 13px;
             /* Aumentar el grosor de las barras */
         }
@@ -399,6 +400,22 @@
         } 
         // Convertimos toda la cadena a minúsculas y luego a formato de título
         $nombreModificado = ucwords(strtolower($nombreModificado));
+
+        $colores = [
+            'blue-line',
+            'red-line',
+            'green-line',
+            'celeste-line',
+            'purple-line',
+            'orange-line',
+            'yellow-line'
+        ];
+
+        // Asignar colores a los cargos
+        $cargoColores = [];
+        foreach ($enviosPorCargo as $index => $cargo) {
+            $cargoColores[$cargo['cargo']] = $colores[$index % count($colores)];
+        }
         ?>
         
         <p> {{ $nombreModificado }}</p>
@@ -435,7 +452,7 @@
                         </tr>
                         <tr>
                             <td>2</td>
-                            <td>Resumen por Categoría</td>
+                            <td>Resumen por Competencias</td>
                             <td>B</td>
                         </tr>
                         <tr>
@@ -466,28 +483,21 @@
 
     <div class="container">
         <h2 style="font-size: 18px; margin-left: 50px;">Data</h2>
-        <table style="width: 85%;" class="data-table">
-            <tr>
-                <th>Cargo</th>
-                <th>Color</th>
-            </tr>
-            @foreach ($enviosPorCargo as $index => $cargo)
-
-            <tr>
-                <td> {{ $cargo['cargo'] }} </td>
-                <td>
-                    <div class="@if($index % 6 == 0) blue-line
-            @elseif($index % 6 == 1) red-line
-            @elseif($index % 6 == 2) green-line
-            @elseif($index % 6 == 3) purple-line
-            @elseif($index % 6 == 4) orange-line
-            @else yellow-line
-            @endif"></div>
-                </td>
-            </tr>
-            @endforeach
-
-        </table>
+<!-- Primera Tabla: Muestra los colores asignados a los cargos -->
+<table style="width: 85%;" class="data-table">
+    <tr>
+        <th>Cargo</th>
+        <th>Color</th>
+    </tr>
+    @foreach ($enviosPorCargo as $index => $cargo)
+    <tr>
+        <td> {{ $cargo['cargo'] }} </td>
+        <td>
+            <div class="{{ $cargoColores[$cargo['cargo']] }}"></div>
+        </td>
+    </tr>
+    @endforeach
+</table>
     </div>
 
     <!-- <span class=" page-number">Página </span> -->
@@ -551,11 +561,12 @@
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
                         @if($cargo['promedio_rango'] > 0)
-                        <div class="@if($index % 6 == 0) blue-line
-      @elseif($index % 6 == 1) red-line
-      @elseif($index % 6 == 2) green-line
-      @elseif($index % 6 == 3) purple-line
-      @elseif($index % 6 == 4) orange-line
+                        <div class="@if($index % 7 == 0) blue-line
+                        @elseif($index % 7 == 1) red-line
+                        @elseif($index % 7 == 2) green-line
+                        @elseif($index % 7 == 3) celeste-line
+                        @elseif($index % 7 == 4) purple-line
+                        @elseif($index % 7 == 5) orange-line
       @else yellow-line
       @endif" style="width: {{ (($cargo['promedio_rango'] - 1) * 25.1) }}%;">
                         </div>
@@ -592,7 +603,7 @@
     @foreach ($categorias as $index => $categoria)
 
     <div class="container">
-        <h2 class="headerdrecho">Resumen por Categoría</h2>
+        <h2 class="headerdrecho">Resumen por Competencias</h2>
         <h2 style="font-size: 18px; margin-left: 50px;">{{$categoria->nombre}}</h2>
         <!-- Tabla con los textos de respuestas y una única recta debajo -->
         <table class="table">
@@ -648,11 +659,12 @@
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
                         @if($vinculo->promedio_score > 0)
-                        <div class="@if($index % 6 == 0) blue-line
-                                            @elseif($index % 6 == 1) red-line
-                                            @elseif($index % 6 == 2) green-line
-                                            @elseif($index % 6 == 3) purple-line
-                                            @elseif($index % 6 == 4) orange-line
+                        <div class="@if($index % 7 == 0) blue-line
+                        @elseif($index % 7 == 1) red-line
+                        @elseif($index % 7 == 2) green-line
+                        @elseif($index % 7 == 3) celeste-line
+                        @elseif($index % 7 == 4) purple-line
+                        @elseif($index % 7 == 5) orange-line
                                             @else yellow-line
                                             @endif" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;">
                         </div>
@@ -715,16 +727,14 @@
             <tr>
                 <th></th> <!-- Encabezado de la nueva columna -->
                 <th></th> <!-- Encabezado de la nueva columna -->
-
+        
                 @foreach ($respuestas as $index => $respuesta)
                 <!-- Cada celda tiene un contenedor que ayuda a alinear los segmentos correctamente -->
                 <th>
                     <div style="font-size: 61%; ">{{ $respuesta->texto }}</div>
-
                 </th>
                 @endforeach
                 <th></th>
-
             </tr>
             <tr>
                 <td></td> <!-- Celda vacía para alinear la línea -->
@@ -733,21 +743,18 @@
                         <div style="position: absolute; top: -30px; font-size: 12px; margin-left: 23px;">N</div>
                     </div>
                 </td> <!-- Celda vacía para alinear la línea -->
-
+        
                 <td colspan="{{ count($respuestas) + 1 }}">
                     <div class="line-container" style="height: 20px;">
                         <!-- Cada segmento se posiciona según el porcentaje del ancho total -->
                         <div class="line">
                             @foreach ($respuestas as $index => $respuesta)
                             <!-- Cada segmento se posiciona según el porcentaje del ancho total -->
-
                             <div class="segment seg-{{ $index + 1 }}" style="left: calc({{ (100 / count($respuestas)) * $index }}%);">
                                 <!-- Agregar número al segmento -->
-
                                 <div style="position: absolute; top: -25px; font-size: 12px;">{{ $respuesta->score }}</div>
                             </div>
                             @endforeach
-
                         </div>
                     </div>
                 </td>
@@ -757,6 +764,7 @@
                     </div>
                 </td>
             </tr>
+        
             @foreach ($resultadosPorCategoria[$categoria->id] as $index => $vinculo)
             <tr>
                 <td style="font-size: 61%; text-align: right;">{{ $vinculo->nombre_vinculo }}</td>
@@ -764,37 +772,34 @@
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
                         @if($vinculo->promedio_score > 0)
-                        <div class="@if($index % 6 == 0) blue-line
-                                            @elseif($index % 6 == 1) red-line
-                                            @elseif($index % 6 == 2) green-line
-                                            @elseif($index % 6 == 3) purple-line
-                                            @elseif($index % 6 == 4) orange-line
-                                            @else yellow-line
-                                            @endif" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;">
-                        </div>
-
+                        <!-- Asignar color basado en el mapeo `cargoColores` -->
+                        <div class="{{ $cargoColores[$vinculo->nombre_vinculo] }}" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;"></div>
                         @endif
-
+        
                         @isset($vinculo->Oportunidad_Crítica)
                         @if($vinculo->Oportunidad_Crítica > 0)
                         <div class="number-on-container" style="left: 0%;">{{ $vinculo->Oportunidad_Crítica }}</div>
                         @endif
                         @endisset
+        
                         @isset($vinculo->Debe_Mejorar)
                         @if($vinculo->Debe_Mejorar > 0)
                         <div class="number-on-container" style="left: 25%;">{{ $vinculo->Debe_Mejorar }}</div>
                         @endif
                         @endisset
+        
                         @isset($vinculo->Regular)
                         @if($vinculo->Regular > 0)
                         <div class="number-on-container" style="left: 50%;">{{ $vinculo->Regular }}</div>
                         @endif
                         @endisset
+        
                         @isset($vinculo->Hábil)
                         @if($vinculo->Hábil > 0)
                         <div class="number-on-container" style="left: 75%;">{{ $vinculo->Hábil }}</div>
                         @endif
                         @endisset
+        
                         @isset($vinculo->Destaca)
                         @if($vinculo->Destaca > 0)
                         <div class="number-on-container" style="right: 0%;">{{ $vinculo->Destaca }}</div>
@@ -805,8 +810,6 @@
                 <td style="font-size: 61%; text-align: right">{{ $vinculo->promedio_score }}</td>
             </tr>
             @endforeach
-
-
         </table>
         @php $conteoGraficos++; @endphp
 
@@ -825,17 +828,16 @@
                 <tr>
                     <th></th> <!-- Encabezado de la nueva columna -->
                     <th></th> <!-- Encabezado de la nueva columna -->
-    
+            
                     @foreach ($respuestas as $index => $respuesta)
                     <!-- Cada celda tiene un contenedor que ayuda a alinear los segmentos correctamente -->
                     <th>
-                        <div style="font-size: 61%; ">{{ $respuesta->texto }}</div>
-    
+                        <div style="font-size: 61%;">{{ $respuesta->texto }}</div>
                     </th>
                     @endforeach
                     <th></th>
-    
                 </tr>
+            
                 <tr>
                     <td></td> <!-- Celda vacía para alinear la línea -->
                     <td>
@@ -843,21 +845,18 @@
                             <div style="position: absolute; top: -30px; font-size: 12px; margin-left: 23px;">N</div>
                         </div>
                     </td> <!-- Celda vacía para alinear la línea -->
-    
+            
                     <td colspan="{{ count($respuestas) + 1 }}">
                         <div class="line-container" style="height: 20px;">
                             <!-- Cada segmento se posiciona según el porcentaje del ancho total -->
                             <div class="line">
                                 @foreach ($respuestas as $index => $respuesta)
                                 <!-- Cada segmento se posiciona según el porcentaje del ancho total -->
-    
                                 <div class="segment seg-{{ $index + 1 }}" style="left: calc({{ (100 / count($respuestas)) * $index }}%);">
                                     <!-- Agregar número al segmento -->
-    
                                     <div style="position: absolute; top: -25px; font-size: 12px;">{{ $respuesta->score }}</div>
                                 </div>
                                 @endforeach
-    
                             </div>
                         </div>
                     </td>
@@ -867,46 +866,43 @@
                         </div>
                     </td>
                 </tr>
+            
                 @foreach ($resultadosPorPregunta[$pregunta->id] as $index => $vinculo)
                 <tr>
                     <td style="font-size: 61%; text-align: right;">{{ $vinculo->nombre_vinculo }}</td>
                     <td style="font-size: 61%; text-align: center;">{{ $vinculo->cantidad_respuestas }}</td>
                     <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                         <div class="bar-container">
-                            @if($vinculo->promedio_score > 0)
-                            <div class="@if($index % 6 == 0) blue-line
-                                                @elseif($index % 6 == 1) red-line
-                                                @elseif($index % 6 == 2) green-line
-                                                @elseif($index % 6 == 3) purple-line
-                                                @elseif($index % 6 == 4) orange-line
-                                                @else yellow-line
-                                                @endif" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;">
-                            </div>
-    
+                            @if ($vinculo->promedio_score > 0)
+                            <div class="{{ $cargoColores[$vinculo->nombre_vinculo] }}" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;"></div>
                             @endif
-    
+            
                             @isset($vinculo->Oportunidad_Crítica)
-                            @if($vinculo->Oportunidad_Crítica > 0)
+                            @if ($vinculo->Oportunidad_Crítica > 0)
                             <div class="number-on-container" style="left: 0%;">{{ $vinculo->Oportunidad_Crítica }}</div>
                             @endif
                             @endisset
+            
                             @isset($vinculo->Debe_Mejorar)
-                            @if($vinculo->Debe_Mejorar > 0)
+                            @if ($vinculo->Debe_Mejorar > 0)
                             <div class="number-on-container" style="left: 25%;">{{ $vinculo->Debe_Mejorar }}</div>
                             @endif
                             @endisset
+            
                             @isset($vinculo->Regular)
-                            @if($vinculo->Regular > 0)
+                            @if ($vinculo->Regular > 0)
                             <div class="number-on-container" style="left: 50%;">{{ $vinculo->Regular }}</div>
                             @endif
                             @endisset
+            
                             @isset($vinculo->Hábil)
-                            @if($vinculo->Hábil > 0)
+                            @if ($vinculo->Hábil > 0)
                             <div class="number-on-container" style="left: 75%;">{{ $vinculo->Hábil }}</div>
                             @endif
                             @endisset
+            
                             @isset($vinculo->Destaca)
-                            @if($vinculo->Destaca > 0)
+                            @if ($vinculo->Destaca > 0)
                             <div class="number-on-container" style="right: 0%;">{{ $vinculo->Destaca }}</div>
                             @endif
                             @endisset
@@ -915,8 +911,6 @@
                     <td style="font-size: 61%; text-align: right">{{ $vinculo->promedio_score }}</td>
                 </tr>
                 @endforeach
-    
-    
             </table>
         </div>
         @php $conteoGraficos++; @endphp
@@ -929,7 +923,7 @@
         @endforeach
     </div>
     @endforeach
-    <div class="page-break"></div>
+
 
  {{-- TOP 5 --}}
     @foreach ($enviosPorCargo as $index => $cargos)
@@ -1004,11 +998,12 @@
 
  
 
-    <h2 class="@if($index % 6 == 0) blue-line
-    @elseif($index % 6 == 1) red-line
-    @elseif($index % 6 == 2) green-line
-    @elseif($index % 6 == 3) purple-line
-    @elseif($index % 6 == 4) orange-line
+    <h2 class="@if($index % 7 == 0) blue-line
+    @elseif($index % 7 == 1) red-line
+    @elseif($index % 7 == 2) green-line
+    @elseif($index % 7 == 3) celeste-line
+    @elseif($index % 7 == 4) purple-line
+    @elseif($index % 7 == 5) orange-line
     @else yellow-line
     @endif" style="font-size: 14px;height: 18px; margin-left: 50px; width: 85%;">
         {{ $preg->nombreVinculos }}

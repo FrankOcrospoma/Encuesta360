@@ -11,6 +11,7 @@ class Create extends Component
     use WithFileUploads;
 
     public $nombre;
+    public $descripcion;
     
     protected $rules = [
         'nombre' => 'required|string|max:255',        
@@ -30,6 +31,7 @@ class Create extends Component
         
         Categoria::create([
             'nombre' => $this->nombre,
+            'descripcion' => $this->descripcion,
             'user_id' => auth()->id(),
         ]);
 

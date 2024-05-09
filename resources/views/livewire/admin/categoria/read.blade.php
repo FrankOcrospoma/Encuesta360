@@ -39,6 +39,7 @@
                     <thead>
                         <tr>
                             <th scope="col" style='cursor: pointer' wire:click="sort('nombre')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'nombre') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'nombre') fa-sort-amount-up ml-2 @endif'></i> {{ __('Nombre') }} </th>
+                            <th scope="col" style='cursor: pointer' wire:click="sort('descripcion')"> <i class='fa @if($sortType == 'desc' and $sortColumn == 'descripcion') fa-sort-amount-down ml-2 @elseif($sortType == 'asc' and $sortColumn == 'descripcion') fa-sort-amount-up ml-2 @endif'></i> {{ __('Descripcion') }} </th>
                             
                             @if(getCrudConfig('Categoria')->delete or getCrudConfig('Categoria')->update)
                                 <th scope="col">{{ __('Action') }}</th>

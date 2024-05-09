@@ -27,7 +27,7 @@
                 </li>
 
 
-{{-- 
+
                 @if(hasPermission(getRouteName().'.crud.lists', true))
                 <li class="sidebar-item @isActive([getRouteName().'.crud.lists', getRouteName().'.crud.create'], 'selected')">
                     <a class="sidebar-link @isActive([getRouteName().'.crud.lists', getRouteName().'.crud.create'], 'active') " href="@route(getRouteName().'.crud.lists')" aria-expanded="false">
@@ -35,7 +35,7 @@
                         <span class="hide-menu">{{ __('CRUD Manager') }}</span>
                     </a>
                 </li>
-                @endif --}}
+                @endif
 
                 @if(hasPermission(getRouteName().'.translation', true))
                 <li class="sidebar-item @isActive(getRouteName().'.translation', 'selected')">

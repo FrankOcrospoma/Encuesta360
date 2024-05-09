@@ -136,7 +136,15 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
         justify-content: space-between; 
 
     }
-    
+    .rotate-icon, .rotate-icon-proceso {
+    transition: transform 0.3s ease;
+}
+
+.rotated, .rotated2 {
+    transform: rotate(90deg);
+}
+
+
     
 </style>
 
@@ -394,21 +402,25 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
 <div class="card card-empresa">
     <div class="card-header" id="headingEmpresa{{ $empresaId }}">
             <h5 class="mb-0">
+                
                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseEmpresa{{ $empresaId }}" aria-expanded="false" aria-controls="collapseEmpresa{{ $empresaId }}">
-                    {{ $empresa->nombre ?? 'Empresa no encontrada' }}
+                    <span class="fas fa-chevron-right rotate-icon"></span> {{ $empresa->nombre ?? 'Empresa no encontrada' }}
                 </button>
+                
+                
             </h5>
         </div>
 
-        <div id="collapseEmpresa{{ $empresaId }}" class="collapse" aria-labelledby="headingEmpresa{{ $empresaId }}" data-parent="#accordion">
+        <div id="collapseEmpresa{{ $empresaId }}" class="collapse collapse-empresa" aria-labelledby="headingEmpresa{{ $empresaId }}" data-parent="#accordion">
             <div class="card-body">
                     @foreach($encuestasPorProceso as $proceso => $encuestasDelProceso)
                     <div class="card">
-                        <div class="card-header" id="headingProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}">
+                        <div class="card-header-proceso" id="headingProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" data-toggle="collapse" data-target="#collapseProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" aria-expanded="true" aria-controls="collapseProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}">
-                                    {{ $proceso }}
+                                    <span class="fas fa-chevron-right rotate-icon-proceso"></span> {{ $proceso }}
                                 </button>
+                                
                                 @php
                                 $todasConEnvios = true;
                                 foreach ($encuestasDelProceso as $encuesta) {
@@ -429,7 +441,7 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
                         
                         
 
-                        <div id="collapseProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" class="collapse" aria-labelledby="headingProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" data-parent="#collapseEmpresa{{ $empresaId }}">
+                        <div id="collapseProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" class="collapse collapse-proceso" aria-labelledby="headingProceso{{ $empresaId }}_{{ str_replace(' ', '', $proceso) }}" data-parent="#collapseEmpresa{{ $empresaId }}">
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
@@ -766,17 +778,22 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
 <script>
 $(document).ready(function() {
     $('.collapse').on('show.bs.collapse', function() {
+
         $(this).css({
             'transition': 'height 0.5s ease' // Aumenta el tiempo a 0.75 segundos
         });
     });
 
     $('.collapse').on('hide.bs.collapse', function() {
+
         $(this).css({
             'transition': 'height 0.5s ease' // Aumenta el tiempo a 0.75 segundos
         });
     });
 });
+
+
+
 
 function filterCompanies() {
     var input = document.getElementById("searchInput");
@@ -896,6 +913,29 @@ function enviarTodasEncuestas(encuestaIds) {
         }
     });
 }
+// Íconos de Empresa
+$(document).ready(function() {
+    $('.collapse-empresa').on('show.bs.collapse', function() {
+        var button = $(this).prev('.card-header').find('.rotate-icon');
+        button.addClass('rotated');
+    });
+
+    $('.collapse-empresa').on('hide.bs.collapse', function() {
+        var button = $(this).prev('.card-header').find('.rotate-icon');
+        button.removeClass('rotated');
+    });
+
+    $('.collapse-proceso').on('show.bs.collapse', function() {
+        var button = $(this).prev('.card-header-proceso').find('.rotate-icon-proceso');
+        button.addClass('rotated2');
+    });
+
+    $('.collapse-proceso').on('hide.bs.collapse', function() {
+        var button = $(this).prev('.card-header-proceso').find('.rotate-icon-proceso');
+        button.removeClass('rotated2');
+    });
+});
+
 
 
 

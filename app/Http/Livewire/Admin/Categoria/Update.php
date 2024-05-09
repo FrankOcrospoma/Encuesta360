@@ -13,6 +13,7 @@ class Update extends Component
     public $categoria;
 
     public $nombre;
+    public $descripcion;
     
     protected $rules = [
         'nombre' => 'required|string|max:255',        
@@ -20,7 +21,8 @@ class Update extends Component
 
     public function mount(Categoria $Categoria){
         $this->categoria = $Categoria;
-        $this->nombre = $this->categoria->nombre;        
+        $this->nombre = $this->categoria->nombre;
+        $this->descripcion = $this->categoria->descripcion;        
     }
 
     public function updated($input)
@@ -37,6 +39,7 @@ class Update extends Component
         
         $this->categoria->update([
             'nombre' => $this->nombre,
+            'descripcion' => $this->descripcion,
             'user_id' => auth()->id(),
         ]);
     }

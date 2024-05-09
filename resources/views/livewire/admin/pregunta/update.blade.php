@@ -20,26 +20,28 @@
                 <input type='text' id='input-texto' wire:model.lazy='texto' class="form-control  @error('texto') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('texto') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
+                        <!-- Estado Input -->
+                        <div class='form-group'>
+                            <div class='form-check mt-4 mb-3'>
+                                <input wire:model.lazy='estado' id='input-estado' class='form-check-input' type='checkbox' autocomplete='on'>
+                                <label class='form-check-label' for='input-estado'>{{ __('(Con Respuestas)') }}</label>
+                            </div>
+                            @error('estado') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+                        </div>
             <!-- Categoria Input -->
+            @if($estado) <!-- Asume que 'estado' es un booleano que indica si el checkbox está marcado -->
             <div class='form-group'>
-                <label for='input-categoria' class='col-sm-2 control-label '> {{ __('Categoria') }}</label>
-                <select id='input-categoria' wire:model.lazy='categoria' class="form-control  @error('categoria') is-invalid @enderror">
+                <label for='input-categoria' class='col-sm-2 control-label'> {{ __('Categoria') }}</label>
+                <select id='input-categoria' wire:model.lazy='categoria' class="form-control @error('categoria') is-invalid @enderror">
                     @foreach(getCrudConfig('Pregunta')->inputs()['categoria']['select'] as $key => $value)
                         <option value='{{ $key }}'>{{ $value }}</option>
                     @endforeach
                 </select>
                 @error('categoria') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
-            <!-- Estado Input -->
-            <div class='form-group'>
-                <div class='form-check mt-4 mb-3'>
-                    <input wire:model.lazy='estado' id='input-estado' class='form-check-input ' type='checkbox' autocomplete='on'>
-                    <label class='form-check-label ' for='input-estado'>{{ __('Estado') }}</label>
-                </div>
-                @error('estado') <div class='invalid-feedback'>{{ $message }}</div> @enderror
-            </div>
+            @endif
 
-
+       
         </div>
 
         <div class="card-footer">

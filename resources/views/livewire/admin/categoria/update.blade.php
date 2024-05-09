@@ -20,6 +20,12 @@
                 <input type='text' id='input-nombre' wire:model.lazy='nombre' class="form-control  @error('nombre') is-invalid @enderror" placeholder='' autocomplete='on'>
                 @error('nombre') <div class='invalid-feedback'>{{ $message }}</div> @enderror
             </div>
+            <!-- Descripcion Input -->
+            <div class='form-group'>
+                <label for='input-descripcion' class='col-sm-2 control-label '> {{ __('Descripcion') }}</label>
+                <textarea id="input-descripcion" wire:model.lazy='descripcion' class="form-control  @error('descripcion') is-invalid @enderror" placeholder='' autocomplete='on'></textarea>
+                @error('descripcion') <div class='invalid-feedback'>{{ $message }}</div> @enderror
+            </div>
 
 
         </div>

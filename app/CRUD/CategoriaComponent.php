@@ -25,7 +25,7 @@ class CategoriaComponent implements CRUDComponent
     // which kind of data should be showed in list page
     public function fields()
     {
-        return ['nombre'];
+        return ['nombre', 'descripcion'];
     }
 
     // Searchable fields, if you dont want search feature, remove it
@@ -41,6 +41,7 @@ class CategoriaComponent implements CRUDComponent
     {
         return [
             'nombre' => 'text',
+            'descripcion' => 'textarea',
         ];
     }
 
