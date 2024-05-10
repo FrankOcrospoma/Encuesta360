@@ -383,7 +383,11 @@
         <h1>Informe de Feedback 360</h1>
         <br><br><br><br><br><br><br>
         <h2>{{ ucfirst(\Carbon\Carbon::parse($encuesta->fecha)->locale('es')->isoFormat('MMMM [de] YYYY')) }}</h2>
-
+        @php
+        $indicesPreguntas = [];
+        $numeroGlobalPregunta = 0;
+        @endphp
+        
         <?php
         $nombreCompleto = $evaluado->personal;
         $partes = explode(' ', $nombreCompleto);
@@ -558,31 +562,31 @@
             <tr>
                 <td style="font-size: 61%; text-align: right;">{{ $cargo['cargo'] }}</td>
                 <td style="font-size: 61%; text-align: center;">{{ $cargo['cantidad_envios'] }}</td>
-                <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
+                <td colspan="{{ count($responseNames) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
-                        @if ($cargo['promedio_rango'] > 0)
-                        <div class="@if ($index % 7 == 0) blue-line
-                        @elseif ($index % 7 == 1) red-line
-                        @elseif ($index % 7 == 2) green-line
-                        @elseif ($index % 7 == 3) celeste-line
-                        @elseif ($index % 7 == 4) purple-line
-                        @elseif ($index % 7 == 5) orange-line
-                        @else yellow-line @endif" style="width: {{ (($cargo['promedio_rango'] - 1) * 25.1) }}%;"></div>
+                        @if($cargo['promedio_rango'] > 0)
+                        <div class="@if($index % 7 == 0) blue-line
+                            @elseif($index % 7 == 1) red-line
+                            @elseif($index % 7 == 2) green-line
+                            @elseif($index % 7 == 3) celeste-line
+                            @elseif($index % 7 == 4) purple-line
+                            @elseif($index % 7 == 5) orange-line
+                            @else yellow-line
+                            @endif" style="width: {{ (($cargo['promedio_rango'] - 1) * 25.1) }}%;">
+                        </div>
                         @endif
-            
-                        <!-- Distribuir dinámicamente las cantidades de respuesta -->
-                        @php $leftOffset = 0; @endphp
-                        @foreach ($cargo['respuestas'] as $nombre => $cantidad)
-                            @if ($cantidad > 0)
-                            <div class="number-on-container" style="left: {{ $leftOffset }}%;">{{ $cantidad }}</div>
+        
+                        @foreach ($responseNames as $responseName)
+                            @if ($cargo[$responseName] > 0)
+                                <div class="number-on-container" style="left: {{ (125 / count($responseNames)) * array_search($responseName, $responseNames) }}%;">{{ $cargo[$responseName] }}</div>
                             @endif
-                            @php $leftOffset += 25; @endphp
                         @endforeach
                     </div>
                 </td>
                 <td style="font-size: 61%; text-align: right">{{ $cargo['promedio_rango'] }}</td>
             </tr>
             @endforeach
+        
             
             
             
@@ -777,11 +781,15 @@
 
         @foreach ($preguntas as $index => $pregunta)
         @if ($pregunta->categoria == $categoria->id)
-        @php $numeroPregunta++; @endphp
+            @php
+             $numeroGlobalPregunta++;
+            $indicesPreguntas[$pregunta->id] = $numeroGlobalPregunta;
+           
+            @endphp
         <div class="container">
             
             <div style="height: 25px; margin-left: 50px; font-size: 13px; margin-right: 50px; background-color: rgb(235, 235, 235); padding-top: 1px; padding-bottom: 15px ">
-                <p style="font-size: 12px;">{{ $numeroPregunta }}. {{$pregunta->texto}}</p>
+                <p style="font-size: 12px;">{{ $numeroGlobalPregunta }}. {{$pregunta->texto}}</p>
             </div>
             
       
@@ -828,15 +836,20 @@
                         </div>
                     </td>
                 </tr>
-            
                 @foreach ($resultadosPorPregunta[$pregunta->id] as $index => $vinculo)
                 <tr>
-                    <td style="font-size: 61%; text-align: right;">{{ $vinculo['cargo'] }}</td>
-                    <td style="font-size: 61%; text-align: center;">{{ $vinculo['cantidad_envios'] }}</td>
+                    <td style="font-size: 61%; text-align: right;">{{ $vinculo['nombre_vinculo'] }}</td>
+                    <td style="font-size: 61%; text-align: center;">{{ $vinculo['cantidad_respuestas'] }}</td>
                     <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                         <div class="bar-container">
-                            @if($vinculo['promedio_rango'] > 0)
-                            <div class="{{ $cargoColores[$vinculo['cargo']] }}" style="width: {{ (($vinculo['promedio_rango'] - 1) * 25.1) }}%;"></div>
+                            @if ($vinculo['promedio_score'] > 0)
+                            <div class="@if ($index % 7 == 0) blue-line
+                            @elseif ($index % 7 == 1) red-line
+                            @elseif ($index % 7 == 2) green-line
+                            @elseif ($index % 7 == 3) celeste-line
+                            @elseif ($index % 7 == 4) purple-line
+                            @elseif ($index % 7 == 5) orange-line
+                            @else yellow-line @endif" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
                             @endif
                 
                             <!-- Distribuir dinámicamente las cantidades de respuesta -->
@@ -844,14 +857,16 @@
                             @foreach ($vinculo['respuestas'] as $nombre => $cantidad)
                                 @if ($cantidad > 0)
                                 <div class="number-on-container" style="left: {{ $leftOffset }}%;">{{ $cantidad }}</div>
-                                @php $leftOffset += 25; @endphp
                                 @endif
+                                @php $leftOffset += 25; @endphp
                             @endforeach
                         </div>
                     </td>
-                    <td style="font-size: 61%; text-align: right">{{ $vinculo['promedio_rango'] }}</td>
+                    <td style="font-size: 61%; text-align: right">{{ $vinculo['promedio_score'] }}</td>
                 </tr>
                 @endforeach
+                
+                
                 
             </table>
         </div>
@@ -883,14 +898,14 @@
 
                 <tbody>
                     @if ( $cargos['cargo']!='Group Average')
-                    @foreach ($top5[$cargos['cargo']]  as $index => $top)
+                    @foreach ($top5[$cargos['cargo']] as $index => $top)
                     <tr>
-                        <td>{{ $top->IdPregunta }}</td>
+                        <td>{{ $indicesPreguntas[$top->IdPregunta] ?? 'N/A' }}</td>
                         <td>{{ $top->TextoPregunta }}</td>
                         <td>{{ $top->PromedioScore }}</td>
                     </tr>
-                    
-                    @endforeach
+                @endforeach
+                
                  
                     @endif
                 </tbody>
@@ -905,14 +920,14 @@
 
                 <tbody>
                     @if ( $cargos['cargo']!='Group Average')
-                    @foreach ($Bottom5[$cargos['cargo']]  as $index => $Bottom)
+                    @foreach ($Bottom5[$cargos['cargo']] as $index => $Bottom)
                     <tr>
-                        <td>{{ $Bottom->IdPregunta }}</td>
+                        <td>{{ $indicesPreguntas[$Bottom->IdPregunta] ?? 'N/A' }}</td>
                         <td>{{ $Bottom->TextoPregunta }}</td>
                         <td>{{ $Bottom->PromedioScore }}</td>
                     </tr>
-                   
-                    @endforeach
+                @endforeach
+                
                     @endif
                 </tbody>
             </table>
