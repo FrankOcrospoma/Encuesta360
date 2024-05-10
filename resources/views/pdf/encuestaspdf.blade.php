@@ -947,7 +947,7 @@
 
 @foreach ($preguntasAbiertas->groupBy('preguntaTexto') as $preguntaTexto => $vinculos)
 <div class="container">
-    <h2 class="headerderecho">Comentarios Abiertos</h2>
+    <h2 class="headerdrecho">Comentarios Abiertos</h2>
     <h2 style="font-size: 14px; width: 85%; margin-left: 50px; background-color: gainsboro;">
         {{ $preguntaTexto }}
     </h2>
