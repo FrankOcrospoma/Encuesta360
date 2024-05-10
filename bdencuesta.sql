@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-05-2024 a las 21:03:11
+-- Tiempo de generación: 10-05-2024 a las 04:12:36
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -81,153 +81,31 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerBottom5PorCargo` (IN `encues
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerDatosResumen` (IN `encuesta_id` INT)   BEGIN
-SET SESSION group_concat_max_len = 1000000;
+    SET SESSION group_concat_max_len = 1000000;
 
-SET @sql = NULL;
-SELECT
-  GROUP_CONCAT(DISTINCT
-        CONCAT(
-            'SUM(CASE WHEN r.texto = ''',
-            REPLACE(texto, '''', ''''''),  -- Escape internal single quotes in the text
-            ''' AND r.score != 0 THEN 1 ELSE 0 END) AS `',
-            REPLACE(REPLACE(texto, ' ', '_'), '''', ''),  -- Remove single quotes from field names
-            '`'
-        )
-  ) INTO @sql
-FROM respuestas
-WHERE estado = 1 AND id IN (
-    SELECT dp.respuesta
-    FROM envios e
-    JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
-    JOIN detalle_preguntas dp ON dp.id = pr.detalle
-    JOIN preguntas pre ON pre.id = dp.pregunta
-    WHERE e.encuesta = encuesta_id AND e.estado = 'F'
-);
-
-SET @sql = CONCAT('SELECT 
-    COALESCE(v.nombre, ''Your Average'') AS nombre_vinculo,
-    COALESCE(AVG(r.score),0) AS promedio_score,
-    COUNT(distinct pr.id) AS cantidad_respuestas,
-    ', @sql, ' 
-  FROM vinculos v
-  LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
-  LEFT JOIN personals p ON p.id = ev.evaluador_id
-  LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
-  LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
-  LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
-  LEFT JOIN preguntas pre ON pre.id = dp.pregunta
-  LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
-  WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" and r.estado = 1 and r.score != 0
-  GROUP BY v.nombre WITH ROLLUP
-  UNION ALL
-  SELECT ''Group Average'' AS nombre_vinculo,
-    COALESCE(AVG(r.score),0) AS promedio_score,
-    COUNT(distinct pr.id) AS cantidad_respuestas,
-    ', @sql, '
-  FROM vinculos v
-  LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
-  LEFT JOIN personals p ON p.id = ev.evaluador_id
-  LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
-  LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
-  LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
-  LEFT JOIN preguntas pre ON pre.id = dp.pregunta
-  LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
-  WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" and r.estado = 1 and r.score != 0
-  GROUP BY ''Group Average''
-');
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerResumenEnviosPorCategoria` (IN `categoria_id` INT, IN `encuesta_id` INT)   BEGIN
-SET SESSION group_concat_max_len = 1000000;
-
-SET @sql = NULL;
-SELECT
-  GROUP_CONCAT(DISTINCT
-    CONCAT(
-            'SUM(CASE WHEN r.texto = ''',
-            REPLACE(texto, '''', ''''''),  -- Escape internal single quotes in the text
-            ''' AND r.score != 0 THEN 1 ELSE 0 END) AS `',
-            REPLACE(REPLACE(texto, ' ', '_'), '''', ''),  -- Remove single quotes from field names
-            '`'
-        )
-  ) INTO @sql
-FROM respuestas
-WHERE estado = 1 AND id IN (
-    SELECT dp.respuesta
-    FROM envios e
-    JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
-    JOIN detalle_preguntas dp ON dp.id = pr.detalle
-    JOIN preguntas pre ON pre.id = dp.pregunta
-    WHERE e.encuesta = encuesta_id AND e.estado = 'F' AND pre.categoria = categoria_id 
-);
-
-SET @sql = CONCAT('SELECT 
-    COALESCE(v.nombre, ''Your Average'') AS nombre_vinculo,
-    COALESCE(ROUND(AVG(r.score), 2),0) AS promedio_score,
-    COUNT(distinct pr.id) AS cantidad_respuestas,
-    ', @sql, ' 
-  FROM vinculos v
-  LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
-  LEFT JOIN personals p ON p.id = ev.evaluador_id
-  LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
-  LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
-  LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
-  LEFT JOIN preguntas pre ON pre.id = dp.pregunta
-  LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
-  WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F"  AND r.score != 0 and r.estado = 1 AND pre.categoria = ', categoria_id, ' 
-  GROUP BY v.nombre WITH ROLLUP
-  UNION ALL
-  SELECT ''Group Average'' AS nombre_vinculo,
-    COALESCE(ROUND(AVG(r.score), 2),0) AS promedio_score,
-    COUNT(distinct pr.id) AS cantidad_respuestas,
-    ', @sql, '
-  FROM vinculos v
-  LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
-  LEFT JOIN personals p ON p.id = ev.evaluador_id
-  LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
-  LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
-  LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
-  LEFT JOIN preguntas pre ON pre.id = dp.pregunta
-  LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
-  WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F"  AND r.score != 0 and r.estado = 1 AND pre.categoria = ', categoria_id, '
-  GROUP BY ''Group Average''
-');
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerResumenEnviosPorPregunta` (IN `encuesta_id` INT, IN `pregunta_id` INT)   BEGIN
-        SET SESSION group_concat_max_len = 1000000;
     SET @sql = NULL;
-    
-SELECT
-    GROUP_CONCAT(DISTINCT
-        CONCAT(
-            'SUM(CASE WHEN r.texto = ''',
-            REPLACE(texto, '''', ''''''),  -- Escape internal single quotes in the text
-            ''' AND r.score != 0 THEN 1 ELSE 0 END) AS `',
-            REPLACE(REPLACE(texto, ' ', '_'), '''', ''),  -- Remove single quotes from field names
-            '`'
-        )
-    ) INTO @sql
-    FROM respuestas
-    WHERE estado = 1  AND id IN (
+    SELECT
+        GROUP_CONCAT(DISTINCT
+            CONCAT(
+                'SUM(CASE WHEN r.texto = ''',
+                REPLACE(texto, '''', ''''''),  -- Escapar comillas simples en el texto
+                ''' AND r.score != 0 THEN 1 ELSE 0 END) AS `',
+                REPLACE(REPLACE(texto, ' ', '_'), '''', ''),  -- Eliminar comillas simples de los nombres de campo
+                '`'
+            )
+        ORDER BY r.score ASC  -- Ordenar por score para construir las columnas dinámicas
+        ) INTO @sql
+    FROM respuestas r
+    WHERE r.estado = 1 AND r.score != 0 AND r.id IN (
         SELECT dp.respuesta
         FROM envios e
         JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
         JOIN detalle_preguntas dp ON dp.id = pr.detalle
         JOIN preguntas pre ON pre.id = dp.pregunta
-        WHERE e.encuesta = encuesta_id AND e.estado = 'F' AND pre.id = pregunta_id 
+        WHERE e.encuesta = encuesta_id AND e.estado = 'F' and r.score != 0
     );
 
+    -- Crear la consulta completa utilizando las columnas dinámicas
     SET @sql = CONCAT('SELECT 
         COALESCE(v.nombre, ''Your Average'') AS nombre_vinculo,
         COALESCE(ROUND(AVG(r.score), 2),0) AS promedio_score,
@@ -241,7 +119,134 @@ SELECT
       LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
       LEFT JOIN preguntas pre ON pre.id = dp.pregunta
       LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
-      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" AND r.score != 0 and r.estado = 1 AND pre.id = ', pregunta_id, ' 
+      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" AND r.score != 0 AND r.estado = 1
+      GROUP BY v.nombre WITH ROLLUP
+      UNION ALL
+      SELECT ''Group Average'' AS nombre_vinculo,
+         COALESCE(ROUND(AVG(r.score), 2),0) AS promedio_score,
+        COUNT(distinct pr.id) AS cantidad_respuestas,
+        ', @sql, '
+      FROM vinculos v
+      LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
+      LEFT JOIN personals p ON p.id = ev.evaluador_id
+      LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
+      LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
+      LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
+      LEFT JOIN preguntas pre ON pre.id = dp.pregunta
+      LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
+      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" AND r.score != 0 AND r.estado = 1
+      GROUP BY ''Group Average''
+    ');
+
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerResumenEnviosPorCategoria` (IN `categoria_id` INT, IN `encuesta_id` INT)   BEGIN
+    SET SESSION group_concat_max_len = 1000000;
+
+    -- Crear la consulta para columnas de respuestas ordenadas por score
+    SET @sql = NULL;
+    SELECT
+      GROUP_CONCAT(DISTINCT
+        CONCAT(
+                'SUM(CASE WHEN r.texto = ''',
+                REPLACE(texto, '''', ''''''),  -- Escapar comillas simples en el texto
+                ''' AND r.score != 0 THEN 1 ELSE 0 END) AS `',
+                REPLACE(REPLACE(texto, ' ', '_'), '''', ''),  -- Eliminar comillas simples de los nombres de campo
+                '`'
+            )
+      ORDER BY r.score ASC) INTO @sql  -- Ordenar por el campo score
+    FROM respuestas r
+    WHERE r.estado = 1 AND r.score != 0 AND r.id IN (
+        SELECT dp.respuesta
+        FROM envios e
+        JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
+        JOIN detalle_preguntas dp ON dp.id = pr.detalle
+        JOIN preguntas pre ON pre.id = dp.pregunta
+        WHERE e.encuesta = encuesta_id AND e.estado = 'F' AND pre.categoria = categoria_id AND r.score != 0
+    );
+
+    -- Crear la consulta completa con columnas dinámicas
+    SET @sql = CONCAT('SELECT 
+        COALESCE(v.nombre, ''Your Average'') AS nombre_vinculo,
+        COALESCE(ROUND(AVG(r.score), 2),0) AS promedio_score,
+        COUNT(distinct pr.id) AS cantidad_respuestas,
+        ', @sql, ' 
+      FROM vinculos v
+      LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
+      LEFT JOIN personals p ON p.id = ev.evaluador_id
+      LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
+      LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
+      LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
+      LEFT JOIN preguntas pre ON pre.id = dp.pregunta
+      LEFT JOIN respuestas r ON r.id = dp.respuesta 
+      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" AND r.score != 0 AND r.estado = 1 AND pre.categoria = ', categoria_id, ' 
+      GROUP BY v.nombre WITH ROLLUP
+      UNION ALL
+      SELECT ''Group Average'' AS nombre_vinculo,
+        COALESCE(ROUND(AVG(r.score), 2),0) AS promedio_score,
+        COUNT(distinct pr.id) AS cantidad_respuestas,
+        ', @sql, '
+      FROM vinculos v
+      LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
+      LEFT JOIN personals p ON p.id = ev.evaluador_id
+      LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
+      LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
+      LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
+      LEFT JOIN preguntas pre ON pre.id = dp.pregunta
+      LEFT JOIN respuestas r ON r.id = dp.respuesta
+      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" AND r.score != 0 AND r.estado = 1 AND pre.categoria = ', categoria_id, '
+      GROUP BY ''Group Average''
+    ');
+
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerResumenEnviosPorPregunta` (IN `encuesta_id` INT, IN `pregunta_id` INT)   BEGIN
+    SET SESSION group_concat_max_len = 1000000;
+    SET @sql = NULL;
+
+    -- Preparar la consulta dinámica para contar respuestas específicas basadas en el texto y el score
+    SELECT
+        GROUP_CONCAT(DISTINCT
+            CONCAT(
+                'SUM(CASE WHEN r.texto = ''',
+                REPLACE(texto, '''', ''''''),  -- Escapar comillas simples internas
+                ''' AND r.score != 0 THEN 1 ELSE 0 END) AS `',
+                REPLACE(REPLACE(texto, ' ', '_'), '''', ''),  -- Eliminar comillas simples y espacios para nombres de campo
+                '`'
+            )
+        ORDER BY r.score ASC  -- Ordenar por score para construir las columnas dinámicas
+        ) INTO @sql
+    FROM respuestas r
+    WHERE r.estado = 1 AND r.id IN (
+        SELECT dp.respuesta
+        FROM envios e
+        JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
+        JOIN detalle_preguntas dp ON dp.id = pr.detalle
+        JOIN preguntas pre ON pre.id = dp.pregunta
+        WHERE e.encuesta = encuesta_id AND e.estado = 'F' AND pre.id = pregunta_id AND r.score != 0
+    );
+
+    -- Crear la consulta final agregando las columnas dinámicas
+    SET @sql = CONCAT('SELECT 
+        COALESCE(v.nombre, ''Your Average'') AS nombre_vinculo,
+        COALESCE(ROUND(AVG(r.score), 2),0) AS promedio_score,
+        COUNT(distinct pr.id) AS cantidad_respuestas,
+        ', @sql, ' 
+      FROM vinculos v
+      LEFT JOIN evaluados ev ON v.id = ev.vinculo_id
+      LEFT JOIN personals p ON p.id = ev.evaluador_id
+      LEFT JOIN envios e ON e.encuesta = ev.encuesta_id AND e.persona = p.id
+      LEFT JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
+      LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
+      LEFT JOIN preguntas pre ON pre.id = dp.pregunta
+      LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
+      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" AND r.score != 0 AND r.estado = 1 AND pre.id = ', pregunta_id, ' 
       GROUP BY v.nombre WITH ROLLUP
       UNION ALL
       SELECT ''Group Average'' AS nombre_vinculo,
@@ -256,14 +261,13 @@ SELECT
       LEFT JOIN detalle_preguntas dp ON dp.id = pr.detalle
       LEFT JOIN preguntas pre ON pre.id = dp.pregunta
       LEFT JOIN respuestas r ON r.id = dp.respuesta AND r.estado = 1
-      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F"  AND r.score != 0 and r.estado = 1 AND pre.id = ', pregunta_id, '
+      WHERE e.encuesta = ', encuesta_id, ' AND e.estado = "F" AND r.score != 0 AND r.estado = 1 AND pre.id = ', pregunta_id, '
       GROUP BY ''Group Average''
     ');
 
     PREPARE stmt FROM @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerTop5PorCargo` (IN `encuesta_id` INT, IN `vinculo_id` INT)   BEGIN
@@ -2675,7 +2679,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('FpTGUFMZt5YxPZZdAW1wNK91Q8eTNkAfXzd2LE8M', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoidTNzelJGSjhmeExoN0VpQm50am5zOHVMM1Rvb2JYN3BqQ2hPQ29RMSI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjIxOiJwYXNzd29yZF9oYXNoX3NhbmN0dW0iO3M6NjA6IiQyeSQxMiR4RzhoVTd1SGxMeHN0VHd1OU50N2J1MHAvbmNnNXk5Mi5FUjB5aDR2Q2dBcFhWUnI4dWNaLiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9lbmN1ZXN0YXBkZi80MzIiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1715247212);
+('ExwbArctcYL0s8GeFFbSyIQaX8ZcqUkV153gQVc1', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 OPR/107.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoieERuYm9kSTRMV3JxU21UM1FTWTlUYTBQY1h1ejNFblVhRncwQzlPUyI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2VuY3Vlc3RhcGRmLzQzMiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6MjE6InBhc3N3b3JkX2hhc2hfc2FuY3R1bSI7czo2MDoiJDJ5JDEyJHhHOGhVN3VIbEx4c3RUd3U5TnQ3YnUwcC9uY2c1eTkyLkVSMHloNHZDZ0FwWFZScjh1Y1ouIjt9', 1715307050);
 
 -- --------------------------------------------------------
 
