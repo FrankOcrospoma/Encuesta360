@@ -28,7 +28,7 @@
 
 
 
-                @if(hasPermission(getRouteName().'.crud.lists', true))
+                {{-- @if(hasPermission(getRouteName().'.crud.lists', true))
                 <li class="sidebar-item @isActive([getRouteName().'.crud.lists', getRouteName().'.crud.create'], 'selected')">
                     <a class="sidebar-link @isActive([getRouteName().'.crud.lists', getRouteName().'.crud.create'], 'active') " href="@route(getRouteName().'.crud.lists')" aria-expanded="false">
                         <i data-feather="package" class="feather-icon"></i>
@@ -44,7 +44,7 @@
                         <span class="hide-menu">{{ __('Translation') }}</span>
                     </a>
                 </li>
-                @endif
+                @endif --}}
 
                 {{-- @if(hasPermission(getRouteName().'.role.lists', true))
                 <li class="sidebar-item @isActive([getRouteName().'.role.lists', getRouteName().'.role.create', getRouteName().'.role.update'], 'selected')">
