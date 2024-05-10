@@ -346,14 +346,75 @@ class EncuestaController extends Controller
             $vinculos = Vinculo::all();
 
             $results = DB::select('CALL ObtenerDatosResumen(?)', array($encuestaId));
+            // Inicializar un array para almacenar los resultados categorizados
+            $resultadosPorCategoria = [];
 
+            // Iterar sobre cada categoría para obtener los datos
             foreach ($categorias as $key => $cats) {
-                $resultadosPorCategoria[$cats->id] = DB::select('CALL ObtenerResumenEnviosPorCategoria(?,?)', array($cats->id, $encuestaId));
+                // Ejecutar el procedimiento almacenado con las categorías y la encuesta específica
+                $resultados = DB::select('CALL ObtenerResumenEnviosPorCategoria(?, ?)', [$cats->id, $encuestaId]);
 
+                // Verificar si hay resultados antes de procesar
+                if (count($resultados) > 0) {
+                    // Obtener los nombres de las columnas dinámicas
+                    $columns = array_keys(get_object_vars($resultados[0]));
+                    $responseFields = array_filter($columns, function ($col) {
+                        return !in_array($col, ['nombre_vinculo', 'promedio_score', 'cantidad_respuestas']);
+                    });
+
+                    // Procesar los resultados para esta categoría
+                    $processedResults = [];
+                    foreach ($resultados as $item) {
+                        $data = [
+                            'nombre_vinculo' => $item->nombre_vinculo,
+                            'promedio_score' => number_format($item->promedio_score, 2),
+                            'cantidad_respuestas' => $item->cantidad_respuestas,
+                            'respuestas' => []
+                        ];
+
+                        // Agregar todas las respuestas dinámicas al array de respuestas
+                        foreach ($responseFields as $field) {
+                            $data['respuestas'][$field] = $item->$field ?? 0;
+                        }
+
+                        $processedResults[] = $data;
+                    }
+
+                    // Asignar los resultados procesados a la categoría correspondiente
+                    $resultadosPorCategoria[$cats->id] = $processedResults;
+                }
             }
-            foreach ($preguntas as $key => $pregs) {
-                $resultadosPorPregunta[$pregs->id] = DB::select('CALL ObtenerResumenEnviosPorPregunta(?,?)', array( $encuestaId,$pregs->id));
+    
+
+            foreach ($preguntas as $key => $preg) {
+                $results = DB::select('CALL ObtenerResumenEnviosPorPregunta(?, ?)', [$encuestaId, $preg->id]);
+                if (count($results) > 0) {
+                    // Detectar columnas dinámicas de respuesta
+                    $columns = array_keys(get_object_vars($results[0]));
+                    $responseFields = array_filter($columns, function ($col) {
+                        return !in_array($col, ['nombre_vinculo', 'promedio_score', 'cantidad_respuestas']);
+                    });
+            
+                    // Almacenar los datos
+                    foreach ($results as $item) {
+                        $data = [
+                            'cargo' => $item->nombre_vinculo,
+                            'promedio_rango' => number_format($item->promedio_score, 2),
+                            'cantidad_envios' => $item->cantidad_respuestas,
+                            'respuestas' => []
+                        ];
+            
+                        foreach ($responseFields as $field) {
+                            $data['respuestas'][$field] = $item->$field ?? 0;
+                        }
+            
+                        $resultadosPorPregunta[$preg->id][] = $data;
+                    }
+                } else {
+                    $resultadosPorPregunta[$preg->id] = [];
+                }
             }
+            
             foreach ($vinculos as $key => $vin) {
             
                 $Top5[$vin->nombre]  = DB::select('CALL ObtenerTop5PorCargo(?,?)', array($encuestaId,$vin->id));
@@ -364,19 +425,38 @@ class EncuestaController extends Controller
 
             $Bottom5["Your Average"] = DB::select('CALL ObtenerBottom5PorCargo(?,0)', array($encuestaId));
             // Convertir los resultados a un array asociativo
+
+            // Inicializar un array para los datos de los envíos
             $enviosPorCargoscore = [];
-            foreach ($results as $item) {
-                $enviosPorCargoscore[] = [
-                    'cargo' => $item->nombre_vinculo,
-                    'promedio_rango' => number_format($item->promedio_score, 2), // Formatear a dos decimales
-                    'cantidad_envios' => $item->cantidad_respuestas,
-                    'cantidad_rango_1' => $item->Oportunidad_Crítica ?? 0,
-                    'cantidad_rango_2' => $item->Debe_Mejorar ?? 0,
-                    'cantidad_rango_3' => $item->Regular ?? 0,
-                    'cantidad_rango_4' => $item->Hábil ?? 0,
-                    'cantidad_rango_5' => $item->Destaca ?? 0,
-                ];
+
+            // Obtener todas las posibles respuestas dinámicamente desde los nombres de las columnas
+            if (count($results) > 0) {
+                // Obtener nombres de todas las columnas menos las fijas
+                $columns = array_keys(get_object_vars($results[0]));
+                $responseFields = array_filter($columns, function ($col) {
+                    return !in_array($col, ['nombre_vinculo', 'promedio_score', 'cantidad_respuestas']);
+                });
+
+                // Procesar los resultados
+                foreach ($results as $item) {
+                    $data = [
+                        'cargo' => $item->nombre_vinculo,
+                        'promedio_rango' => number_format($item->promedio_score, 2),
+                        'cantidad_envios' => $item->cantidad_respuestas,
+                        'respuestas' => []
+                    ];
+
+                    // Agregar todas las respuestas dinámicas al array de respuestas
+                    foreach ($responseFields as $field) {
+                        $data['respuestas'][$field] = $item->$field ?? 0;
+                    }
+
+                    $enviosPorCargoscore[] = $data;
+                }
             }
+
+            // dd($resultadosPorCategoria);
+            
 
             $datos = [
                 'encuesta' => $encuesta,

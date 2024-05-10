@@ -560,40 +560,32 @@
                 <td style="font-size: 61%; text-align: center;">{{ $cargo['cantidad_envios'] }}</td>
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
-                        @if($cargo['promedio_rango'] > 0)
-                        <div class="@if($index % 7 == 0) blue-line
-                        @elseif($index % 7 == 1) red-line
-                        @elseif($index % 7 == 2) green-line
-                        @elseif($index % 7 == 3) celeste-line
-                        @elseif($index % 7 == 4) purple-line
-                        @elseif($index % 7 == 5) orange-line
-      @else yellow-line
-      @endif" style="width: {{ (($cargo['promedio_rango'] - 1) * 25.1) }}%;">
-                        </div>
-
+                        @if ($cargo['promedio_rango'] > 0)
+                        <div class="@if ($index % 7 == 0) blue-line
+                        @elseif ($index % 7 == 1) red-line
+                        @elseif ($index % 7 == 2) green-line
+                        @elseif ($index % 7 == 3) celeste-line
+                        @elseif ($index % 7 == 4) purple-line
+                        @elseif ($index % 7 == 5) orange-line
+                        @else yellow-line @endif" style="width: {{ (($cargo['promedio_rango'] - 1) * 25.1) }}%;"></div>
                         @endif
-
-                        <!-- Distribuir las cantidades de rango solo si son mayores que 0 -->
-                        @if($cargo['cantidad_rango_1'] > 0)
-                        <div class="number-on-container" style="left: 0%;">{{ $cargo['cantidad_rango_1'] }}</div>
-                        @endif
-                        @if($cargo['cantidad_rango_2'] > 0)
-                        <div class="number-on-container" style="left: 25%;">{{ $cargo['cantidad_rango_2'] }}</div>
-                        @endif
-                        @if($cargo['cantidad_rango_3'] > 0)
-                        <div class="number-on-container" style="left: 50%;">{{ $cargo['cantidad_rango_3'] }}</div>
-                        @endif
-                        @if($cargo['cantidad_rango_4'] > 0)
-                        <div class="number-on-container" style="left: 75%;">{{ $cargo['cantidad_rango_4'] }}</div>
-                        @endif
-                        @if($cargo['cantidad_rango_5'] > 0)
-                        <div class="number-on-container" style="right: 0%;">{{ $cargo['cantidad_rango_5'] }}</div>
-                        @endif
+            
+                        <!-- Distribuir dinámicamente las cantidades de respuesta -->
+                        @php $leftOffset = 0; @endphp
+                        @foreach ($cargo['respuestas'] as $nombre => $cantidad)
+                            @if ($cantidad > 0)
+                            <div class="number-on-container" style="left: {{ $leftOffset }}%;">{{ $cantidad }}</div>
+                            @endif
+                            @php $leftOffset += 25; @endphp
+                        @endforeach
                     </div>
                 </td>
                 <td style="font-size: 61%; text-align: right">{{ $cargo['promedio_rango'] }}</td>
             </tr>
             @endforeach
+            
+            
+            
 
 
         </table>
@@ -638,7 +630,6 @@
 
                             <div class="segment seg-{{ $index + 1 }}" style="left: calc({{ (100 / count($respuestas)) * $index }}%);">
                                 <!-- Agregar número al segmento -->
-
                                 <div style="position: absolute; top: -25px; font-size: 12px;">{{ $respuesta->score }}</div>
                             </div>
                             @endforeach
@@ -653,54 +644,37 @@
                 </td>
             </tr>
             @foreach ($resultadosPorCategoria[$categoria->id] as $index => $vinculo)
+
             <tr>
-                <td style="font-size: 61%; text-align: right;">{{ $vinculo->nombre_vinculo }}</td>
-                <td style="font-size: 61%; text-align: center;">{{ $vinculo->cantidad_respuestas }}</td>
+                <td style="font-size: 61%; text-align: right;">{{ $vinculo['nombre_vinculo'] }}</td>
+                <td style="font-size: 61%; text-align: center;">{{ $vinculo['cantidad_respuestas'] }}</td>
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
-                        @if($vinculo->promedio_score > 0)
-                        <div class="@if($index % 7 == 0) blue-line
-                        @elseif($index % 7 == 1) red-line
-                        @elseif($index % 7 == 2) green-line
-                        @elseif($index % 7 == 3) celeste-line
-                        @elseif($index % 7 == 4) purple-line
-                        @elseif($index % 7 == 5) orange-line
-                                            @else yellow-line
-                                            @endif" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;">
-                        </div>
-
+                        @if ($vinculo['promedio_score'] > 0)
+                        <div class="@if ($index % 7 == 0) blue-line
+                        @elseif ($index % 7 == 1) red-line
+                        @elseif ($index % 7 == 2) green-line
+                        @elseif ($index % 7 == 3) celeste-line
+                        @elseif ($index % 7 == 4) purple-line
+                        @elseif ($index % 7 == 5) orange-line
+                        @else yellow-line @endif" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
                         @endif
-
-                        @isset($vinculo->Oportunidad_Crítica)
-                        @if($vinculo->Oportunidad_Crítica > 0)
-                        <div class="number-on-container" style="left: 0%;">{{ $vinculo->Oportunidad_Crítica }}</div>
-                        @endif
-                        @endisset
-                        @isset($vinculo->Debe_Mejorar)
-                        @if($vinculo->Debe_Mejorar > 0)
-                        <div class="number-on-container" style="left: 25%;">{{ $vinculo->Debe_Mejorar }}</div>
-                        @endif
-                        @endisset
-                        @isset($vinculo->Regular)
-                        @if($vinculo->Regular > 0)
-                        <div class="number-on-container" style="left: 50%;">{{ $vinculo->Regular }}</div>
-                        @endif
-                        @endisset
-                        @isset($vinculo->Hábil)
-                        @if($vinculo->Hábil > 0)
-                        <div class="number-on-container" style="left: 75%;">{{ $vinculo->Hábil }}</div>
-                        @endif
-                        @endisset
-                        @isset($vinculo->Destaca)
-                        @if($vinculo->Destaca > 0)
-                        <div class="number-on-container" style="right: 0%;">{{ $vinculo->Destaca }}</div>
-                        @endif
-                        @endisset
+            
+                        <!-- Distribuir dinámicamente las cantidades de respuesta -->
+                        @php $leftOffset = 0; @endphp
+                        @foreach ($vinculo['respuestas'] as $nombre => $cantidad)
+                            @if ($cantidad > 0)
+                            <div class="number-on-container" style="left: {{ $leftOffset }}%;">{{ $cantidad }}</div>
+                            @endif
+                            @php $leftOffset += 25; @endphp
+                        @endforeach
                     </div>
                 </td>
-                <td style="font-size: 61%; text-align: right">{{ $vinculo->promedio_score }}</td>
+                <td style="font-size: 61%; text-align: right">{{ $vinculo['promedio_score'] }}</td>
             </tr>
             @endforeach
+            
+            
 
 
         </table>
@@ -766,50 +740,38 @@
             </tr>
         
             @foreach ($resultadosPorCategoria[$categoria->id] as $index => $vinculo)
+            {{-- @php
+                dd($vinculo['nombre_vinculo'] );
+            @endphp --}}
             <tr>
-                <td style="font-size: 61%; text-align: right;">{{ $vinculo->nombre_vinculo }}</td>
-                <td style="font-size: 61%; text-align: center;">{{ $vinculo->cantidad_respuestas }}</td>
+                <td style="font-size: 61%; text-align: right;">{{ $vinculo['nombre_vinculo'] }}</td>
+                <td style="font-size: 61%; text-align: center;">{{ $vinculo['cantidad_respuestas'] }}</td>
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
-                        @if($vinculo->promedio_score > 0)
-                        <!-- Asignar color basado en el mapeo `cargoColores` -->
-                        <div class="{{ $cargoColores[$vinculo->nombre_vinculo] }}" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;"></div>
+                        @if ($vinculo['promedio_score'] > 0)
+                        <div class="@if ($index % 7 == 0) blue-line
+                        @elseif ($index % 7 == 1) red-line
+                        @elseif ($index % 7 == 2) green-line
+                        @elseif ($index % 7 == 3) celeste-line
+                        @elseif ($index % 7 == 4) purple-line
+                        @elseif ($index % 7 == 5) orange-line
+                        @else yellow-line @endif" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
                         @endif
-        
-                        @isset($vinculo->Oportunidad_Crítica)
-                        @if($vinculo->Oportunidad_Crítica > 0)
-                        <div class="number-on-container" style="left: 0%;">{{ $vinculo->Oportunidad_Crítica }}</div>
-                        @endif
-                        @endisset
-        
-                        @isset($vinculo->Debe_Mejorar)
-                        @if($vinculo->Debe_Mejorar > 0)
-                        <div class="number-on-container" style="left: 25%;">{{ $vinculo->Debe_Mejorar }}</div>
-                        @endif
-                        @endisset
-        
-                        @isset($vinculo->Regular)
-                        @if($vinculo->Regular > 0)
-                        <div class="number-on-container" style="left: 50%;">{{ $vinculo->Regular }}</div>
-                        @endif
-                        @endisset
-        
-                        @isset($vinculo->Hábil)
-                        @if($vinculo->Hábil > 0)
-                        <div class="number-on-container" style="left: 75%;">{{ $vinculo->Hábil }}</div>
-                        @endif
-                        @endisset
-        
-                        @isset($vinculo->Destaca)
-                        @if($vinculo->Destaca > 0)
-                        <div class="number-on-container" style="right: 0%;">{{ $vinculo->Destaca }}</div>
-                        @endif
-                        @endisset
+            
+                        <!-- Distribuir dinámicamente las cantidades de respuesta -->
+                        @php $leftOffset = 0; @endphp
+                        @foreach ($vinculo['respuestas'] as $nombre => $cantidad)
+                            @if ($cantidad > 0)
+                            <div class="number-on-container" style="left: {{ $leftOffset }}%;">{{ $cantidad }}</div>
+                            @endif
+                            @php $leftOffset += 25; @endphp
+                        @endforeach
                     </div>
                 </td>
-                <td style="font-size: 61%; text-align: right">{{ $vinculo->promedio_score }}</td>
+                <td style="font-size: 61%; text-align: right">{{ $vinculo['promedio_score'] }}</td>
             </tr>
             @endforeach
+            
         </table>
         @php $conteoGraficos++; @endphp
 
@@ -869,48 +831,28 @@
             
                 @foreach ($resultadosPorPregunta[$pregunta->id] as $index => $vinculo)
                 <tr>
-                    <td style="font-size: 61%; text-align: right;">{{ $vinculo->nombre_vinculo }}</td>
-                    <td style="font-size: 61%; text-align: center;">{{ $vinculo->cantidad_respuestas }}</td>
+                    <td style="font-size: 61%; text-align: right;">{{ $vinculo['cargo'] }}</td>
+                    <td style="font-size: 61%; text-align: center;">{{ $vinculo['cantidad_envios'] }}</td>
                     <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                         <div class="bar-container">
-                            @if ($vinculo->promedio_score > 0)
-                            <div class="{{ $cargoColores[$vinculo->nombre_vinculo] }}" style="width: {{ (($vinculo->promedio_score - 1) * 25.1) }}%;"></div>
+                            @if($vinculo['promedio_rango'] > 0)
+                            <div class="{{ $cargoColores[$vinculo['cargo']] }}" style="width: {{ (($vinculo['promedio_rango'] - 1) * 25.1) }}%;"></div>
                             @endif
-            
-                            @isset($vinculo->Oportunidad_Crítica)
-                            @if ($vinculo->Oportunidad_Crítica > 0)
-                            <div class="number-on-container" style="left: 0%;">{{ $vinculo->Oportunidad_Crítica }}</div>
-                            @endif
-                            @endisset
-            
-                            @isset($vinculo->Debe_Mejorar)
-                            @if ($vinculo->Debe_Mejorar > 0)
-                            <div class="number-on-container" style="left: 25%;">{{ $vinculo->Debe_Mejorar }}</div>
-                            @endif
-                            @endisset
-            
-                            @isset($vinculo->Regular)
-                            @if ($vinculo->Regular > 0)
-                            <div class="number-on-container" style="left: 50%;">{{ $vinculo->Regular }}</div>
-                            @endif
-                            @endisset
-            
-                            @isset($vinculo->Hábil)
-                            @if ($vinculo->Hábil > 0)
-                            <div class="number-on-container" style="left: 75%;">{{ $vinculo->Hábil }}</div>
-                            @endif
-                            @endisset
-            
-                            @isset($vinculo->Destaca)
-                            @if ($vinculo->Destaca > 0)
-                            <div class="number-on-container" style="right: 0%;">{{ $vinculo->Destaca }}</div>
-                            @endif
-                            @endisset
+                
+                            <!-- Distribuir dinámicamente las cantidades de respuesta -->
+                            @php $leftOffset = 0; @endphp
+                            @foreach ($vinculo['respuestas'] as $nombre => $cantidad)
+                                @if ($cantidad > 0)
+                                <div class="number-on-container" style="left: {{ $leftOffset }}%;">{{ $cantidad }}</div>
+                                @php $leftOffset += 25; @endphp
+                                @endif
+                            @endforeach
                         </div>
                     </td>
-                    <td style="font-size: 61%; text-align: right">{{ $vinculo->promedio_score }}</td>
+                    <td style="font-size: 61%; text-align: right">{{ $vinculo['promedio_rango'] }}</td>
                 </tr>
                 @endforeach
+                
             </table>
         </div>
         @php $conteoGraficos++; @endphp
