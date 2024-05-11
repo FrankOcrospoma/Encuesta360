@@ -38,7 +38,7 @@ class Read extends Component
     public function render()
     {
         // Inicia la consulta filtrando por estado true
-        $data = Respuesta::where('estado', true);
+        $data = Respuesta::where('estado', true)->where('vigencia', true);
 
         $instance = getCrudConfig('respuesta');
         if($instance->searchable()){

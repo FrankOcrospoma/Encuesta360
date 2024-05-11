@@ -57,7 +57,7 @@ class FormularioController extends Controller
     }
     public function edit(Formulario $formulario)
     {
-        $preguntas = Pregunta::all(); // Asumiendo que tienes un modelo Pregunta
+        $preguntas = Pregunta::where('vigencia',1)->get(); // Asumiendo que tienes un modelo Pregunta
         return view('livewire.admin.formulario.update', compact('formulario', 'preguntas'));
     }
 

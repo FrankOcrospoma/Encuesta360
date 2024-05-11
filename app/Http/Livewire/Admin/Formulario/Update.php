@@ -45,7 +45,7 @@ class Update extends Component
 
     public function render()
     {
-        $preguntas = Pregunta::all();
+        $preguntas = Pregunta::where('vigencia',1)->get();
         $idDelFormulario = $this->formulario->id;
         $forms = Formulario::where('id', $idDelFormulario)->get();
         $detalles = [];

@@ -28,7 +28,7 @@ $preguntas = Pregunta::select('preguntas.*')
 
 
 $formulario = Formulario::where('id', $encuesta->formulario_id)->first(); 
-$respuestas = Respuesta::all();
+$respuestas = Respuesta::where('vigencia',1)->get();
 
 ?>
 

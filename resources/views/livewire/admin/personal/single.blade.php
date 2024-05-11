@@ -8,7 +8,7 @@ use App\Models\Personal;
 use App\Models\Vinculo;
 
 use App\Models\Empresa; 
-$empresas = Empresa::all();
+$empresas = Empresa::where('estado',1)->get();
 $vinculados = Evaluado::where('empresa_id', $empresa->id)->where('encuesta_id', null)->get();
 
 $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
@@ -16,7 +16,7 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
                         ->whereNotNull('encuesta_id')
                         ->orderBy('encuesta_id', 'desc')
                         ->get();
-$vinculos = Vinculo::all();
+$vinculos = Vinculo::where('vigencia',1)->get();
 
 $detalle = Detalle_empresa::where('empresa_id', $empresa->id)->get(); 
 $personalIds = $detalle->pluck('personal_id'); 

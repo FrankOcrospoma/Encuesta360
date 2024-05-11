@@ -9,7 +9,7 @@ class Respuesta extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['texto','score','estado'];
+    protected $fillable = ['texto','score','estado', 'vigencia'];
     public function __toString()
     {
         return $this->texto; 

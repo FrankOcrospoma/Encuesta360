@@ -9,7 +9,7 @@ class Categoria extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['nombre','descripcion'];
+    protected $fillable = ['nombre','descripcion', 'vigencia'];
     public function __toString()
     {
         return $this->nombre; // Devuelve el nombre de la categoría al convertir a cadena

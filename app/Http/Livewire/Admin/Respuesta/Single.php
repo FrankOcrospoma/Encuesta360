@@ -17,8 +17,8 @@ class Single extends Component
 
     public function delete()
     {
-        $this->respuesta->detallesPregunta()->delete();
-        $this->respuesta->delete();
+        $this->respuesta->vigencia = false;
+        $this->respuesta->save();
         $this->dispatchBrowserEvent('show-message', ['type' => 'error', 'message' => __('DeletedMessage', ['name' => __('Respuesta') ]) ]);
         $this->emit('respuestaDeleted');
     }

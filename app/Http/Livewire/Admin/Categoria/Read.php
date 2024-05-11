@@ -36,7 +36,7 @@ class Read extends Component
 
     public function render()
     {
-        $data = Categoria::query();
+        $data = Categoria::where('vigencia', true); 
 
         $instance = getCrudConfig('categoria');
         if($instance->searchable()){

@@ -16,7 +16,8 @@ class Single extends Component
 
     public function delete()
     {
-        $this->vinculo->delete();
+        $this->vinculo->vigencia = false;
+        $this->vinculo->save();
         $this->dispatchBrowserEvent('show-message', ['type' => 'error', 'message' => __('DeletedMessage', ['name' => __('Vinculo') ]) ]);
         $this->emit('vinculoDeleted');
     }

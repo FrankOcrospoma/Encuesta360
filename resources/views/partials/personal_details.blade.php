@@ -328,7 +328,7 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
                 <!-- Empresa Input -->
                 @php
                 use App\Models\Empresa; 
-                    $empresas = Empresa::all();
+                    $empresas = Empresa::where('estado',1)->get();
                 @endphp
                 <div class='form-group'>
                     <label for='input-empresa' class='col-sm-2 control-label'>{{ __('Empresa') }} <span style="color: red" class="required" >*</span></label>

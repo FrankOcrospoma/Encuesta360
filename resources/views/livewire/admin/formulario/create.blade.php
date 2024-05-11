@@ -3,7 +3,7 @@
 use App\Models\Pregunta;
 
 
-$preguntas = Pregunta::all();
+$preguntas = Pregunta::where('vigencia',1)->get();
 
 
 ?>
@@ -58,7 +58,7 @@ $preguntas = Pregunta::all();
                 <div class='form-group'>
                     <label>{{ __('Respuestas') }}</label>
                     <div>
-                        @foreach(App\Models\Respuesta::where('estado', 1)->get() as $respuesta)
+                        @foreach(App\Models\Respuesta::where('estado', 1)->where('vigencia', 1)->get() as $respuesta)
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="respuestas[]" value="{{ $respuesta->id }}">
                                 <label class="form-check-label">

@@ -15,12 +15,12 @@ use App\Models\Evaluado;
 use App\Models\Detalle_empresa;
 
 
-$preguntas = Pregunta::all();
-$respuestas = Respuesta::all()->take(5); 
+$preguntas = Pregunta::where('vigencia',1)->get();
+$respuestas = Respuesta::where('vigencia',1)->get();
 $formularios = Formulario::where('estado', true)->get()->keyBy('id');
 $usuarios = Personal::where('estado', true)->get();
 $encuestas = Encuesta::with('evaluados.personal')->get();
-$vinculos = Vinculo::all();
+$vinculos = Vinculo::where('vigencia',1)->get();
 $evals = Evaluado::all();
 $envios = Envio::all();
 $empresas = Empresa::where('estado',1)->get();

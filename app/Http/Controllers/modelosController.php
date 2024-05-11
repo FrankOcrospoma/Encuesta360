@@ -59,7 +59,7 @@ class ModelosController extends Controller
             $detalle = Detalle_empresa::where('empresa_id', $empresaId)->get(); 
             $personalIds = $detalle->pluck('personal_id'); 
             $personal = Personal::whereIn('id', $personalIds)->get(); 
-            $vinculos = Vinculo::all();
+            $vinculos = Vinculo::where('vigencia',1)->get();
             $empresa = Empresa::findOrFail($empresaId); 
             $vinculados = Evaluado::where('empresa_id', $empresaId)->where('encuesta_id', null)->get();
 

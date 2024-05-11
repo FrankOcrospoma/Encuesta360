@@ -36,7 +36,7 @@ class Read extends Component
 
     public function render()
     {
-        $data = Pregunta::query();
+        $data = Pregunta::where('vigencia', true); 
 
         $instance = getCrudConfig('pregunta');
         if($instance->searchable()){

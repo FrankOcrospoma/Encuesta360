@@ -16,7 +16,8 @@ class Single extends Component
 
     public function delete()
     {
-        $this->categoria->delete();
+        $this->categoria->vigencia = false;
+        $this->categoria->save();
         $this->dispatchBrowserEvent('show-message', ['type' => 'error', 'message' => __('DeletedMessage', ['name' => __('Categoria') ]) ]);
         $this->emit('categoriaDeleted');
     }

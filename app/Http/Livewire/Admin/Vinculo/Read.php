@@ -36,7 +36,7 @@ class Read extends Component
 
     public function render()
     {
-        $data = Vinculo::query();
+        $data = Vinculo::where('vigencia', true); 
 
         $instance = getCrudConfig('vinculo');
         if($instance->searchable()){

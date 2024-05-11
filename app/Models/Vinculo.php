@@ -9,7 +9,7 @@ class Vinculo extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['nombre' ];
+    protected $fillable = ['nombre', 'vigencia' ];
     public function __toString()
     {
         return $this->nombre; 

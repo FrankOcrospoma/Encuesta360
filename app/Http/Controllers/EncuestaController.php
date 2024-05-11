@@ -124,9 +124,9 @@ class EncuestaController extends Controller
             }
             
 
-        $usuarios = Personal::all();
-        $vinculos = Vinculo::all();
-        $empresas = Empresa::all(); // Asegúrate de tener este modelo y consulta disponibles.
+        $usuarios = Personal::where('estado',1)->get();
+        $vinculos = Vinculo::where('vigencia',1)->get();
+        $empresas = Empresa::where('estado',1)->get();// Asegúrate de tener este modelo y consulta disponibles.
 
         return view('admin::encuestas', compact('encuesta', 'per', 'preguntasEncuesta', 'vinculos', 'empresas', 'evaluados','usuarios','id'));
     }
@@ -343,7 +343,7 @@ class EncuestaController extends Controller
             $envios = Envio::with('persona')
                 ->where('encuesta', $encuestaId)
                 ->get();
-            $vinculos = Vinculo::all();
+            $vinculos = Vinculo::where('vigencia',1)->get();
 
             $results = DB::select('CALL ObtenerDatosResumen(?)', array($encuestaId));
             $enviosPorCargoscore = [];
@@ -529,7 +529,7 @@ class EncuestaController extends Controller
                                 ->whereNotNull('encuesta_id')
                                 ->orderBy('encuesta_id', 'desc')
                                 ->get();
-        $vinculos = Vinculo::all();
+        $vinculos = Vinculo::where('vigencia',1)->get();
 
         $detalle = Detalle_empresa::where('empresa_id', $empresaId)->get(); 
         $personalIds = $detalle->pluck('personal_id'); 
