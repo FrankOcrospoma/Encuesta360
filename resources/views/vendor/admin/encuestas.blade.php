@@ -17,8 +17,8 @@ use App\Models\Detalle_empresa;
 
 $preguntas = Pregunta::all();
 $respuestas = Respuesta::all()->take(5); 
-$formularios = Formulario::all()->keyBy('id');
-$usuarios = Personal::all();
+$formularios = Formulario::where('estado', true)->get()->keyBy('id');
+$usuarios = Personal::where('estado', true)->get();
 $encuestas = Encuesta::with('evaluados.personal')->get();
 $vinculos = Vinculo::all();
 $evals = Evaluado::all();
@@ -232,20 +232,18 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
                 
                 
                <!-- Evaluados Input -->
-                <div class='form-group'>
-                    <label for='input-evaluados' class='form-label'>{{ __('Evaluado') }}  <span style="color: red" class="required" >*</span></label>
-
-                    <div class="d-flex" >
-       
+               <div class='form-group'>
+                <label for='input-evaluados' class='form-label'>{{ __('Evaluado') }}  <span style="color: red" class="required" >*</span></label>
+                <div class="row">
+                    <div class="col-md-8 col-12">
                         <select name='evaluado' id='input-evaluados' class="form-control @error('evaluado') is-invalid @enderror">
                             @isset($evaluados)
                                 @foreach($usuarios as $usuario)
                                 <option value='{{ $usuario->id }}' {{ $per !== null && $usuario->id == $per->id ? 'selected' : '' }}>
                                     {{ $usuario->nombre }}
                                 </option>
-                                
                                 @endforeach
-    
+            
                             @else
                                 @foreach($usuarios as $usuario)
                                 <option value='{{ $usuario->id }}'>
@@ -254,14 +252,14 @@ $emp = Empresa::where('id', auth()->user()->empresa_id)->first();
                                 @endforeach
                             @endisset
                         </select>
-     
-                       
-                            <button class="btn btn-outline-secondary ml-2" type="button" onclick="añadirEvaluado()">Añadir</button>
-                            <button type="button" class="btn btn-outline-primary ml-2" onclick="añadirTodosLosEvaluados()" style="height: 38px; width: 180px">Añadir Todos</button>
-
-
+                    </div>
+                    <div class="col-md-4 col-12 mt-md-0 mt-2 text-md-left text-center">
+                        <button class="btn btn-outline-secondary" type="button" onclick="añadirEvaluado()">Añadir</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="añadirTodosLosEvaluados()" style="height: 38px; width: 180px">Añadir Todos</button>
                     </div>
                 </div>
+            </div>
+            
 
                 <div id="lista-evaluados" class="mt-3">
                     <ul class="list-group" id="lista-evaluados-ul">
@@ -1218,10 +1216,36 @@ document.getElementById('lista-evaluados').addEventListener('click', function(ev
 }
 
 function quitarEvaluador(element) {
-    var evaluadoId = $(element).data('evaluado-id');
+    var evaluadorId = $(element).data('evaluado-id');
+    var personaId = $(element).closest('[id^="lista-evaluadores-ul-"]').attr('id').split('-').pop();
+    var nombreEvaluador = $(element).parent().find('.col-3:first').text();
+    var selectEvaluadores = document.getElementById('input-evaluadores-' + personaId);
+
+    // Crear nueva opción para el select
+    var newOption = document.createElement('option');
+    newOption.value = evaluadorId;
+    newOption.text = nombreEvaluador;
+    selectEvaluadores.appendChild(newOption);
+
+    // Reordenar las opciones del select alfabéticamente, si necesario
+    $(selectEvaluadores).html($('option', selectEvaluadores).sort(function(a, b) {
+        return a.text == b.text ? 0 : a.text < b.text ? -1 : 1;
+    }));
+
+    // Remover el elemento de la lista
     $(element).closest('div.list-group-item').remove();
-    actualizarIndices(personaId); // Llama a la función para actualizar índices tras eliminar un elemento
+
+    // Actualizar los índices
+    actualizarIndices(personaId);
+
+    // Actualizar el componente select2 para reflejar el cambio
+    $(selectEvaluadores).select2({
+        placeholder: "Seleccione una opción",
+        allowClear: true,
+        width: '100%'
+    });
 }
+
 
 function actualizarIndices(personaId) {
     var listaEvaluadores = document.getElementById('lista-evaluadores-ul-' + personaId);

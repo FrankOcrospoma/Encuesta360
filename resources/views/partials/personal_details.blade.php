@@ -20,19 +20,11 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
     <div class="col-md-4 d-flex justify-content-between align-items-center">
         <button id="btnCrearPersonal" onclick="abrirModalcrear()" class="btn btn-success">Crear {{ __('Personal')}}</button>
         <button  id="btnVinculos" onclick="mostrarVinculos()" class="btn btn-primary mt-3">Vínculos</button>
-        @if(getCrudConfig('Personal')->searchable())
-            <div class="col-md-4">
-                <div class="input-group">
-                    <input type="text" class="form-control" @if(config('easy_panel.lazy_mode')) wire:model.lazy="search" @else wire:model="search" @endif placeholder="{{ __('Search') }}" value="{{ request('search') }}">
-                    <div class="input-group-append">
-                        <button class="btn btn-default">
-                            <a wire:target="search" wire:loading.remove><i class="fa fa-search"></i></a>
-                            <a wire:loading wire:target="search"><i class="fas fa-spinner fa-spin" ></i></a>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        @endif
+        <div class="col-md-4 input-group">
+            <input type="text" id="searchInputPersonal" class="form-control" placeholder="Buscar Personas..." onkeyup="filterPeople()">
+            <span class="input-group-text"><i class="fa fa-search"></i></span>
+        </div>
+
     </div>
 
     <br>
@@ -76,7 +68,7 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
             </thead>
             <tbody>
                 @foreach ($personal as $persona)
-                <tr >
+                <tr id="persona_{{ $persona->id }}"> <!-- Agrega este ID único -->
                     <td class="">{{ $persona->dni }}</td>
                     <td class="">{{ $persona->nombre }}</td>
                     <td class="">{{ $persona->cargo }}</td>
@@ -421,4 +413,6 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
             width: '100%'
         });
     });
+
+
 </script>

@@ -9,7 +9,7 @@ class Formulario extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['id','detalle_id', 'nombre'];
+    protected $fillable = ['id','detalle_id', 'nombre', 'estado'];
     public function __toString()
     {
         return $this->nombre; 

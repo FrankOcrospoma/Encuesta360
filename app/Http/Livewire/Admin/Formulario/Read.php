@@ -36,7 +36,7 @@ class Read extends Component
 
     public function render()
     {
-        $data = Formulario::query();
+        $data = Formulario::where('estado', true);  // Filtra solo los formularios activos
     
         $instance = getCrudConfig('formulario');
         if ($instance->searchable()) {
@@ -63,8 +63,6 @@ class Read extends Component
     
         // Obtenemos los formularios sin duplicados basados en el ID
         $data = $data->get()->unique('id');
-    
-
     
         return view('livewire.admin.formulario.read', [
             'formularios' => $data

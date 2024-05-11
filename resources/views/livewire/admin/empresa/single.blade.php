@@ -627,4 +627,21 @@ function recuperarUltimosVinculos() {
             });
         $('.select2-container--default .select2-selection--single').css({'height': '100%'});
     });
+        function filterPeople() {
+    var input = document.getElementById("searchInputPersonal");
+    var filter = input.value.toUpperCase();
+    var table = document.querySelector("#personalList .table"); // Selección específica de la tabla dentro de #personalList
+    var rows = table.getElementsByTagName("tr");
+    for (var i = 0; i < rows.length; i++) {
+        var tdNombre = rows[i].getElementsByTagName("td")[1]; // Cambia el índice según la posición del nombre en la fila
+        if (tdNombre) {
+            var txtValue = tdNombre.textContent || tdNombre.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+}
 </script>

@@ -16,7 +16,8 @@ class Single extends Component
 
     public function delete()
     {
-        $this->formulario->delete();
+        $this->formulario->estado = false;
+        $this->formulario->save();
         $this->dispatchBrowserEvent('show-message', ['type' => 'error', 'message' => __('DeletedMessage', ['name' => __('Formulario') ]) ]);
         $this->emit('formularioDeleted');
     }
