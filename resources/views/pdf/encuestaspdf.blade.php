@@ -648,22 +648,15 @@
                 </td>
             </tr>
             @foreach ($resultadosPorCategoria[$categoria->id] as $index => $vinculo)
-
             <tr>
                 <td style="font-size: 61%; text-align: right;">{{ $vinculo['nombre_vinculo'] }}</td>
                 <td style="font-size: 61%; text-align: center;">{{ $vinculo['cantidad_respuestas'] }}</td>
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
                         @if ($vinculo['promedio_score'] > 0)
-                        <div class="@if ($index % 7 == 0) blue-line
-                        @elseif ($index % 7 == 1) red-line
-                        @elseif ($index % 7 == 2) green-line
-                        @elseif ($index % 7 == 3) celeste-line
-                        @elseif ($index % 7 == 4) purple-line
-                        @elseif ($index % 7 == 5) orange-line
-                        @else yellow-line @endif" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
+                        <div class="{{ $cargoColores[$vinculo['nombre_vinculo']] ?? 'default-color' }}" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
                         @endif
-            
+                
                         <!-- Distribuir dinámicamente las cantidades de respuesta -->
                         @php $leftOffset = 0; @endphp
                         @foreach ($vinculo['respuestas'] as $nombre => $cantidad)
@@ -744,24 +737,15 @@
             </tr>
         
             @foreach ($resultadosPorCategoria[$categoria->id] as $index => $vinculo)
-            {{-- @php
-                dd($vinculo['nombre_vinculo'] );
-            @endphp --}}
             <tr>
                 <td style="font-size: 61%; text-align: right;">{{ $vinculo['nombre_vinculo'] }}</td>
                 <td style="font-size: 61%; text-align: center;">{{ $vinculo['cantidad_respuestas'] }}</td>
                 <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                     <div class="bar-container">
                         @if ($vinculo['promedio_score'] > 0)
-                        <div class="@if ($index % 7 == 0) blue-line
-                        @elseif ($index % 7 == 1) red-line
-                        @elseif ($index % 7 == 2) green-line
-                        @elseif ($index % 7 == 3) celeste-line
-                        @elseif ($index % 7 == 4) purple-line
-                        @elseif ($index % 7 == 5) orange-line
-                        @else yellow-line @endif" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
+                        <div class="{{ $cargoColores[$vinculo['nombre_vinculo']] ?? 'default-color' }}" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
                         @endif
-            
+                
                         <!-- Distribuir dinámicamente las cantidades de respuesta -->
                         @php $leftOffset = 0; @endphp
                         @foreach ($vinculo['respuestas'] as $nombre => $cantidad)
@@ -843,15 +827,9 @@
                     <td colspan="{{ count($respuestas) }}" style="position: relative; padding: 0;">
                         <div class="bar-container">
                             @if ($vinculo['promedio_score'] > 0)
-                            <div class="@if ($index % 7 == 0) blue-line
-                            @elseif ($index % 7 == 1) red-line
-                            @elseif ($index % 7 == 2) green-line
-                            @elseif ($index % 7 == 3) celeste-line
-                            @elseif ($index % 7 == 4) purple-line
-                            @elseif ($index % 7 == 5) orange-line
-                            @else yellow-line @endif" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
+                            <div class="{{ $cargoColores[$vinculo['nombre_vinculo']] ?? 'default-color' }}" style="width: {{ (($vinculo['promedio_score'] - 1) * 25.1) }}%;"></div>
                             @endif
-                
+                    
                             <!-- Distribuir dinámicamente las cantidades de respuesta -->
                             @php $leftOffset = 0; @endphp
                             @foreach ($vinculo['respuestas'] as $nombre => $cantidad)
@@ -865,9 +843,7 @@
                     <td style="font-size: 61%; text-align: right">{{ $vinculo['promedio_score'] }}</td>
                 </tr>
                 @endforeach
-                
-                
-                
+                   
             </table>
         </div>
         @php $conteoGraficos++; @endphp
