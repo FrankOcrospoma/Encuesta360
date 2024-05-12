@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-05-2024 a las 01:22:11
+-- Tiempo de generación: 12-05-2024 a las 08:25:02
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.1.25
 
@@ -93,17 +93,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerDatosResumen` (IN `encuesta_
                 REPLACE(REPLACE(texto, ' ', '_'), '''', ''),  -- Eliminar comillas simples de los nombres de campo
                 '`'
             )
-        ORDER BY r.score ASC  -- Ordenar por score para construir las columnas dinámicas
-        ) INTO @sql
+       ORDER BY r.score ASC) INTO @sql  -- Ordenar por el campo score
     FROM respuestas r
-    WHERE r.estado = 1 AND r.score != 0 AND r.id IN (
-        SELECT dp.respuesta
-        FROM envios e
-        JOIN persona_respuestas pr ON pr.encuesta_id = e.encuesta AND pr.persona = e.persona
-        JOIN detalle_preguntas dp ON dp.id = pr.detalle
-        JOIN preguntas pre ON pre.id = dp.pregunta
-        WHERE e.encuesta = encuesta_id AND e.estado = 'F' and r.score != 0
-    );
+    left join detalle_preguntas dp on dp.respuesta = r.id
+    left join formularios form on form.detalle_id = dp.id
+    left join encuestas enc on enc.formulario_id = form.id
+
+    WHERE r.estado = 1 AND r.score != 0 and enc.id = encuesta_id;
 
     -- Crear la consulta completa utilizando las columnas dinámicas
     SET @sql = CONCAT('SELECT 
@@ -2676,7 +2672,10 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('0coLFAkoEmBAMXc01QxziBgv7TZRo8WagGK65TuA', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiOVdwYUxjR0lROWpmNGFEbENRV01tN0dad05aQ1lzM3RMdnBPUk5jdCI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozMDoiaHR0cDovL2xvY2FsaG9zdC9hZG1pbi92aW5jdWxvIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1715469677);
+('0coLFAkoEmBAMXc01QxziBgv7TZRo8WagGK65TuA', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiOVdwYUxjR0lROWpmNGFEbENRV01tN0dad05aQ1lzM3RMdnBPUk5jdCI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozMDoiaHR0cDovL2xvY2FsaG9zdC9hZG1pbi92aW5jdWxvIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1715469677),
+('ASzYoz55Lb3sVzAc1CwQl5px1kaEEu94KR7t8aDt', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZHhYMXA5WHZHWWhvbDBhajJwRTllV1EzbVBRc1NXYVFSNk5veUNNVCI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozMDoiaHR0cDovL2xvY2FsaG9zdC9hZG1pbi92aW5jdWxvIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1715478831),
+('cgbmMzMTwZuGKBle2e02KNvWm4bjAxOfIo7NlbL1', 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 OPR/109.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiWHpkWE9WUXpjT0pJY2RFdnI0Wk1tR25OMVlobUJIVnk2Z3psNTI0NCI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjIxOiJwYXNzd29yZF9oYXNoX3NhbmN0dW0iO3M6NjA6IiQyeSQxMiR4RzhoVTd1SGxMeHN0VHd1OU50N2J1MHAvbmNnNXk5Mi5FUjB5aDR2Q2dBcFhWUnI4dWNaLiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly9sb2NhbGhvc3QvZW5jdWVzdGFwZGYvMzA5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1715495050),
+('v5RPAF2enSPI4wj06ikdiXrdxakuVKz0E46xbgnU', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiU2VDRFR6QWJkNEJSRnVETFVqQlF3TDBTWDFPc0xUQ3IwbEJpWld1MiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjI6Imh0dHA6Ly9sb2NhbGhvc3QvbG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1715494311);
 
 -- --------------------------------------------------------
 
