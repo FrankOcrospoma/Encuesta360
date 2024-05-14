@@ -36,11 +36,10 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-])->group(function () {
+])->group(function () { 
     Route::get('/admin', function () {
         return view('admin::home');
     })->name('admin');
-    // Route::get('/admin', [LoginController::class, 'index'])->name('admin');
 
     Route::get('/encuestas', function () {
         return view('admin::encuestas');
