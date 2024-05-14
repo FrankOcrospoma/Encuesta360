@@ -16,7 +16,7 @@ use App\Models\Detalle_empresa;
 use App\Models\Personal; // Asegúrate de que el namespace sea correcto para tu modelo.
 use App\Models\Envio; // Asegúrate de que el namespace sea correcto para tu modelo.
 use Illuminate\Support\Str; // Aquí se agrega la importación correcta
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use App\Models\Persona_respuesta;
 use App\Models\Empresa;
 

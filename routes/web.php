@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Encuesta;
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use App\Http\Controllers\EncuestaController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\RespuestasController;
