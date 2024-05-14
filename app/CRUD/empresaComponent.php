@@ -6,7 +6,7 @@ use EasyPanel\Contracts\CRUDComponent;
 use EasyPanel\Parsers\Fields\Field;
 use App\Models\Empresa;
 
-class EmpresaComponent implements CRUDComponent
+class empresaComponent implements CRUDComponent
 {
     public $create = true;
     public $delete = true;
