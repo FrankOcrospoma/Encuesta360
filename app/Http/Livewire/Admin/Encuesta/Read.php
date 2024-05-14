@@ -38,7 +38,7 @@ class Read extends Component
     {
         $data = Encuesta::query();
 
-        $instance = getCrudConfig('encuesta');
+        $instance = getCrudConfig('Encuesta');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){

@@ -42,7 +42,7 @@ class Read extends Component
         $personalIds = $detalle->pluck('personal_id'); 
         $query = Personal::whereIn('id', $personalIds);
     
-        $instance = getCrudConfig('personal');
+        $instance = getCrudConfig('Personal');
         if ($instance->searchable()) {
             $searchableFields = (array) $instance->searchable();
             $query->where(function (Builder $query) use ($searchableFields) {

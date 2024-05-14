@@ -38,7 +38,7 @@ class Read extends Component
     {
         $data = Empresa::query();
 
-        $instance = getCrudConfig('empresa');
+        $instance = getCrudConfig('Empresa');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){

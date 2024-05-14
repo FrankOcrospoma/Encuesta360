@@ -38,7 +38,7 @@ class Read extends Component
     {
         $data = Envio::query();
 
-        $instance = getCrudConfig('envio');
+        $instance = getCrudConfig('Envio');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){

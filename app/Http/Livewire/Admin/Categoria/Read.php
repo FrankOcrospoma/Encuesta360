@@ -38,7 +38,7 @@ class Read extends Component
     {
         $data = Categoria::where('vigencia', true); 
 
-        $instance = getCrudConfig('categoria');
+        $instance = getCrudConfig('Categoria');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){

@@ -38,7 +38,7 @@ class Read extends Component
     {
         $data = Cargo::query();
 
-        $instance = getCrudConfig('cargo');
+        $instance = getCrudConfig('Cargo');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){

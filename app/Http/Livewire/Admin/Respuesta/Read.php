@@ -40,7 +40,7 @@ class Read extends Component
         // Inicia la consulta filtrando por estado true
         $data = Respuesta::where('estado', true)->where('vigencia', true);
 
-        $instance = getCrudConfig('respuesta');
+        $instance = getCrudConfig('Respuesta');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){

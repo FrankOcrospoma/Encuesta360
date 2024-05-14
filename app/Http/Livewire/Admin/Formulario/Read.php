@@ -38,7 +38,7 @@ class Read extends Component
     {
         $data = Formulario::where('estado', true);  // Filtra solo los formularios activos
     
-        $instance = getCrudConfig('formulario');
+        $instance = getCrudConfig('Formulario');
         if ($instance->searchable()) {
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array) {
