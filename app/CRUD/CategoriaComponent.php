@@ -34,9 +34,7 @@ class CategoriaComponent implements CRUDComponent
         return ['nombre'];
     }
 
-    // Write every fields in your db which you want to have a input
-    // Available types : "ckeditor", "checkbox", "text", "select", "file", "textarea"
-    // "password", "number", "email", "select", "date", "datetime", "time"
+
     public function inputs()
     {
         return [
