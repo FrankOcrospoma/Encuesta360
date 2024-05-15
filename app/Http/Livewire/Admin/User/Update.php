@@ -5,7 +5,7 @@ namespace App\Http\Livewire\Admin\User;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-
+use Illuminate\Support\Facades\Hash;
 class Update extends Component
 {
     use WithFileUploads;
@@ -46,7 +46,7 @@ class Update extends Component
         $this->user->update([
             'name' => $this->name,
             'email' => $this->email,
-            'password' => $this->password,
+            'password' => Hash::make($this->password),
             'empresa_id' => $this->empresa_id,
             'user_id' => auth()->id(),
         ]);
