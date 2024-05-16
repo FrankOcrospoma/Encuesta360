@@ -186,7 +186,7 @@ $respuestas = Respuesta::where('vigencia',1)->get();
 
                                        ?>
                                         
-                                        <?php foreach ($detalles as $detalle) ?>
+                                        <?php foreach ($detalles as $detalle): ?>
                                         <?php
                                         $respuesta = Respuesta::find($detalle->respuesta);
                                         $score = $respuesta->score; // Suponemos que cada respuesta tiene un 'score' asociado
@@ -195,21 +195,20 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                             <input type="radio" name="detalle[{{ $pregunta->id }}]" value="{{ $detalle->id }}"
                                                 class="form-check-input" id="detalle{{ $detalle->id }}"
                                                 required {{ $respuestaGuardada && $respuestaGuardada->detalle == $detalle->id ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="detalle{{ $detalle->id }}">
-                                                    {{ $respuesta->texto }}
-                                                    <span id="stars{{ $detalle->id }}">
-                                                        <?php for ($i = 0; $i < $score; $i++) ?>
-                                                            <i class="bi bi-star-fill"></i> <!-- Estrellas llenas ahora en gris -->
-                                                            <?php endfor ?>
-                                                            <?php ($i = $score; $i < 5; $i++) ?>
-                                                            <i class="bi bi-star" style="color: #ccc;"></i> <!-- Estrellas vacías -->
-                                                            <?php endfor?>
-                                                    </span>
-                                                </label>
-                                                
+                                            <label class="form-check-label" for="detalle{{ $detalle->id }}">
+                                                {{ $respuesta->texto }}
+                                                <span id="stars{{ $detalle->id }}">
+                                                    <?php for ($i = 0; $i < $score; $i++): ?>
+                                                        <i class="bi bi-star-fill"></i> <!-- Estrellas llenas ahora en gris -->
+                                                    <?php endfor ?>
+                                                    <?php for ($i = $score; $i < 5; $i++): ?>
+                                                        <i class="bi bi-star" style="color: #ccc;"></i> <!-- Estrellas vacías -->
+                                                    <?php endfor ?>
+                                                </span>
+                                            </label>
                                         </div>
-                                        <?php endforeach ?>
-
+                                    <?php endforeach ?>
+                                    
                                   
                                     </div>
                                 </div>
