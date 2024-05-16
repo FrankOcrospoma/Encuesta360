@@ -57,7 +57,6 @@ Route::middleware([
 
     Route::post('/encuestas', [EncuestaController::class, 'store'])->name('encuestas.store');
 
-    Route::post('/guardar-respuestas', [RespuestasController::class, 'store'])->name('guardar.respuestas');
 
 
     Route::get('/enviar-encuesta/{id}', [EncuestaController::class, 'enviarEncuesta'])->name('enviar.encuesta');
@@ -88,7 +87,8 @@ Route::middleware([
     Route::get('/admin/formulario/update/{formulario}', [FormularioController::class, 'edit'])->name('formularios.edit');
     Route::put('/formularios/{formulario}', [FormularioController::class, 'update'])->name('formularios.update');
     Route::get('/obtener-evaluados/{empresaId}/{perid}',  [EncuestaController::class, 'obtenerEvaluados'])->name('obtener-evaluados');
-    Route::post('/continuar-encuesta/{uuid}',  [EncuestaController::class, 'continuarEncuesta'])->name('continuar.encuesta');
 });
 
 Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder'])->name('encuestas.responder');
+Route::post('/guardar-respuestas', [RespuestasController::class, 'store'])->name('guardar.respuestas');
+Route::post('/continuar-encuesta/{uuid}',  [EncuestaController::class, 'continuarEncuesta'])->name('continuar.encuesta');
