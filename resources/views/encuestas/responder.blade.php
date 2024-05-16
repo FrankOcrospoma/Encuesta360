@@ -170,7 +170,7 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                 </h2>
                                 <div id="collapse<?php echo $index; ?>" class="accordion-collapse" aria-labelledby="heading<?php echo $index; ?>" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
-                                        @php
+                                        <?php
                                         $detalles = Detalle_Pregunta::join('formularios', 'formularios.detalle_id', '=', 'detalle_preguntas.id')->join('respuestas', 'respuestas.id', '=', 'detalle_preguntas.respuesta')
                                             ->where('detalle_preguntas.pregunta', $pregunta->id)
                                             ->where('formularios.id', $formulario->id)
@@ -184,12 +184,12 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                            $query->select('id')->from('detalle_preguntas')->where('pregunta', $pregunta->id);
                                        })->first();
 
-                                        @endphp
+                                       ?>
                                         @foreach ($detalles as $detalle)
-                                        @php
+                                        <?php
                                         $respuesta = Respuesta::find($detalle->respuesta);
                                         $score = $respuesta->score; // Suponemos que cada respuesta tiene un 'score' asociado
-                                        @endphp
+                                        ?>
                                         <div class="form-check">
                                             <input type="radio" name="detalle[{{ $pregunta->id }}]" value="{{ $detalle->id }}"
                                                 class="form-check-input" id="detalle{{ $detalle->id }}"
@@ -219,7 +219,7 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                         {{-- Mostrar preguntas abiertas --}}
                         @foreach ($preguntas->where('estado', false) as $pregunta)
                 
-                            @php
+                        <?php
                             // Obtener la respuesta guardada si existe
                             $respuestaGuardada = Persona_Respuesta::where('persona', $envio->persona)
                                         ->where('encuesta_id', $envio->encuesta)
@@ -237,7 +237,7 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                                             ->select('respuestas.*')  // Selecciona todos los campos de detalle_preguntas
                                                             ->first();
 }
-                            @endphp
+?>
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading<?php echo $index; ?>">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
