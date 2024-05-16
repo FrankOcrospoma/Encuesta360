@@ -17,10 +17,9 @@ class Create extends Component
     public $estado=true;
     
     protected $rules = [
-        'ruc' => 'required|string|max:11',
+
         'nombre' => 'max:100',
-        'direccion' => 'max:200',
-        'representante' => 'max:200',        
+     
     ];
 
     public function updated($input)
