@@ -54,28 +54,28 @@ $respuestas = Respuesta::where('vigencia',1)->get();
             background-color: var(--color-light);
         }
         .bi-star-fill {
-    color: #ccc; /* Cambiar el color a gris claro */
-}
+                color: #ccc; /* Cambiar el color a gris claro */
+            }
 
-        .form-check-label {
-    display: flex;
-    align-items: center;
-}
-.bi-star-fill.amarillo {
-    color: #ffc107; /* Amarillo */
-}
+                    .form-check-label {
+                display: flex;
+                align-items: center;
+            }
+            .bi-star-fill.amarillo {
+                color: #ffc107; /* Amarillo */
+            }
 
 
-.form-check-label i {
-    margin-left: 5px; /* Espaciado entre texto y estrellas */
-}
+            .form-check-label i {
+                margin-left: 5px; /* Espaciado entre texto y estrellas */
+            }
 
-    .categoria-titulo {
-        font-size: 1.5rem; /* Tamaño de fuente */
-        font-weight: bold; /* Negrita */
-        color: var(--color-primary); /* Color primario */
-        margin-top: 2rem; /* Margen superior */
-    }
+                .categoria-titulo {
+                    font-size: 1.5rem; /* Tamaño de fuente */
+                    font-weight: bold; /* Negrita */
+                    color: var(--color-primary); /* Color primario */
+                    margin-top: 2rem; /* Margen superior */
+                }
 
 
         .accordion-item {
@@ -155,7 +155,7 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                         <?php $index = 1; ?>
                         <?php $currentCategoria = null; ?>
                         {{-- Mostrar preguntas de opción múltiple --}}
-                        @foreach ($preguntas->where('estado', true) as $pregunta)
+                        <?php foreach ($preguntas->where('estado', true) as $pregunta)?>
                             <?php
                             if ($currentCategoria != $pregunta->Categoria) {
                                 $currentCategoria = $pregunta->Categoria;
@@ -185,7 +185,8 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                        })->first();
 
                                        ?>
-                                        @foreach ($detalles as $detalle)
+                                        
+                                        <?php foreach ($detalles as $detalle) ?>
                                         <?php
                                         $respuesta = Respuesta::find($detalle->respuesta);
                                         $score = $respuesta->score; // Suponemos que cada respuesta tiene un 'score' asociado
@@ -207,17 +208,17 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                                 </label>
                                                 
                                         </div>
-                                        @endforeach
+                                        <?php endforeach ?>
 
                                   
                                     </div>
                                 </div>
                             </div>
                             <?php $index++; ?>
-                        @endforeach
+                        <?php endforeach ?>
                         <h2 class='categoria-titulo'>Preguntas Abiertas</h2>
                         {{-- Mostrar preguntas abiertas --}}
-                        @foreach ($preguntas->where('estado', false) as $pregunta)
+                        <?php foreach ($preguntas->where('estado', false) as $pregunta) ?>
                 
                         <?php
                             // Obtener la respuesta guardada si existe
@@ -236,8 +237,8 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                                             ->where('detalle_preguntas.id', $respuestaGuardada->detalle)
                                                             ->select('respuestas.*')  // Selecciona todos los campos de detalle_preguntas
                                                             ->first();
-}
-?>
+                                }
+                                ?>
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="heading<?php echo $index; ?>">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $index; ?>" aria-expanded="true" aria-controls="collapse<?php echo $index; ?>">
@@ -252,7 +253,7 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                 </div>
                             </div>
                             <?php $index++; ?>
-                        @endforeach
+                            <?php endforeach ?>
                     </div>
                     
                     <div class="text-center mt-4">
