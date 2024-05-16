@@ -7,6 +7,7 @@ use App\Models\Envio;
 use App\Models\Formulario;
 use App\Models\Detalle_Pregunta;
 use App\Models\Persona_Respuesta;
+use Illuminate\Support\Facades\DB;
 
 $uuid = request()->segment(3);
 $envio = Envio::where('uuid', $uuid)->first();
@@ -160,9 +161,10 @@ $respuestas = Respuesta::where('vigencia', 1)->get();
                                 <div id="collapse{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $index }}" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
                                         @php
-                                        $detalles = Detalle_Pregunta::where('detalle_preguntas.pregunta', $pregunta->id)
+                                        $detalles = DB::table('detalle_preguntas')
                                             ->join('formularios', 'formularios.detalle_id', '=', 'detalle_preguntas.id')
                                             ->join('respuestas', 'respuestas.id', '=', 'detalle_preguntas.respuesta')
+                                            ->where('detalle_preguntas.pregunta', $pregunta->id)
                                             ->where('formularios.id', $formulario->id)
                                             ->select('detalle_preguntas.*')
                                             ->orderBy('respuestas.score')
