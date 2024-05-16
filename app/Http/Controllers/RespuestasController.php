@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Persona_Respuesta; 
+use App\Models\Persona_respuesta; 
 use App\Models\Envio; 
 use App\Models\Respuesta; 
 
-use App\Models\Detalle_Pregunta;
+use App\Models\Detalle_pregunta;
 use Illuminate\Support\Facades\DB; // Importar Facade para las transacciones
 
 class RespuestasController extends Controller
@@ -27,14 +27,14 @@ class RespuestasController extends Controller
             $totalScore = 0;
             // dd($respuestasAbiertas);
             // Eliminar respuestas anteriores para evitar duplicados
-            Persona_Respuesta::where('persona', $personaId)
+            Persona_respuesta::where('persona', $personaId)
                              ->where('encuesta_id', $envio->encuesta)
                              ->delete();
     
             // Primero procesar respuestas predefinidas
             foreach ($respuestas as $preguntaId => $detallePreguntaId) {
                 if (!is_null($detallePreguntaId)) {
-                    $detalle = Detalle_Pregunta::find($detallePreguntaId);
+                    $detalle = Detalle_pregunta::find($detallePreguntaId);
                     if ($detalle) {
                         $respuesta = Respuesta::find($detalle->respuesta);
                         $totalScore += $respuesta->score;
@@ -57,7 +57,7 @@ class RespuestasController extends Controller
                         'estado' => false,
                     ]);
     
-                    $detalle = Detalle_Pregunta::create([
+                    $detalle = Detalle_pregunta::create([
                         'pregunta' => $preguntaId,
                         'respuesta' => $nuevaRespuesta->id,
                     ]);
@@ -67,7 +67,7 @@ class RespuestasController extends Controller
                         $detalle->save();
     
                         // También registrar esta respuesta en persona_respuestas
-                        Persona_Respuesta::create([
+                        Persona_respuesta::create([
                             'persona' => $personaId,
                             'detalle' => $detalle->id, 
                             'encuesta_id' => $envio->encuesta,
