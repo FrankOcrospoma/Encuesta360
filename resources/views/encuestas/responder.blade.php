@@ -198,12 +198,12 @@ $respuestas = Respuesta::where('vigencia',1)->get();
                                                 <label class="form-check-label" for="detalle{{ $detalle->id }}">
                                                     {{ $respuesta->texto }}
                                                     <span id="stars{{ $detalle->id }}">
-                                                        @for ($i = 0; $i < $score; $i++)
+                                                        <?php for ($i = 0; $i < $score; $i++) ?>
                                                             <i class="bi bi-star-fill"></i> <!-- Estrellas llenas ahora en gris -->
-                                                        @endfor
-                                                        @for ($i = $score; $i < 5; $i++)
+                                                            <?php endfor ?>
+                                                            <?php ($i = $score; $i < 5; $i++) ?>
                                                             <i class="bi bi-star" style="color: #ccc;"></i> <!-- Estrellas vacías -->
-                                                        @endfor
+                                                            <?php endfor?>
                                                     </span>
                                                 </label>
                                                 
