@@ -160,9 +160,9 @@ $respuestas = Respuesta::where('vigencia', 1)->get();
                                 <div id="collapse{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $index }}" data-bs-parent="#accordionExample">
                                     <div class="accordion-body">
                                         @php
-                                        $detalles = Detalle_Pregunta::join('formularios', 'formularios.detalle_id', '=', 'detalle_preguntas.id')
+                                        $detalles = Detalle_Pregunta::where('detalle_preguntas.pregunta', $pregunta->id)
+                                            ->join('formularios', 'formularios.detalle_id', '=', 'detalle_preguntas.id')
                                             ->join('respuestas', 'respuestas.id', '=', 'detalle_preguntas.respuesta')
-                                            ->where('detalle_preguntas.pregunta', $pregunta->id)
                                             ->where('formularios.id', $formulario->id)
                                             ->select('detalle_preguntas.*')
                                             ->orderBy('respuestas.score')
