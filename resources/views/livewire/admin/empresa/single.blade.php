@@ -181,7 +181,42 @@
         </td>
     @endif
 </tr>
-  
+@if(session('error'))
+<!-- Modal de Error -->
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">Error de Importación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ session('error') }}
+                <form id="addVinculoForm" action="{{ route('agregar.vinculo') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="nombre" id="vinculoNombre" value="{{ session('vinculo_nombre') }}">
+                    <input type="hidden" name="empresa_id" value="{{ session('empresa_id') }}">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="addVinculoButton">Agregar Vínculo y Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@if(session()->has('success'))
+    <div class="alert alert-success">
+        {{ session()->get('success') }}
+    </div>
+    {{ session()->forget('success') }}
+@endif
+
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 
@@ -393,7 +428,7 @@ function agregarPersonalATabla(personal) {
             $('#confirmDeleteModal').modal('hide');
             
             $.ajax({
-                url: "/persona/delete/" + personaId,
+                url: "/persona/delete/" + personaId + "/" + empresaId,
                 type: "GET",
                 success: function(response) {
                     if(response.success) {
@@ -644,4 +679,18 @@ function recuperarUltimosVinculos() {
         }
     }
 }
+</script>
+<!-- Incluir los scripts de jQuery y Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        @if(session('error'))
+            $('#errorModal').modal('show');
+        @endif
+
+        $('#addVinculoButton').click(function() {
+            $('#addVinculoForm').submit();
+        });
+    });
 </script>

@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
 <!-- CSS de Bootstrap -->
+<!-- jQuery -->
+
 
 <?php
 use App\Models\Evaluado;
@@ -28,7 +30,6 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
     </div>
 
     <br>
-    
     <form action="{{ route('importar.personas') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="empresa_id" value="{{ $empresa->id }}">
@@ -45,11 +46,8 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
     </form>
 
 
-    @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-    @endif
+
+    
 
     @endif
 
@@ -392,7 +390,6 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
-
 <script>
     $(document).ready(function() {
     
@@ -416,3 +413,4 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
 
 
 </script>
+    

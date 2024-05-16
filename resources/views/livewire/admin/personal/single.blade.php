@@ -277,7 +277,7 @@ $personals = Personal::whereIn('id', $personalIds)->get();
                 
             
 
-                <button class="btn text-danger mt-1" onclick="confirmDelete({{ $personal->id }}, this)">
+                <button class="btn text-danger mt-1" onclick="confirmDelete({{ $personal->id }}, {{ auth()->user()->empresa_id }}, this)">
                     <i class="icon-trash"></i>
                 </button>
                 
@@ -433,12 +433,12 @@ function enviarDatos(empresaId) {
     
 </script>
 <script>
-    function confirmDelete(personaId, element) {
+    function confirmDelete(personaId, empid, element) {
     $('#deleteConfirmButton').off('click').on('click', function() {
         $('#confirmDeleteModal').modal('hide');
 
         $.ajax({
-            url: "/persona/delete/" + personaId,
+            url: "/persona/delete/" + personaId + "/" +empid ,
             type: "GET",
             success: function(response) {
                 if(response.success) {

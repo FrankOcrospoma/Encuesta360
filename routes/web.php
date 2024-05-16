@@ -69,9 +69,12 @@ Route::middleware([
     Route::post('/empresa/updateEstado/{id}', [ModelosController::class, 'updateEstadoEmpresa'])->name('empresa.updateEstado');
     Route::get('/empresa/personal/{empresaId}', [ModelosController::class, 'personal'])->name('empresa.personal');
     Route::post('/empresa/personal/', [PersonasEmpresaController::class, 'store'])->name('personals.create');
-    Route::get('/persona/delete/{id}', [PersonasEmpresaController::class, 'eliminar'])->name('persona.delete');
+    Route::get('/persona/delete/{id}/{empresaid}', [PersonasEmpresaController::class, 'eliminar'])->name('persona.delete');
     Route::get('/personal/editar/{id}', [PersonasEmpresaController::class, 'editar'])->name('personal.editar');
     Route::post('/importar-personas', [PersonasEmpresaController::class, 'importarPersonas'])->name('importar.personas');
+    Route::post('/agregar-vin', [PersonasEmpresaController::class, 'agregarVin'])->name('agregar.vinculo');
+
+
     Route::get('/encuestas/{id}/edit', [EncuestaController::class, 'edit'])->name('encuestas.edit');
     Route::put('/encuestas', [EncuestaController::class, 'store'])->name('encuestas.update');
     Route::get('/encuestas/destroy/{id}', [EncuestaController::class, 'destroy'])->name('encuestas.destroy');
