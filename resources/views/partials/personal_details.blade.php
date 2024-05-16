@@ -332,7 +332,7 @@ $ultimosVin = Evaluado::with(['evaluador', 'vinculo'])
                     <label for='input-empresa' class='col-sm-2 control-label'>{{ __('Empresa') }} <span style="color: red" class="required" >*</span></label>
                     <select disabled id='input-empresa' name='empresa' class="form-control @error('empresa') is-invalid @enderror">
                         @foreach($empresas as $key => $value)
-                            <option value='{{ $key }}' {{ $empresa->id == $key ? 'selected' : '' }}>{{ $value }}</option>
+                            <option value='{{ $key }}' {{ $empresa->id == $value->id ? 'selected' : '' }}>{{ $value }}</option>
                         @endforeach
                     </select>
                     @error('empresa') <div class='invalid-feedback'>{{ $message }}</div> @enderror
