@@ -9,6 +9,7 @@ class Detalle_pregunta extends Model
 {
     public $timestamps = false;
     use HasFactory;
+    protected $table = 'detalle_preguntas';
     protected $fillable = ['pregunta', 'respuesta'];
     public function __toString()
     {
