@@ -171,16 +171,16 @@ $respuestas = Respuesta::where('vigencia', 1)->get();
                                             ->get();
 
                                         // Obtener la respuesta guardada si existe
-                                        $respuestaGuardada = Persona_Respuesta::where('persona', $envio->persona)
-                                            ->where('encuesta_id', $envio->encuesta)
-                                            ->whereIn('detalle', function($query) use ($pregunta) {
+                                        $respuestaGuardada = DB::table('persona_respuestas')->where('persona_respuestas.persona', $envio->persona)
+                                            ->where('persona_respuestas.encuesta_id', $envio->encuesta)
+                                            ->whereIn('persona_respuestas.detalle', function($query) use ($pregunta) {
                                                 $query->select('id')->from('detalle_preguntas')->where('pregunta', $pregunta->id);
                                             })->first();
                                         @endphp
                                         
                                         @foreach ($detalles as $detalle)
                                             @php
-                                            $respuesta = Respuesta::find($detalle->respuesta);
+                                            $respuesta = DB::table('respuestas')->find($detalle->respuesta);
                                             $score = $respuesta->score; // Suponemos que cada respuesta tiene un 'score' asociado
                                             @endphp
                                             <div class="form-check">
@@ -210,9 +210,9 @@ $respuestas = Respuesta::where('vigencia', 1)->get();
                         @foreach ($preguntas->where('estado', false) as $pregunta)
                             @php
                             // Obtener la respuesta guardada si existe
-                            $respuestaGuardada = Persona_Respuesta::where('persona', $envio->persona)
-                                ->where('encuesta_id', $envio->encuesta)
-                                ->whereIn('detalle', function($query) use ($pregunta) {
+                            $respuestaGuardada =DB::table('persona_respuestas')->('persona_respuestas.persona', $envio->persona)
+                                ->where('persona_respuestas.encuesta_id', $envio->encuesta)
+                                ->whereIn('persona_respuestas.detalle', function($query) use ($pregunta) {
                                     $query->select('id')->from('detalle_preguntas')->where('pregunta', $pregunta->id);
                                 })->first();
 
@@ -221,7 +221,7 @@ $respuestas = Respuesta::where('vigencia', 1)->get();
 
                             // Verifica si se encontró una respuesta guardada antes de intentar acceder a la propiedad 'detalle'
                             if ($respuestaGuardada) {
-                                $respuestatexto = Respuesta::join('detalle_preguntas', 'respuestas.id', '=', 'detalle_preguntas.respuesta')
+                                $respuestatexto = DB::table('respuestas')->join('detalle_preguntas', 'respuestas.id', '=', 'detalle_preguntas.respuesta')
                                     ->where('detalle_preguntas.id', $respuestaGuardada->detalle)
                                     ->select('respuestas.*')
                                     ->first();
