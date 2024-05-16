@@ -63,7 +63,7 @@ Route::middleware([
     Route::get('/enviar-encuesta/{id}', [EncuestaController::class, 'enviarEncuesta'])->name('enviar.encuesta');
     Route::post('/enviar-todas-encuestas', [EncuestaController::class, 'enviarTodasEncuestas'])->name('enviar-todas-encuestas');
 
-    Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder'])->name('encuestas.responder');
+
 
     Route::post('/personal/updateEstado/{id}', [ModelosController::class, 'updateEstadoPersona'])->name('personal.updateEstado');
     Route::post('/empresa/updateEstado/{id}', [ModelosController::class, 'updateEstadoEmpresa'])->name('empresa.updateEstado');
@@ -90,3 +90,5 @@ Route::middleware([
     Route::get('/obtener-evaluados/{empresaId}/{perid}',  [EncuestaController::class, 'obtenerEvaluados'])->name('obtener-evaluados');
     Route::post('/continuar-encuesta/{uuid}',  [EncuestaController::class, 'continuarEncuesta'])->name('continuar.encuesta');
 });
+
+Route::get('/encuestas/responder/{uuid}', [EncuestaController::class, 'responder'])->name('encuestas.responder');

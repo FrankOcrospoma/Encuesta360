@@ -1119,10 +1119,23 @@ function actualizarIndicesEvaluados() {
 function añadirEvaluado() {
     var selectEvaluados = document.getElementById('input-evaluados');
     var formularioSelect = document.getElementById('input-formulario');
+
+    // Verificar si se ha seleccionado una opción en ambos selects
+    if (selectEvaluados.selectedIndex === -1) {
+        alert("Por favor, selecciona un evaluado.");
+        return;
+    }
+    if (formularioSelect.selectedIndex === -1) {
+        alert("Por favor, selecciona un formulario.");
+        return;
+    }
+
     var evaluadorId = selectEvaluados.value;
     var evaluadorNombre = selectEvaluados.options[selectEvaluados.selectedIndex].text;
     var formularioId = formularioSelect.value;
     var formularioTexto = formularioSelect.options[formularioSelect.selectedIndex].text;
+
+    console.log(evaluadorId);
 
     var evaluadorYaAgregado = false;
     document.querySelectorAll('#lista-evaluados input[type="hidden"]').forEach(function(input) {
