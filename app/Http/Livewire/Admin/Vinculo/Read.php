@@ -38,7 +38,7 @@ class Read extends Component
     {
         $data = Vinculo::where('vigencia', true); 
 
-        $instance = getCrudConfig('vinculo');
+        $instance = getCrudConfig('Vinculo');
         if($instance->searchable()){
             $array = (array) $instance->searchable();
             $data->where(function (Builder $query) use ($array){
